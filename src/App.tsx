@@ -4,6 +4,7 @@ import LandingPage from './components/page/LandingPage';
 function App() {
   const [landingPage, setLandingPage] = useState(true);
 
+
   useEffect(() => {
     const stored = localStorage.getItem('landingPage');
     if (stored) {
@@ -12,6 +13,7 @@ function App() {
   }, []);
 
   return <div>{landingPage && <LandingPage />}</div>;
+
 }
 
 export default App;
