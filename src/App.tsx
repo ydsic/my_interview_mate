@@ -7,7 +7,7 @@ function App() {
     <>
       <Nav />
 
-      <div className="flex items-center justify-center min-h-screen bg-[#f5f7fa]">
+      <div className="flex items-center justify-center h-[93vh] bg-[#f5f7fa]">
         <div className="text-center space-y-5">
           <h2 className="text-3xl font-semibold text-gray-800">
             AI와 함께하는
