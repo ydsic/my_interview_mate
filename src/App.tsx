@@ -1,19 +1,18 @@
 import { useEffect, useState } from 'react';
-import LandingPage from './components/page/LandingPage';
+import FirstLandingPage from './components/page/FirstLandingPage';
+import Nav from './components/page/Nav';
 
 function App() {
-  const [landingPage, setLandingPage] = useState(true);
-
+  const [firstLandingPage, setFirstLandingPage] = useState(true);
 
   useEffect(() => {
-    const stored = localStorage.getItem('landingPage');
+    const stored = localStorage.getItem('firstLandingPage');
     if (stored) {
-      setLandingPage(JSON.parse(stored));
+      setFirstLandingPage(JSON.parse(stored));
     }
   }, []);
 
-  return <div>{landingPage && <LandingPage />}</div>;
-
+  return <div>{firstLandingPage && <FirstLandingPage />}</div>;
 }
 
 export default App;
