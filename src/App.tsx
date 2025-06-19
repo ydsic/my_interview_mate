@@ -1,9 +1,8 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import MainPage from './page/MainPage';
-import StyleTest from './page/styleTest';
+import StyleTest from './page/StyleTest';
 import LoginPage from './page/LoginPage';
 import MyPage from './page/MyPage';
-
 
 export default function App() {
   return (
