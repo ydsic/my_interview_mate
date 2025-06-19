@@ -13,8 +13,6 @@ export default function MainPage() {
     }
   }, []);
 
-  useEffect(() => {}, [firstLandingPage]);
-
   return (
     <>
       {firstLandingPage ? (
