@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import FirstLandingPage from './components/page/FirstLandingPage';
-import Nav from './components/page/Nav';
+import FirstLandingPage from './page/FirstLandingPage';
+import Nav from './page/Nav';
 
 function App() {
   const [firstLandingPage, setFirstLandingPage] = useState(true);

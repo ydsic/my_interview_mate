@@ -1,5 +1,5 @@
 import LiquidGlass from 'liquid-glass-react';
-import bg from '../../assets/login_bg.mp4';
+import bg from '../assets/login_bg.mp4';
 import { useRef } from 'react';
 
 export default function FirstLandingPage() {
