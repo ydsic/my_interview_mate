@@ -1,12 +1,17 @@
 import LiquidGlass from 'liquid-glass-react';
-import bg from '../assets/login_bg.mp4';
+import bg from '../../assets/login_bg.mp4';
 import { useRef } from 'react';
 
-export default function FirstLandingPage() {
+type Props = {
+  setFirstLandingPage: (show: boolean) => void;
+};
+
+export default function FirstLandingPage({ setFirstLandingPage }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const dontSeeAgain = () => {
     localStorage.setItem('firstLandingPage', JSON.stringify(false));
+    setFirstLandingPage(false);
   };
 
   return (

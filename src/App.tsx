@@ -1,16 +1,12 @@
-import { useEffect, useState } from 'react';
-import FirstLandingPage from './page/FirstLandingPage';
-import Nav from './components/page/Nav';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import MainPage from './page/MainPage';
 
 export default function App() {
-  const [firstLandingPage, setFirstLandingPage] = useState(true);
-
-  useEffect(() => {
-    const stored = localStorage.getItem('firstLandingPage');
-    if (stored) {
-      setFirstLandingPage(JSON.parse(stored));
-    }
-  }, []);
-
-  return <div>{firstLandingPage && <FirstLandingPage />}</div>;
+  return (
+    <BrowserRouter basename="/my_interview_mate">
+      <Routes>
+        <Route path="/" element={<MainPage />} />
+      </Routes>
+    </BrowserRouter>
+  );
 }
