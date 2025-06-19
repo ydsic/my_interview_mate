@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import FirstLandingPage from './page/FirstLandingPage';
-import Nav from './page/Nav';
+import Nav from './components/page/Nav';
 
-function App() {
+export default function App() {
   const [firstLandingPage, setFirstLandingPage] = useState(true);
 
   useEffect(() => {
@@ -14,5 +14,3 @@ function App() {
 
   return <div>{firstLandingPage && <FirstLandingPage />}</div>;
 }
-
-export default App;
