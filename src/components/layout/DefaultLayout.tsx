@@ -6,8 +6,8 @@ interface DefaultLayoutProps {
 
 export default function DefaultLayout({ children }: DefaultLayoutProps) {
   return (
-    <div className="w-full flex justify-center">
-      <div className="w-full max-w-7xl px-5">{children}</div>
+    <div className="w-full flex justify-center min-h-[93vh]">
+      <div className="w-[1280px] max-w-7xl px-5">{children}</div>
     </div>
   );
 }
