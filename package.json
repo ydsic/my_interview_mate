@@ -14,12 +14,12 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.50.0",
+    "@tailwindcss/postcss": "^4.0.0-alpha.13",
     "@tailwindcss/vite": "^4.1.10",
     "liquid-glass-react": "^1.1.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-router-dom": "^7.6.2",
-    "tailwindcss": "^4.1.10",
     "zustand": "^5.0.5"
   },
   "devDependencies": {
