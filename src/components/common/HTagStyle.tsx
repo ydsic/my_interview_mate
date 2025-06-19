@@ -18,7 +18,7 @@ export function H3_sub_detail({ children }: textTag) {
 
 export function H5_button({ children }: textTag) {
   return (
-    <h2 className="text-[22px] font-semibold h-[48px] bg-gradient-to-r from-Linear-Button-L to-Linear-Button-R hover:from-Linear-Button-L-h hover:to-Linear-Button -R-h">
+    <h2 className="text-[22px] font-semibold h-[48px] bg-gradient-to-r from-Linear-Button-L to-Linear-Button-R hover:from-Linear-Button-L-h hover:to-Linear-Button-R-h">
       {children}
     </h2>
   );
