@@ -6,13 +6,18 @@ import {
   H4_placeholder,
 } from '../components/common/HTagStyle';
 import Nav from '../components/common/Nav';
-import DefaultLayout from '../components/layout/DefaultLayout';
 import { Link } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [userInfo, setUserInfo] = useState<{
+    nickname: string;
+    profile_img: string;
+    job: string;
+    goal: string;
+  } | null>(null);
 
   const handleSubmit = async () => {
     if (!email || !password) {
@@ -31,6 +36,12 @@ export default function LoginPage() {
     }
     if (data) {
       alert('로그인 성공!');
+      setUserInfo({
+        nickname: data.nickname,
+        profile_img: data.profile_img,
+        job: data.job,
+        goal: data.goal,
+      });
     } else {
       alert('아이디 또는 비밀번호가 올바르지 않습니다.');
     }
