@@ -13,7 +13,11 @@ export function H2_content_title({ children }: textTag) {
 }
 
 export function H3_sub_detail({ children }: textTag) {
-  return <h2 className="text-[22px] font-semibold h-[48px]">{children}</h2>;
+  return <h3 className="text-[22px] font-semibold h-[48px]">{children}</h3>;
+}
+
+export function H4_placeholder({ children }: textTag) {
+  return <h4 className="text-[16px] font-semibold h-[48px]">{children}</h4>;
 }
 
 export function H5_button({ children }: textTag) {
