@@ -1,8 +1,14 @@
 @import 'tailwindcss';
+
 @font-face {
   font-family: 'Pretendard';
   src: url('/public/fonts/PretendardVariable.ttf');
 }
+
 body * {
   font-family: 'Pretendard';
+}
+
+*::-webkit-scrollbar {
+  display: none;
 }
