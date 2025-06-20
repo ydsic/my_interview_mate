@@ -39,69 +39,67 @@ export default function LoginPage() {
   return (
     <>
       <Nav />
-      <DefaultLayout>
-        <div className="flex flex-col h-full justify-center items-center text-center gap-5">
-          <H1_big_title>모의 면접 플랫폼</H1_big_title>
-          <H3_sub_detail>AI와 함께하는 스마트한 면접 준비 </H3_sub_detail>
+      <div className="flex flex-col h-full justify-center items-center text-center gap-5">
+        <H1_big_title>모의 면접 플랫폼</H1_big_title>
+        <H3_sub_detail>AI와 함께하는 스마트한 면접 준비 </H3_sub_detail>
 
-          <div className="w-1/2 bg-gray-50 flex items-center justify-center px-4">
-            <div className="w-full">
-              <div className="bg-white rounded-2xl border-2 border-gray-300 p-8 shadow-sm">
-                <h1 className="text-2xl font-bold text-center mb-8">로그인</h1>
+        <div className="w-1/2 bg-gray-50 flex items-center justify-center px-4">
+          <div className="w-full">
+            <div className="bg-white rounded-2xl border-2 border-gray-300 p-8 shadow-sm">
+              <h1 className="text-2xl font-bold text-center mb-8">로그인</h1>
 
-                <div className="space-y-6">
-                  <div>
-                    <label className="flex font-medium text-gray-700 mb-2">
-                      아이디
-                    </label>
-                    <H4_placeholder>
-                      <input
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="아이디를 입력하세요"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      />
-                    </H4_placeholder>
-                  </div>
-
-                  <div>
-                    <label className="flex font-medium text-gray-700 mb-2">
-                      비밀번호
-                    </label>
-                    <H4_placeholder>
-                      <input
-                        type="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        placeholder="비밀번호를 입력하세요"
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      />
-                    </H4_placeholder>
-                  </div>
-
-                  <Button
-                    onClick={handleSubmit}
-                    className="w-full py-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-lg hover:from-blue-600 hover:to-purple-600 transition-all duration-200 shadow-md"
-                  >
-                    로그인
-                  </Button>
+              <div className="space-y-6">
+                <div>
+                  <label className="flex font-medium text-gray-700 mb-2">
+                    아이디
+                  </label>
+                  <H4_placeholder>
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="아이디를 입력하세요"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </H4_placeholder>
                 </div>
 
-                <div className="mt-6 text-center">
-                  <span className="text-gray-600">계정이 없으신가요? </span>
-                  <Link
-                    to="/#"
-                    className="text-blue-500 hover:text-blue-600 font-medium"
-                  >
-                    회원가입
-                  </Link>
+                <div>
+                  <label className="flex font-medium text-gray-700 mb-2">
+                    비밀번호
+                  </label>
+                  <H4_placeholder>
+                    <input
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="비밀번호를 입력하세요"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </H4_placeholder>
                 </div>
+
+                <Button
+                  onClick={handleSubmit}
+                  className="w-full py-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-lg hover:from-blue-600 hover:to-purple-600 transition-all duration-200 shadow-md"
+                >
+                  로그인
+                </Button>
+              </div>
+
+              <div className="mt-6 text-center">
+                <span className="text-gray-600">계정이 없으신가요? </span>
+                <Link
+                  to="/#"
+                  className="text-blue-500 hover:text-blue-600 font-medium"
+                >
+                  회원가입
+                </Link>
               </div>
             </div>
           </div>
         </div>
-      </DefaultLayout>
+      </div>
     </>
   );
 }
