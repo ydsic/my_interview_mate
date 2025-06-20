@@ -45,9 +45,7 @@ export default function MyPage() {
         </div>
       </div>
 
-      <div className=" w-full rounded-4xl px-10 py-3">
-        {tabComponents[activeTab]}
-      </div>
+      <div className=" w-full ">{tabComponents[activeTab]}</div>
     </>
   );
 }
