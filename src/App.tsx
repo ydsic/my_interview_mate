@@ -3,6 +3,7 @@ import MainPage from './page/MainPage';
 import StyleTest from './page/StyleTest';
 import LoginPage from './page/LoginPage';
 import DefaultLayout from './components/layout/DefaultLayout';
+import SignupPage from './page/SignupPage';
 
 export default function App() {
   return (
@@ -12,6 +13,7 @@ export default function App() {
           <Route path="/" element={<MainPage />} />
           <Route path="/styleTest" element={<StyleTest />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
         </Routes>
       </DefaultLayout>
     </BrowserRouter>
