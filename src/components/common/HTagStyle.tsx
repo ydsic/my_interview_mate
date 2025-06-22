@@ -13,11 +13,13 @@ export function H2_content_title({ children }: textTag) {
 }
 
 export function H3_sub_detail({ children }: textTag) {
-  return <h3 className="text-[22px] font-semibold h-[48px]">{children}</h3>;
+  return (
+    <h3 className="text-[22px] font-semibold leading-none">{children}</h3>
+  ); /* 해당 부분 상의 필요 height 높이를 정하느냐 아니면 leading-none */
 }
 
 export function H4_placeholder({ children }: textTag) {
-  return <h4 className="text-[16px] font-semibold h-[48px]">{children}</h4>;
+  return <h4 className="text-[16px] font-semibold ">{children}</h4>;
 }
 
 export function H5_button({ children }: textTag) {

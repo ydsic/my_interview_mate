@@ -13,6 +13,7 @@
   --color-purple-10: #faf5ff;
   --color-orange-10: #fff7ed;
   --color-yellow-10: #fffeea;
+  --color-green-10: #e7ffeb;
 
   --color-orange-100: #ffc107;
 
@@ -32,4 +33,33 @@
   --color-front-bg-tag: #dbe9fe;
   --color-cs-bg-tag: #d5f8bb;
   --color-git-bg-tag: #feecdb;
+}
+.front-text-tag {
+  color: var(--color-front-text-tag);
+}
+.front-bg-tag {
+  background-color: var(--color-front-bg-tag);
+}
+.front-bg {
+  background-color: var(--color-blue-10);
+}
+
+.cs-text-tag {
+  color: var(--color-cs-text-tag);
+}
+.cs-bg-tag {
+  background-color: var(--color-cs-bg-tag);
+}
+.cs-bg {
+  background-color: var(--color-green-10);
+}
+
+.git-text-tag {
+  color: var(--color-git-text-tag);
+}
+.git-bg-tag {
+  background-color: var(--color-git-bg-tag);
+}
+.git-bg {
+  background-color: var(--color-orange-10);
 }
