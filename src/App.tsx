@@ -19,16 +19,6 @@ export default function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/mypage" element={<MyPage />} />
           <Route path="/signup" element={<SignupPage />} />
-
-          {/* <Route
-            path="/test"
-            element={
-              <InterviewQuestion
-                category="git"
-                question="React의 상태관리는 어떻게 하나요?"
-              />
-            }
-          /> */}
           <Route path="/interview" element={<InterviewPage />} />
         </Routes>
       </DefaultLayout>
