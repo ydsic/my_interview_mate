@@ -6,9 +6,9 @@ import {
   H4_placeholder,
 } from '../components/common/HTagStyle';
 import { Link } from 'react-router-dom';
-import { supabase } from '../supabaseClient';
 import { useUserDataStore } from '../store/userData';
 import Input from '../components/common/Input';
+import { loginUserInfo } from '../api/userInfo';
 
 export default function LoginPage() {
   const [userId, setUserId] = useState('');
@@ -23,13 +23,9 @@ export default function LoginPage() {
       alert('아이디와 비밀번호를 입력하세요.');
       return;
     }
-    // user_info 테이블에서 user_id로 select
-    const { data, error } = await supabase
-      .from('user_info')
-      .select('*')
-      .eq('user_id', userId)
-      .eq('password', userPassword)
-      .single();
+
+    const { data, error } = await loginUserInfo(userId, userPassword);
+
     if (error) {
       alert('로그인 중 오류가 발생했습니다.');
       return;
