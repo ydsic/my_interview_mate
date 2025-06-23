@@ -14,6 +14,11 @@ type UserDataStore = {
   clearUserData: () => void;
 };
 
+type LoggedInType = {
+  isLoggedIn: boolean;
+  setIsLoggedIn: (status: boolean) => void;
+};
+
 export const useUserDataStore = create<UserDataStore>((set) => ({
   userData: {
     user_id: '',
@@ -36,4 +41,9 @@ export const useUserDataStore = create<UserDataStore>((set) => ({
         goal: '',
       },
     }),
+}));
+
+export const useLoggedInStore = create<LoggedInType>((set) => ({
+  isLoggedIn: false,
+  setIsLoggedIn: (status) => set({ isLoggedIn: status }),
 }));
