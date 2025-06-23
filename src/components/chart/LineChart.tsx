@@ -1,6 +1,6 @@
 import { Line } from 'react-chartjs-2';
 
-export default function LinChart() {
+export default function LineChart() {
   const data = {
     labels: ['6/13', '6/14', '6/15', '6/16', '6/17', '6/18', '6/19'],
     datasets: [

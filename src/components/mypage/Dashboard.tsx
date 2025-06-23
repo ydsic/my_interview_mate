@@ -1,5 +1,5 @@
 import DoughnutChart from '../chart/DoughnutChart';
-import LinChart from '../chart/LinChart';
+import LineChart from '../chart/LineChart';
 import { H2_content_title } from '../common/HTagStyle';
 
 export default function Dashboard(): React.JSX.Element {
@@ -37,7 +37,7 @@ export default function Dashboard(): React.JSX.Element {
       <section className="flex w-full justify-between gap-3">
         <div className="flex-col bg-white w-full p-3">
           <p className="font-semibold">점수 변화 추이</p>
-          <LinChart />
+          <LineChart />
         </div>
         <div className="flex bg-white w-full"> 역량 분석</div>
       </section>
