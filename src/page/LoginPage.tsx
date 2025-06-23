@@ -6,15 +6,16 @@ import {
   H4_placeholder,
 } from '../components/common/HTagStyle';
 import { Link } from 'react-router-dom';
-import { supabase } from '../supabaseClient';
 import { useUserDataStore } from '../store/userData';
 import Input from '../components/common/Input';
+import { loginUserInfo } from '../api/userInfo';
 
 export default function LoginPage() {
   const [userId, setUserId] = useState('');
   const [userPassword, setUserPassword] = useState('');
 
-  const UserData = useUserDataStore((state) => state.userData);
+  // 필요 시 활성화
+  // const UserData = useUserDataStore((state) => state.userData);
   const setUserData = useUserDataStore((state) => state.setUserData);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -23,17 +24,14 @@ export default function LoginPage() {
       alert('아이디와 비밀번호를 입력하세요.');
       return;
     }
-    // user_info 테이블에서 user_id로 select
-    const { data, error } = await supabase
-      .from('user_info')
-      .select('*')
-      .eq('user_id', userId)
-      .eq('password', userPassword)
-      .single();
+
+    const { data, error } = await loginUserInfo(userId, userPassword); // 로그인 API 호출
+
     if (error) {
       alert('로그인 중 오류가 발생했습니다.');
-      return;
     }
+
+    // 로그인 성공 시 사용자 데이터 저장
     if (data) {
       alert('로그인 성공!');
       setUserData({
