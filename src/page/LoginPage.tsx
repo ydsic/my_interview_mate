@@ -14,7 +14,8 @@ export default function LoginPage() {
   const [userId, setUserId] = useState('');
   const [userPassword, setUserPassword] = useState('');
 
-  const UserData = useUserDataStore((state) => state.userData);
+  // 필요 시 활성화
+  // const UserData = useUserDataStore((state) => state.userData);
   const setUserData = useUserDataStore((state) => state.setUserData);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -24,12 +25,13 @@ export default function LoginPage() {
       return;
     }
 
-    const { data, error } = await loginUserInfo(userId, userPassword);
+    const { data, error } = await loginUserInfo(userId, userPassword); // 로그인 API 호출
 
     if (error) {
       alert('로그인 중 오류가 발생했습니다.');
-      return;
     }
+
+    // 로그인 성공 시 사용자 데이터 저장
     if (data) {
       alert('로그인 성공!');
       setUserData({
