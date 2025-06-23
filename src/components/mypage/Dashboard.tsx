@@ -36,11 +36,11 @@ export default function Dashboard(): React.JSX.Element {
       </section>
 
       <section className="flex w-full justify-between gap-3">
-        <div className="flex-col bg-white w-full p-5 rounded-4xl">
+        <div className="flex-col bg-white w-full p-5 rounded-4xl shadow-md">
           <p className="font-semibold">점수 변화 추이</p>
           <LineChart />
         </div>
-        <div className="flex-col items-center bg-white w-full p-5 rounded-4xl">
+        <div className="flex-col items-center bg-white w-full p-5 rounded-4xl shadow-md">
           <p className="font-semibold">역량 분석</p>
           <RadarChart />
         </div>
