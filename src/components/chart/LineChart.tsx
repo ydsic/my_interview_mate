@@ -6,8 +6,9 @@ export default function LineChart() {
     datasets: [
       {
         data: [70, 82, 85, 92, 88, 75, 60],
-        backgroundColor: ['#000'],
-        color: ['#000'],
+        backgroundColor: '#3C82F6',
+        borderColor: '#3C82F6',
+        pointBorderColor: '#fff',
       },
     ],
   };
