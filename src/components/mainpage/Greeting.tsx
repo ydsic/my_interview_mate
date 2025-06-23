@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import Button from '../common/Button';
 import { H1_big_title } from '../common/HTagStyle';
 
@@ -17,7 +18,9 @@ export default function Greeting() {
           가까워지세요.
         </p>
 
-        <Button className="w-full">로그인</Button>
+        <Link to="/login">
+          <Button className="w-full">로그인</Button>
+        </Link>
       </div>
     </div>
   );
