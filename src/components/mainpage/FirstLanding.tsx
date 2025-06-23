@@ -1,6 +1,7 @@
 import LiquidGlass from 'liquid-glass-react';
 import bg from '../../assets/login_bg.mp4';
 import { useRef } from 'react';
+import { H3_sub_detail } from '../common/HTagStyle';
 
 type Props = {
   setFirstLandingPage: (show: boolean) => void;
@@ -43,16 +44,14 @@ export default function FirstLandingPage({ setFirstLandingPage }: Props) {
       >
         <div className="relative flex flex-col items-center text-center space-y-8 px-6">
           <div className="flex items-center">
-            <h2 className="text-4xl font-semibold text-blue-300">AI</h2>
-            <h2 className="text-3xl font-semibold text-blue-100">
-              와 함께하는
-            </h2>
+            <h2 className="text-4xl font-semibold text-blue-200">AI</h2>
+            <h2 className="text-3xl font-semibold text-white">와 함께하는</h2>
           </div>
 
           <h1 className="text-5xl font-bold bg-gradient-to-r from-white to-blue-200 text-transparent bg-clip-text">
             스마트한 면접 준비
           </h1>
-          <p className="text-gray-100 font-semibold text-xl leading-relaxed">
+          <p className='className="text-gray-100 font-semibold text-xl leading-relaxed'>
             개인 맞춤형 질문 생성부터 실시간 피드백까지,
             <br />
             AI가 도와주는 체계적인 면접 준비로 꿈의 직장에 한 걸음 더
