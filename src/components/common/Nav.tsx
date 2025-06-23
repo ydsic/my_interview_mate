@@ -6,7 +6,7 @@ export default function Nav() {
       <p className="font-semibold">나만의 인터뷰 메이트</p>
       <div className="flex gap-15 font-heavy">
         <Link to="/login">로그인</Link>
-        <p>회원가입</p>
+        <Link to="/signup">회원가입</Link>
       </div>
     </div>
   );
