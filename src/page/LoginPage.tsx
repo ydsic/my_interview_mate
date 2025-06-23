@@ -5,8 +5,8 @@ import {
   H3_sub_detail,
   H4_placeholder,
 } from '../components/common/HTagStyle';
-import { Link } from 'react-router-dom';
-import { useUserDataStore } from '../store/userData';
+import { Link, useNavigate } from 'react-router-dom';
+import { useLoggedInStore, useUserDataStore } from '../store/userData';
 import Input from '../components/common/Input';
 import { loginUserInfo } from '../api/userInfo';
 
@@ -14,9 +14,10 @@ export default function LoginPage() {
   const [userId, setUserId] = useState('');
   const [userPassword, setUserPassword] = useState('');
 
-  // 필요 시 활성화
-  // const UserData = useUserDataStore((state) => state.userData);
   const setUserData = useUserDataStore((state) => state.setUserData);
+  const setIsLoggedIn = useLoggedInStore((state) => state.setIsLoggedIn);
+
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -33,7 +34,6 @@ export default function LoginPage() {
 
     // 로그인 성공 시 사용자 데이터 저장
     if (data) {
-      alert('로그인 성공!');
       setUserData({
         user_id: data.user_id,
         nickname: data.nickname,
@@ -41,6 +41,8 @@ export default function LoginPage() {
         job: data.job,
         goal: data.goal,
       });
+      setIsLoggedIn(true);
+      navigate('/');
     } else {
       alert('아이디 또는 비밀번호가 올바르지 않습니다.');
     }
