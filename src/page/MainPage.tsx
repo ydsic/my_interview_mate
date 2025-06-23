@@ -18,10 +18,7 @@ export default function MainPage() {
       {firstLandingPage ? (
         <FirstLandingPage setFirstLandingPage={setFirstLandingPage} />
       ) : (
-        <>
-          <Nav />
-          <Greeting />
-        </>
+        <Greeting />
       )}
     </>
   );
