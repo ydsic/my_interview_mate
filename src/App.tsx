@@ -3,6 +3,7 @@ import MainPage from './page/MainPage';
 import StyleTest from './page/StyleTest';
 import LoginPage from './page/LoginPage';
 import DefaultLayout from './components/layout/DefaultLayout';
+import MyPage from './page/MyPage';
 import SignupPage from './page/SignupPage';
 import Nav from './components/common/Nav';
 import InterviewQuestion from './components/interviewpage/InterviewQuestion';
@@ -16,6 +17,7 @@ export default function App() {
           <Route path="/" element={<MainPage />} />
           <Route path="/styleTest" element={<StyleTest />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/mypage" element={<MyPage />} />
           <Route path="/signup" element={<SignupPage />} />
 
           {/* <Route
