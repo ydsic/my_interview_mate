@@ -6,7 +6,7 @@ import DefaultLayout from './components/layout/DefaultLayout';
 import MyPage from './page/MyPage';
 import SignupPage from './page/SignupPage';
 import Nav from './components/common/Nav';
-import InterviewQuestion from './components/interviewpage/InterviewQuestion';
+import InterviewPage from './page/InterviewPage';
 
 export default function App() {
   return (
@@ -19,16 +19,7 @@ export default function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/mypage" element={<MyPage />} />
           <Route path="/signup" element={<SignupPage />} />
-
-          {/* <Route
-            path="/test"
-            element={
-              <InterviewQuestion
-                category="git"
-                question="React의 상태관리는 어떻게 하나요?"
-              />
-            }
-          /> */}
+          <Route path="/interview" element={<InterviewPage />} />
         </Routes>
       </DefaultLayout>
     </BrowserRouter>
