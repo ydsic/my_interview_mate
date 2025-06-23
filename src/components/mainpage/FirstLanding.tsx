@@ -17,7 +17,7 @@ export default function FirstLandingPage({ setFirstLandingPage }: Props) {
   return (
     <div
       ref={containerRef}
-      className="relative min-h-screen flex items-center justify-center"
+      className="absolute left-0 top-0 w-screen min-h-screen flex items-center justify-center"
     >
       <video
         autoPlay
