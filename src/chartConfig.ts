@@ -7,6 +7,8 @@ import {
   PointElement,
   CategoryScale,
   LinearScale,
+  RadialLinearScale,
+  Filler,
 } from 'chart.js';
 
 ChartJS.register(
@@ -17,4 +19,6 @@ ChartJS.register(
   PointElement,
   CategoryScale,
   LinearScale,
+  RadialLinearScale,
+  Filler,
 );
