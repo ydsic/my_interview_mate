@@ -37,6 +37,7 @@ export default function LoginPage() {
       setUserData({
         user_id: data.user_id,
         nickname: data.nickname,
+        email: data.email,
         profile_img: data.profile_img,
         job: data.job,
         goal: data.goal,
