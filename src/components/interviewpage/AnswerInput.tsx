@@ -50,15 +50,20 @@ export default function AnswerInput() {
         onChange={(e) => setAnswer(e.target.value)}
       />
 
+      {/* 피드백 받기 버튼 */}
+
       <div className="flex justify-end gap-4">
         <SubmitButton
           onClick={handleFeedback}
-          className="flex items-center gap-2"
+          className="flex items-center gap-2  pl-3 pr-4"
           isDisabled={isEmpty}
         >
           <FontAwesomeIcon icon={faCheck} className="text-white" size="lg" />
           피드백 받기
         </SubmitButton>
+
+        {/* 추가 질문 버튼 */}
+
         <button
           onClick={handleFollowUp}
           className={`flex items-center gap-2 border border-gray-200 rounded-xl 

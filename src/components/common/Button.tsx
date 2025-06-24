@@ -49,7 +49,7 @@ export function SubmitButton({
       onMouseEnter={() => setIsHover(true)}
       onMouseLeave={() => setIsHover(false)}
       className={`
-        px-10 py-3 text-white font-semibold rounded-xl flex items-center gap-2 cursor-pointer
+        px-5 py-2 text-white rounded-xl flex items-center gap-2 cursor-pointer
         ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90'}
         ${className}
       `}

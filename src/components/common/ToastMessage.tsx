@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
-import type { Toast } from '../../store/toastStore'; // ← type-only import
+import type { Toast } from '../../store/toastStore';
 
-type ToastKind = NonNullable<Toast['type']>; // 'info' | 'success' | 'error'
+type ToastKind = NonNullable<Toast['type']>; // 'info' | 'success' | 'error' info 가 default 값
 
 const typeStyles: Record<ToastKind, string> = {
   info: 'bg-gray-900',
