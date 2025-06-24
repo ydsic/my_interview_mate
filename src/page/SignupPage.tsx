@@ -13,6 +13,7 @@ export default function SignupPage() {
   const [userId, setUserId] = useState('');
   const [password, setPassword] = useState('');
   const [nickname, setNickname] = useState('');
+  const [email, setEmail] = useState('');
   const [job, setJob] = useState('');
   const [goal, setGoal] = useState('');
   const defaultProfileImg =
@@ -21,8 +22,8 @@ export default function SignupPage() {
 
   const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!userId || !password || !nickname) {
-      alert('아이디, 비밀번호, 닉네임을 모두 입력하세요.');
+    if (!userId || !password || !nickname || !email) {
+      alert('아이디, 비밀번호, 닉네임, 이메일을 모두 입력하세요.');
       return;
     }
 
@@ -36,6 +37,7 @@ export default function SignupPage() {
         user_id: userId,
         password,
         nickname,
+        email,
         job: job || '',
         goal: goal || '',
         profile_img: defaultProfileImg,
@@ -54,7 +56,7 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="flex flex-col h-full justify-center items-center text-center gap-5">
+    <div className="flex flex-col h-full justify-center items-center text-center gap-5 mt-5">
       <H1_big_title>회원가입</H1_big_title>
       <H3_sub_detail>정보를 입력해 주세요</H3_sub_detail>
       <form
@@ -86,6 +88,20 @@ export default function SignupPage() {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="비밀번호를 입력하세요"
               autoComplete="off"
+              required
+            />
+          </H4_placeholder>
+        </div>
+        <div>
+          <label className="flex font-medium text-gray-700 mb-2">
+            이메일<span className="text-red-500 ml-1">*</span>
+          </label>
+          <H4_placeholder>
+            <Input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="이메일을 입력하세요"
               required
             />
           </H4_placeholder>
