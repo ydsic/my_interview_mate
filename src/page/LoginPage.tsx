@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import Button from '../components/common/Button';
+import Button, { SubmitButton } from '../components/common/Button';
 import {
   H1_big_title,
   H3_sub_detail,
@@ -43,6 +43,11 @@ export default function LoginPage() {
         goal: data.goal,
       });
       setIsLoggedIn(true);
+
+      // 로그인 성공 시 쿠키에 access_token 저장 (24시간 유지) document에 저장하는거라 보안상 좋지는 않음
+      if (data.access_token) {
+        document.cookie = `access_token=${data.access_token}; path=/; max-age=86400`;
+      }
       navigate('/');
     } else {
       alert('아이디 또는 비밀번호가 올바르지 않습니다.');
@@ -90,12 +95,9 @@ export default function LoginPage() {
                   </H4_placeholder>
                 </div>
 
-                <Button
-                  type="submit"
-                  className="w-full py-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-lg hover:from-blue-600 hover:to-purple-600 transition-all duration-200 shadow-md"
-                >
+                <SubmitButton className="w-full py-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-lg hover:from-blue-600 hover:to-purple-600 transition-all duration-200 shadow-md">
                   로그인
-                </Button>
+                </SubmitButton>
               </form>
 
               <div className="mt-6 text-center">
