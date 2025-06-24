@@ -6,19 +6,31 @@ import { H2_content_title } from '../common/HTagStyle';
 import { useState } from 'react';
 import { OpenAIApi } from '../../api/prompt';
 
-export default function AnswerInput() {
-  const [answer, setAnswer] = useState('');
-  const question = 'React의 상태관리는 어떻게 하나요?';
+interface AnswerInputProps {
+  question: string;
+  onFeedback: (answer: string, feedback: string) => void;
+  disabled?: boolean;
+}
 
+export default function AnswerInput({
+  question,
+  onFeedback,
+  disabled,
+}: AnswerInputProps) {
+  const [answer, setAnswer] = useState('');
   const isEmpty = answer.trim() === '';
+  const [loading, setLoading] = useState(false);
 
   const handleFeedback = async () => {
-    if (isEmpty) return;
+    if (isEmpty || disabled) return;
+    setLoading(true);
     try {
       const feedback = await OpenAIApi(question, answer);
-      console.log(feedback);
+      onFeedback(answer, feedback);
     } catch (e) {
       console.error('피드백 요청 실패:', e);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -34,22 +46,27 @@ export default function AnswerInput() {
         placeholder="답변을 작성하시거나, 음성으로 대답해주세요."
         value={answer}
         onChange={(e) => setAnswer(e.target.value)}
+        disabled={disabled}
       />
 
       <div className="flex justify-end gap-4">
         <SubmitButton
           onClick={handleFeedback}
           className="flex items-center gap-2"
-          disabled={isEmpty}
+          disabled={isEmpty || disabled || loading}
         >
           <FontAwesomeIcon icon={faCheck} className="text-white" size="lg" />
-          피드백 받기
+          {loading ? '피드백 생성 중...' : '피드백 받기'}
         </SubmitButton>
 
         <button
-          disabled={isEmpty}
+          disabled={isEmpty || disabled}
           className={`flex items-center gap-2 border border-gray-200 rounded-xl 
-            px-3 py-1 cursor-pointer hover:bg-gray-50 transition ${isEmpty ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-50'}`}
+            px-3 py-1 cursor-pointer hover:bg-gray-50 transition ${
+              isEmpty || disabled
+                ? 'opacity-50 cursor-not-allowed'
+                : 'hover:bg-gray-50'
+            }`}
         >
           <img
             src={addQuestionIcon}
