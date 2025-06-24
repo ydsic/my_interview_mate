@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 type ButtonProps = {
   children: React.ReactNode;
-  onClick?: () => void;
+  onClick?: React.MouseEventHandler<HTMLButtonElement>;
   className?: string;
   type?: 'button' | 'submit' | 'reset';
 };
@@ -38,21 +38,24 @@ export function SubmitButton({
   children,
   onClick,
   className = '',
-  disabled = false,
-}: Omit<ButtonProps, 'type'> & { disabled?: boolean }) {
+  isDisabled = false,
+}: Omit<ButtonProps, 'type'> & { isDisabled?: boolean }) {
   const [isHover, setIsHover] = useState(false);
 
   return (
     <button
       type="submit"
-      disabled={disabled}
       onClick={onClick}
       onMouseEnter={() => setIsHover(true)}
       onMouseLeave={() => setIsHover(false)}
-      className={`px-4 py-1 text-white rounded-xl transition cursor-pointer ${className}`}
+      className={`
+        px-10 py-3 text-white font-semibold rounded-xl flex items-center gap-2 cursor-pointer
+        ${isDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:opacity-90'}
+        ${className}
+      `}
       style={{
         backgroundColor: 'var(--color-front-text-tag)',
-        opacity: disabled ? 0.5 : isHover ? 0.9 : 1,
+        opacity: isDisabled ? 0.5 : isHover ? 0.9 : 1,
       }}
     >
       {children}

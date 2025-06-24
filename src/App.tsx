@@ -7,21 +7,25 @@ import MyPage from './page/MyPage';
 import SignupPage from './page/SignupPage';
 import Nav from './components/common/Nav';
 import InterviewPage from './page/InterviewPage';
+import ToastProvider from './components/common/ToastProvider';
 
 export default function App() {
   return (
-    <BrowserRouter basename="/my_interview_mate">
-      <Nav />
-      <DefaultLayout>
-        <Routes>
-          <Route path="/" element={<MainPage />} />
-          <Route path="/styleTest" element={<StyleTest />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/mypage" element={<MyPage />} />
-          <Route path="/signup" element={<SignupPage />} />
-          <Route path="/interview" element={<InterviewPage />} />
-        </Routes>
-      </DefaultLayout>
-    </BrowserRouter>
+    <>
+      <ToastProvider />
+      <BrowserRouter basename="/my_interview_mate">
+        <Nav />
+        <DefaultLayout>
+          <Routes>
+            <Route path="/" element={<MainPage />} />
+            <Route path="/styleTest" element={<StyleTest />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/mypage" element={<MyPage />} />
+            <Route path="/signup" element={<SignupPage />} />
+            <Route path="/interview" element={<InterviewPage />} />
+          </Routes>
+        </DefaultLayout>
+      </BrowserRouter>
+    </>
   );
 }
