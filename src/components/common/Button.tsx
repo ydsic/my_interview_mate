@@ -32,3 +32,27 @@ export default function Button({
     </button>
   );
 }
+/* ---------- 새로 추가한 Submit 전용 Button ---------- */
+export function SubmitButton({
+  children,
+  onClick,
+  className = '',
+}: Omit<ButtonProps, 'type'>) {
+  const [isHover, setIsHover] = useState(false);
+
+  return (
+    <button
+      type="submit"
+      onClick={onClick}
+      onMouseEnter={() => setIsHover(true)}
+      onMouseLeave={() => setIsHover(false)}
+      className={`px-10 py-3 text-white font-semibold rounded-xl transition cursor-pointer ${className}`}
+      style={{
+        backgroundColor: 'var(--color-front-text-tag)',
+        opacity: isHover ? 0.9 : 1,
+      }}
+    >
+      {children}
+    </button>
+  );
+}
