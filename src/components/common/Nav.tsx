@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useLoggedInStore } from '../../store/userData';
+import logoutIcon from '../../assets/logout.svg';
 
 export default function Nav() {
   const isLoggedIn = useLoggedInStore((state) => state.isLoggedIn);
@@ -18,7 +19,7 @@ export default function Nav() {
             onClick={() => setIsLoggedIn(false)}
             className="cursor-pointer"
           >
-            로그아웃
+            <img src={logoutIcon} alt="로그아웃 아이콘" className="w-4 h-4" />
           </button>
         </div>
       ) : (
