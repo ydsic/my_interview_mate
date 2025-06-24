@@ -1,23 +1,53 @@
-interface FeedbackCardProps {
+import { useState } from 'react';
+import AiFeedback from './AiFeedback';
+import Answer from './Answer';
+
+type FeedbackCardProps = {
   feedback: string;
   answer: string;
-}
+};
 
 export default function FeedbackCard({ feedback, answer }: FeedbackCardProps) {
+  const [selectedTab, setSelectedTab] = useState<'feedback' | 'answer'>(
+    'feedback',
+  );
+
+  let feedbackObj;
+  try {
+    feedbackObj = JSON.parse(feedback);
+  } catch {
+    feedbackObj = {
+      average:
+        'AI 피드백을 불러오는 데 실패했습니다. 다시 시도해주세요. 문제가 지속되면 관리자에게 문의해주세요.',
+      summary: '',
+    };
+  }
+
   return (
-    <div className="p-5 rounded-xl border border-gray-300 bg-white shadow-sm space-y-4 animate-fade-in">
-      <div className="flex justify-between mb-5">
-        <h2 className="text-lg font-semibold">AI 피드백</h2>
+    <div className="flex flex-col w-full max-w-2xl mx-auto ">
+      <div className="flex justify-around items-center border p-2 border-gray-300 bg-gray-25 shadow-sm rounded-xl text-center mb-3">
+        <div
+          className={`text-md font-semibold w-full p-2 cursor-pointer rounded-xl ${
+            selectedTab === 'feedback' ? 'bg-white' : ''
+          }`}
+          onClick={() => setSelectedTab('feedback')}
+        >
+          AI 피드백
+        </div>
+        <div
+          className={`text-md font-semibold w-full p-2 cursor-pointer rounded-xl ${
+            selectedTab === 'answer' ? 'bg-white' : ''
+          }`}
+          onClick={() => setSelectedTab('answer')}
+        >
+          모범 답안
+        </div>
       </div>
-      <p className="text-gray-600 mb-2">
-        AI가 제공하는 피드백을 통해 답변을 개선해보세요.
-      </p>
-      <div className="bg-gray-50 rounded-lg p-4 text-left whitespace-pre-line text-sm text-gray-800 border border-gray-200 mb-2">
-        <b>내 답변:</b> {answer}
-      </div>
-      <div className="bg-blue-50 rounded-lg p-4 text-left whitespace-pre-line text-sm text-blue-900 border border-blue-200 animate-fade-in">
-        <b>AI 피드백:</b> {feedback}
-      </div>
+      {selectedTab === 'feedback' ? (
+        <AiFeedback feedbackData={feedbackObj} answer={answer} />
+      ) : (
+        <Answer feedbackData={feedbackObj} answer={answer} />
+      )}
     </div>
   );
 }

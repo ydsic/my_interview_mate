@@ -35,7 +35,7 @@ export default function AnswerInput({
   };
 
   return (
-    <div className="p-5 rounded-xl border border-gray-300 bg-white shadow-sm space-y-4">
+    <div className="p-5 rounded-xl border border-gray-300 bg-white shadow-sm space-y-4 mt-3">
       <div className="flex justify-between mb-5">
         <H2_content_title>내 답변</H2_content_title>
       </div>
