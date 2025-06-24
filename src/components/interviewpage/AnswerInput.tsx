@@ -5,6 +5,7 @@ import { SubmitButton } from '../common/Button';
 import { H2_content_title } from '../common/HTagStyle';
 import { useState } from 'react';
 import { OpenAIApi } from '../../api/prompt';
+import { useToast } from '../../hooks/useToast';
 
 interface AnswerInputProps {
   question: string;
@@ -20,18 +21,32 @@ export default function AnswerInput({
   const [answer, setAnswer] = useState('');
   const isEmpty = answer.trim() === '';
   const [loading, setLoading] = useState(false);
+  const toast = useToast();
 
   const handleFeedback = async () => {
-    if (isEmpty || disabled) return;
+    if (isEmpty) {
+      toast('먼저 질문에 대한 답변을 해주세요.');
+      return;
+    }
     setLoading(true);
     try {
       const feedback = await OpenAIApi(question, answer);
-      onFeedback(answer, feedback);
+      onFeedback(answer, feedback); // 상위로 전달
+      toast('피드백을 가져왔어요!', 'success');
     } catch (e) {
       console.error('피드백 요청 실패:', e);
+      toast('피드백 요청에 실패했어요.', 'error');
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleFollowUp = () => {
+    if (isEmpty) {
+      toast('먼저 질문에 대한 답변을 해주세요!');
+      return;
+    }
+    toast('추가 질문을 전송했어요!', 'success');
   };
 
   return (
@@ -49,18 +64,22 @@ export default function AnswerInput({
         disabled={disabled}
       />
 
+      {/* 피드백 받기 버튼 */}
+
       <div className="flex justify-end gap-4">
         <SubmitButton
           onClick={handleFeedback}
-          className="flex items-center gap-2"
-          disabled={isEmpty || disabled || loading}
+          className="flex items-center gap-2  pl-3 pr-4"
+          isDisabled={isEmpty || disabled || loading}
         >
           <FontAwesomeIcon icon={faCheck} className="text-white" size="lg" />
           {loading ? '피드백 생성 중...' : '피드백 받기'}
         </SubmitButton>
+        {/* 추가 질문 버튼 */}
 
         <button
           disabled={isEmpty || disabled}
+          onClick={handleFollowUp}
           className={`flex items-center gap-2 border border-gray-200 rounded-xl 
             px-3 py-1 cursor-pointer hover:bg-gray-50 transition ${
               isEmpty || disabled
