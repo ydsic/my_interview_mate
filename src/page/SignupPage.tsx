@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import Button from '../components/common/Button';
+import Button, { SubmitButton } from '../components/common/Button';
 import {
   H1_big_title,
   H3_sub_detail,
@@ -142,12 +142,9 @@ export default function SignupPage() {
             />
           </H4_placeholder>
         </div>
-        <Button
-          type="submit"
-          className="w-full py-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-lg"
-        >
+        <SubmitButton className="w-full py-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-lg">
           회원가입
-        </Button>
+        </SubmitButton>
         <div className="mt-6 text-center">
           <span className="text-gray-600">이미 계정이 있으신가요? </span>
           <Link
