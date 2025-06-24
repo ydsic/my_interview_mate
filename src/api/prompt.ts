@@ -38,11 +38,12 @@ export async function OpenAIApi(question: string, input: string) {
           ### 출력(JSON) - 예시 포맷
           {
             "question": "React란 무엇이고 왜 사용하나요?",
-            "input": "React는 사용자 인터페이스를 구축하기 위한 JavaScript 라이브러리입니다. 컴포넌트 기반 아키텍처를 통해 재사용성과 유지보수성을 높이고, 가상 DOM을 사용하여 성능을 최적화합니다.",
+            "input": "React는 사용자 인터페이스를 구축하기 위한 JavaScript 라이브러리입니다.",
             "scores": [78, 82, 75, 80, 70],
             "average": 78.8,
             "feedback": ["제어문 예시를 추가해 논리성 강화", "불필요한 반복 문장 제거"], 
-            "summary": "핵심 개념은 정확하나 예시 부족으로 심층성이 낮음."
+            "summary": "핵심 개념은 정확하나 예시 부족으로 심층성이 낮음.",
+            "answer": "React는 사용자 인터페이스를 구축하기 위한 JavaScript 라이브러리로, 컴포넌트 기반 아키텍처를 통해 재사용성과 유지보수성을 높이고, 가상 DOM을 사용하여 성능을 최적화합니다."
           }
 
           ### 주의사항
@@ -51,6 +52,7 @@ export async function OpenAIApi(question: string, input: string) {
             * 'average'는 'scores' 배열의 평균 점수로, 소수점은 표시하지 않으며 반올림한다.
             * 'feedback'은 사용자의 답변에 대한 개선점을 제시하는 배열로, 각 항목은 1개에서 3개 사이의 문자열이어야 한다.
             * 'summary'는 답변에 대한 간단한 요약으로, 최대 3줄로 작성되어야 한다.
+            * 'answer'는 질문에 대한 정답으로, 정석적인 답변으로 작성한다. 단, 위 상황은 말에서 말로 답변하는 상황이므로, 코드로 답변하지 않고 자연어로 답변한다.
             * 출력은 반드시 JSON 형식이어야 하며, 문자열은 큰따옴표로 감싸야 한다.
             * 출력 예시와 동일한 형식을 따라야 한다.
           `,
