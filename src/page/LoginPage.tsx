@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import Button, { SubmitButton } from '../components/common/Button';
+import { SubmitButton } from '../components/common/Button';
 import {
   H1_big_title,
   H3_sub_detail,

@@ -1,7 +1,6 @@
-import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useLoggedInStore } from '../../store/userData';
 import logoutIcon from '../../assets/logout.svg';
-import { use } from 'react';
 
 export default function Nav() {
   const isLoggedIn = useLoggedInStore((state) => state.isLoggedIn);
