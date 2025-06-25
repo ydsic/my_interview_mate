@@ -14,71 +14,50 @@ type UserData = {
 
 type FormData = Omit<UserData, 'user_id' | 'email'>;
 
-// 커스텀 훅 분리
-function useProfileForm(user: UserData) {
+export default function Profile(): React.JSX.Element {
+  const userData = useUserDataStore((state) => state.userData); // 사용자 정보 불러오기
+
   const [formData, setFormData] = useState<FormData>({
-    nickname: user.nickname,
-    job: user.job,
-    goal: user.goal,
-    profile_img: user.profile_img,
+    nickname: userData.nickname,
+    job: userData.job,
+    goal: userData.goal,
+    profile_img: userData.profile_img,
   });
-  const [previewImg, setPreviewImg] = useState<string>(user.profile_img);
+
+  const [previewImg, setPreviewImg] = useState<string>(userData.profile_img);
+  const [isEditing, setIsEditing] = useState(false); // '수정하기' - 편집 상태 확인
 
   useEffect(() => {
-    // 사용자 정보
     setFormData({
-      nickname: user.nickname,
-      job: user.job,
-      goal: user.goal,
-      profile_img: user.profile_img,
+      nickname: userData.nickname,
+      job: userData.job,
+      goal: userData.goal,
+      profile_img: userData.profile_img,
     });
-    setPreviewImg(user.profile_img);
-  }, [user]);
+    setPreviewImg(userData.profile_img);
+  }, [userData]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleImageChage = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-
     if (!file) return;
-
     setPreviewImg(URL.createObjectURL(file));
-    /*********************** 일단 formData에 이름으로 저장 ***********************/
     setFormData((prev) => ({ ...prev, profile_img: file.name }));
   };
 
   const resetForm = () => {
     setFormData({
-      nickname: user.nickname,
-      job: user.job,
-      goal: user.goal,
-      profile_img: user.profile_img,
+      nickname: userData.nickname,
+      job: userData.job,
+      goal: userData.goal,
+      profile_img: userData.profile_img,
     });
+    setPreviewImg(userData.profile_img);
   };
-
-  return {
-    formData,
-    previewImg,
-    handleInputChange,
-    handleImageChage,
-    resetForm,
-  };
-}
-
-export default function Profile(): React.JSX.Element {
-  const userData = useUserDataStore((state) => state.userData); // 사용자 정보 불러오기
-  const {
-    formData,
-    previewImg,
-    handleInputChange,
-    handleImageChage,
-    resetForm,
-  } = useProfileForm(userData);
-
-  const [isEditing, setIsEditing] = useState(false); // '수정하기' - 편집 상태 확인
 
   // 수정 모드
   const startEditing = () => {
@@ -123,7 +102,7 @@ export default function Profile(): React.JSX.Element {
                 type="file"
                 accept="image/*"
                 className="hidden"
-                onChange={handleImageChage}
+                onChange={handleImageChange}
               />
             </label>
           )}
