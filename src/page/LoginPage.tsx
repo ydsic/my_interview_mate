@@ -8,10 +8,10 @@ import {
 import { Link, useNavigate } from 'react-router-dom';
 import { useLoggedInStore, useUserDataStore } from '../store/userData';
 import Input from '../components/common/Input';
-import { loginUserInfo } from '../api/userInfo';
+import { supabase } from '../supabaseClient';
 
 export default function LoginPage() {
-  const [userId, setUserId] = useState('');
+  const [email, setEmail] = useState('');
   const [userPassword, setUserPassword] = useState('');
 
   const setUserData = useUserDataStore((state) => state.setUserData);
@@ -21,43 +21,38 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!userId || !userPassword) {
-      alert('아이디와 비밀번호를 입력하세요.');
+    if (!email || !userPassword) {
+      alert('이메일과 비밀번호를 입력하세요.');
       return;
     }
 
-    const { data, error } = await loginUserInfo(userId, userPassword); // 로그인 API 호출
+    // Supabase Auth로 로그인
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password: userPassword,
+    });
 
     if (error) {
-      alert('로그인 중 오류가 발생했습니다.');
+      alert(error.message || '이메일 또는 비밀번호가 올바르지 않습니다.');
+      return;
     }
 
-    // 로그인 성공 시 사용자 데이터 저장
-    if (data) {
-      const start = performance.now();
+    // 추가 정보(profile) 조회
+    const { data: profile } = await supabase
+      .from('profile')
+      .select('*')
+      .eq('email', email)
+      .single();
 
-      setUserData({
-        user_id: data.user_id,
-        nickname: data.nickname,
-        email: data.email,
-        profile_img: data.profile_img,
-        job: data.job,
-        goal: data.goal,
-      });
-      setIsLoggedIn(true);
-
-      // 로그인 성공 시 쿠키에 access_token 저장 (24시간 유지) document에 저장하는거라 보안상 좋지는 않음
-      if (data.access_token) {
-        document.cookie = `access_token=${data.access_token}; path=/; max-age=86400`;
-      }
-
-      const end = performance.now();
-      console.log(`회원가입 DB 응답시간: ${(end - start).toFixed(2)}ms`);
-
-      navigate('/');
-    } else {
-      alert('아이디 또는 비밀번호가 올바르지 않습니다.');
-    }
+    setUserData({
+      nickname: profile?.nickname ?? '',
+      email,
+      profile_img: profile?.profile_img ?? '',
+      job: profile?.job ?? '',
+      goal: profile?.goal ?? '',
+    });
+    setIsLoggedIn(true);
+    navigate('/');
   };
 
   return (
@@ -74,14 +69,14 @@ export default function LoginPage() {
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
                   <label className="flex font-medium text-gray-700 mb-2">
-                    아이디
+                    이메일
                   </label>
                   <H4_placeholder>
                     <Input
-                      type="text"
-                      value={userId}
-                      onChange={(e) => setUserId(e.target.value)}
-                      placeholder="아이디를 입력하세요"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="이메일을 입력하세요"
                     />
                   </H4_placeholder>
                 </div>

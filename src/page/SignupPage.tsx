@@ -10,10 +10,9 @@ import { supabase } from '../supabaseClient';
 import Input from '../components/common/Input';
 
 export default function SignupPage() {
-  const [userId, setUserId] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [nickname, setNickname] = useState('');
-  const [email, setEmail] = useState('');
   const [job, setJob] = useState('');
   const [goal, setGoal] = useState('');
   const [loading, setLoading] = useState(false);
@@ -23,41 +22,42 @@ export default function SignupPage() {
 
   const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (loading) return; // 중복 요청 방지
-    if (!userId || !password || !nickname || !email) {
-      alert('아이디, 비밀번호, 닉네임, 이메일을 모두 입력하세요.');
-      return;
-    }
-
-    if (userId.length < 3) {
-      alert('아이디는 3자 이상이어야 합니다.');
+    if (loading) return;
+    if (!password || !nickname || !email) {
+      alert('비밀번호, 닉네임, 이메일을 모두 입력하세요.');
       return;
     }
     setLoading(true);
-    const start = performance.now();
-    const { data, error } = await supabase.from('user_info').insert([
-      {
-        user_id: userId,
-        password,
-        nickname,
-        email,
-        job: job || '',
-        goal: goal || '',
-        profile_img: defaultProfileImg,
-      },
-    ]);
-    const end = performance.now();
-    console.log(`회원가입 DB 응답시간: ${(end - start).toFixed(2)}ms`);
-    setLoading(false);
+    // Supabase Auth 회원가입
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+    });
     if (error) {
-      if (error.message.includes('duplicate')) {
-        alert('이미 가입된 아이디입니다.');
+      setLoading(false);
+      if (error.message.includes('already registered')) {
+        alert('이미 가입된 이메일입니다.');
       } else {
         alert(error.message || '회원가입 중 오류가 발생했습니다.');
       }
       return;
     }
-    alert('회원가입 성공! 로그인 페이지로 이동합니다.');
+    // 추가 정보 저장 (예: profile 테이블)
+    const { error: profileError } = await supabase.from('profile').insert([
+      {
+        email,
+        nickname,
+        job: job || '',
+        goal: goal || '',
+        profile_img: defaultProfileImg,
+      },
+    ]);
+    setLoading(false);
+    if (profileError) {
+      alert('프로필 정보 저장 중 오류가 발생했습니다.');
+      return;
+    }
+    alert('회원가입 성공! 이메일 인증 후 로그인하세요.');
     navigate('/login');
   };
 
@@ -71,14 +71,14 @@ export default function SignupPage() {
       >
         <div>
           <label className="flex font-medium text-gray-700 mb-2">
-            아이디<span className="text-red-500 ml-1">*</span>
+            이메일<span className="text-red-500 ml-1">*</span>
           </label>
           <H4_placeholder>
             <Input
-              type="text"
-              value={userId}
-              onChange={(e) => setUserId(e.target.value)}
-              placeholder="아이디를 입력하세요"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="이메일을 입력하세요"
               required
             />
           </H4_placeholder>
@@ -94,20 +94,6 @@ export default function SignupPage() {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="비밀번호를 입력하세요"
               autoComplete="off"
-              required
-            />
-          </H4_placeholder>
-        </div>
-        <div>
-          <label className="flex font-medium text-gray-700 mb-2">
-            이메일<span className="text-red-500 ml-1">*</span>
-          </label>
-          <H4_placeholder>
-            <Input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="이메일을 입력하세요"
               required
             />
           </H4_placeholder>

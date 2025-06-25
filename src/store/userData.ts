@@ -1,9 +1,8 @@
 import { create } from 'zustand';
 
 type dbUserDataType = {
-  user_id: string;
-  nickname: string;
   email: string;
+  nickname: string;
   profile_img: string;
   job: string;
   goal: string;
@@ -22,9 +21,8 @@ type LoggedInType = {
 
 export const useUserDataStore = create<UserDataStore>((set) => ({
   userData: {
-    user_id: '',
-    nickname: '',
     email: '',
+    nickname: '',
     profile_img: '',
     job: '',
     goal: '',
@@ -36,9 +34,8 @@ export const useUserDataStore = create<UserDataStore>((set) => ({
   clearUserData: () =>
     set({
       userData: {
-        user_id: '',
-        nickname: '',
         email: '',
+        nickname: '',
         profile_img: '',
         job: '',
         goal: '',
