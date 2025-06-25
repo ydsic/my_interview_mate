@@ -16,12 +16,14 @@ export default function SignupPage() {
   const [email, setEmail] = useState('');
   const [job, setJob] = useState('');
   const [goal, setGoal] = useState('');
+  const [loading, setLoading] = useState(false);
   const defaultProfileImg =
     'https://vlowdzoigoyaudsydqam.supabase.co/storage/v1/object/public/profileimgs//profile_default_img.png';
   const navigate = useNavigate();
 
   const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (loading) return; // 중복 요청 방지
     if (!userId || !password || !nickname || !email) {
       alert('아이디, 비밀번호, 닉네임, 이메일을 모두 입력하세요.');
       return;
@@ -31,7 +33,8 @@ export default function SignupPage() {
       alert('아이디는 3자 이상이어야 합니다.');
       return;
     }
-
+    setLoading(true);
+    const start = performance.now();
     const { data, error } = await supabase.from('user_info').insert([
       {
         user_id: userId,
@@ -43,6 +46,9 @@ export default function SignupPage() {
         profile_img: defaultProfileImg,
       },
     ]);
+    const end = performance.now();
+    console.log(`회원가입 DB 응답시간: ${(end - start).toFixed(2)}ms`);
+    setLoading(false);
     if (error) {
       if (error.message.includes('duplicate')) {
         alert('이미 가입된 아이디입니다.');
@@ -142,8 +148,11 @@ export default function SignupPage() {
             />
           </H4_placeholder>
         </div>
-        <SubmitButton className="w-full py-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-lg">
-          회원가입
+        <SubmitButton
+          className="w-full py-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-lg"
+          isDisabled={loading}
+        >
+          {loading ? '회원가입 중...' : '회원가입'}
         </SubmitButton>
         <div className="mt-6 text-center">
           <span className="text-gray-600">이미 계정이 있으신가요? </span>

@@ -34,6 +34,8 @@ export default function LoginPage() {
 
     // 로그인 성공 시 사용자 데이터 저장
     if (data) {
+      const start = performance.now();
+
       setUserData({
         user_id: data.user_id,
         nickname: data.nickname,
@@ -48,6 +50,10 @@ export default function LoginPage() {
       if (data.access_token) {
         document.cookie = `access_token=${data.access_token}; path=/; max-age=86400`;
       }
+
+      const end = performance.now();
+      console.log(`회원가입 DB 응답시간: ${(end - start).toFixed(2)}ms`);
+
       navigate('/');
     } else {
       alert('아이디 또는 비밀번호가 올바르지 않습니다.');
