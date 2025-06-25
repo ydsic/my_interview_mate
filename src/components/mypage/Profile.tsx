@@ -12,86 +12,103 @@ type UserData = {
   goal: string;
 };
 
-export default function Profile() {
-  const userData = useUserDataStore((state) => state.userData); // 사용자 정보 불러오기
-  const [isEditing, setIsEditing] = useState(false); // '수정하기' - 편집 상태 확인
-  // 사용자 정보
-  const [formData, setFormData] = useState<Omit<UserData, 'user_id' | 'email'>>(
-    {
-      nickname: ' ',
-      job: ' ',
-      goal: ' ',
-      profile_img: '',
-    },
-  );
-  const [previewImg, setPreviewImg] = useState<string>(userData.profile_img); // 첨부한 사진 미리보기
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+type FormData = Omit<UserData, 'user_id' | 'email'>;
+
+// 커스텀 훅 분리
+function useProfileForm(user: UserData) {
+  const [formData, setFormData] = useState<FormData>({
+    nickname: user.nickname,
+    job: user.job,
+    goal: user.goal,
+    profile_img: user.profile_img,
+  });
+  const [previewImg, setPreviewImg] = useState<string>(user.profile_img);
 
   useEffect(() => {
-    console.log(userData);
+    // 사용자 정보
     setFormData({
-      nickname: userData.nickname,
-      job: userData.job,
-      goal: userData.goal,
-      profile_img: userData.profile_img,
+      nickname: user.nickname,
+      job: user.job,
+      goal: user.goal,
+      profile_img: user.profile_img,
     });
-    setPreviewImg(userData.profile_img);
-  }, [userData]);
+    setPreviewImg(user.profile_img);
+  }, [user]);
 
-  // 되돌리기 버튼 클릭
-  const handleCancel = () => {
-    setFormData({
-      nickname: userData.nickname,
-      job: userData.job,
-      goal: userData.goal,
-      profile_img: userData.profile_img,
-    });
-    setPreviewImg(userData.profile_img);
-    setIsEditing(false);
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // 프로필 사진 변경
-  const handleImgChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChage = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+
     if (!file) return;
 
-    setSelectedFile(file);
     setPreviewImg(URL.createObjectURL(file));
     /*********************** 일단 formData에 이름으로 저장 ***********************/
     setFormData((prev) => ({ ...prev, profile_img: file.name }));
-    console.log('선택된 파일:', selectedFile?.name);
   };
 
-  // isEditing 상태 토글
-  const toggleEditing = () => {
-    setIsEditing((prev) => !prev);
+  const resetForm = () => {
+    setFormData({
+      nickname: user.nickname,
+      job: user.job,
+      goal: user.goal,
+      profile_img: user.profile_img,
+    });
   };
 
-  // '저장하기' 버튼 클릭 시 동작
-  const saveFormData = () => {
-    console.log('저장된 formData : ', formData);
+  return {
+    formData,
+    previewImg,
+    handleInputChange,
+    handleImageChage,
+    resetForm,
+  };
+}
+
+export default function Profile(): React.JSX.Element {
+  const userData = useUserDataStore((state) => state.userData); // 사용자 정보 불러오기
+  const {
+    formData,
+    previewImg,
+    handleInputChange,
+    handleImageChage,
+    resetForm,
+  } = useProfileForm(userData);
+
+  const [isEditing, setIsEditing] = useState(false); // '수정하기' - 편집 상태 확인
+
+  // 수정 모드
+  const startEditing = () => {
+    setIsEditing(true);
   };
 
-  const handleButtonClick = () => {
-    if (isEditing) {
-      saveFormData();
-      toggleEditing();
-    } else {
-      toggleEditing();
-    }
+  // 수정 모드 해제
+  const endEditing = () => {
+    resetForm();
+    setIsEditing(false);
+  };
+
+  const saveChanges = () => {
+    console.log('저장된 FormData : ', formData);
+    setIsEditing(false);
+    /*** API 코드 추가하기 ***/
+  };
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    saveChanges();
   };
 
   return (
-    <div className="flex flex-col gap-10 mb-5 bg-white p-[30px] rounded-4xl shadow-md relative">
+    <form
+      onSubmit={handleSubmit}
+      className="flex flex-col gap-10 mb-5 bg-white p-[30px] rounded-4xl shadow-md relative"
+    >
       <p className="font-semibold">프로필 정보</p>
+
       <div className="flex items-center gap-5.5 h-20 relative">
         <div className="relative">
           <img
@@ -106,7 +123,7 @@ export default function Profile() {
                 type="file"
                 accept="image/*"
                 className="hidden"
-                onChange={handleImgChange}
+                onChange={handleImageChage}
               />
             </label>
           )}
@@ -116,10 +133,12 @@ export default function Profile() {
           {isEditing ? (
             <input
               name="nickname"
+              type="text"
               value={formData.nickname}
               className="font-semibold bg-gray-15 px-5 py-3 rounded-xl focus:outline-none w-full"
               placeholder={userData.nickname}
-              onChange={handleChange}
+              maxLength={15}
+              onChange={handleInputChange}
             />
           ) : (
             <H2_content_title>{userData.nickname}</H2_content_title>
@@ -131,45 +150,58 @@ export default function Profile() {
       <div className="flex flex-col gap-5">
         <div className="flex w-full gap-8 px-2 items-center">
           <p> 희망 직무</p>
-          <input
-            name="job"
-            className="bg-gray-15 grow-1 px-5 py-3 focus:outline-none rounded-2xl"
-            value={formData.job}
-            placeholder={userData.job}
-            disabled={!isEditing}
-            onChange={handleChange}
-          />
+
+          {isEditing ? (
+            <input
+              name="job"
+              type="text"
+              className="bg-gray-15 grow-1 px-5 py-3 focus:outline-none rounded-2xl"
+              value={formData.job}
+              placeholder={userData.job}
+              maxLength={20}
+              onChange={handleInputChange}
+            />
+          ) : (
+            <p className="bg-gray-15 grow-1 px-5 py-3 focus:outline-none rounded-2xl">
+              {userData.job}
+            </p>
+          )}
         </div>
 
         <div className="flex w-full gap-8 px-2 items-center">
           <p> 면접 목표</p>
-          <input
-            name="goal"
-            className="bg-gray-15 grow-1 px-5 py-3 focus:outline-none rounded-2xl"
-            value={formData.goal}
-            placeholder={userData.goal}
-            disabled={!isEditing}
-            onChange={handleChange}
-          />
+          {isEditing ? (
+            <input
+              name="goal"
+              type="text"
+              className="bg-gray-15 grow-1 px-5 py-3 focus:outline-none rounded-2xl"
+              value={formData.goal}
+              placeholder={userData.goal}
+              maxLength={50}
+              onChange={handleInputChange}
+            />
+          ) : (
+            <p className="bg-gray-15 grow-1 px-5 py-3 focus:outline-none rounded-2xl">
+              {userData.goal}
+            </p>
+          )}
         </div>
       </div>
 
       <div className="flex justify-end mt-auto gap-5">
-        {isEditing ? (
+        {isEditing && (
           <button
             className="px-10 py-3 bg-gray-25 text-gray-70 font-semibold rounded-xl cursor-pointer hover:bg-gray-40"
-            onClick={handleCancel}
+            onClick={endEditing}
           >
             되돌리기
           </button>
-        ) : (
-          <></>
         )}
 
-        <Button onClick={handleButtonClick}>
+        <Button onClick={isEditing ? saveChanges : startEditing}>
           {isEditing ? '저장하기' : '프로필 수정'}
         </Button>
       </div>
-    </div>
+    </form>
   );
 }
