@@ -16,8 +16,6 @@ export default function SignupPage() {
   const [job, setJob] = useState('');
   const [goal, setGoal] = useState('');
   const [loading, setLoading] = useState(false);
-  const defaultProfileImg =
-    'https://vlowdzoigoyaudsydqam.supabase.co/storage/v1/object/public/profileimgs//profile_default_img.png';
   const navigate = useNavigate();
 
   const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -49,7 +47,6 @@ export default function SignupPage() {
         nickname,
         job: job || '',
         goal: goal || '',
-        profile_img: defaultProfileImg,
       },
     ]);
     setLoading(false);

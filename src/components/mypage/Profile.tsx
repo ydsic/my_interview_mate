@@ -3,6 +3,7 @@ import { useUserDataStore } from '../../store/userData';
 import Button from '../common/Button';
 import { H2_content_title } from '../common/HTagStyle';
 import { useToast } from '../../hooks/useToast';
+import defaultProfileImg from '../assets/profile_default_img.png';
 
 type UserData = {
   user_id: string;
