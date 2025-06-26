@@ -13,7 +13,7 @@ export default function App() {
   return (
     <>
       <ToastProvider />
-      <BrowserRouter basename="/my_interview_mate">
+      <BrowserRouter>
         <Nav />
         <DefaultLayout>
           <Routes>

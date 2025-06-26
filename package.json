@@ -2,7 +2,6 @@
   "name": "fdsa",
   "private": true,
   "version": "0.0.0",
-  "homepage": "https://ydsic.github.io/my_interview_mate",
   "type": "module",
   "scripts": {
     "dev": "vite",
