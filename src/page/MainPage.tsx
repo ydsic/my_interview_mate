@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import FirstLandingPage from '../components/mainpage/FirstLanding';
 import Greeting from '../components/mainpage/Greeting';
 import { useLoggedInStore } from '../store/userData';
+import UserMain from '../components/mainpage/UserMain';
 
 export default function MainPage() {
   const [firstLandingPage, setFirstLandingPage] = useState(true);
@@ -20,7 +21,7 @@ export default function MainPage() {
       {firstLandingPage ? (
         <FirstLandingPage setFirstLandingPage={setFirstLandingPage} />
       ) : (
-        <>{isLoggedIn ? '로그인 시 보일 화면 컴포넌트 부분' : <Greeting />}</>
+        <>{isLoggedIn ? <UserMain /> : <Greeting />}</>
       )}
     </>
   );
