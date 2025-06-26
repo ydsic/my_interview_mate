@@ -4,6 +4,12 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- XSS 공격에 대한 방어를 위해 CSP(Content Security Policy) 적용 -->
+    <!-- 외부 스크립트 삽입, 인라인 스크립트 실행 등을 차단하는 역할 -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; object-src 'none';"
+    />
     <title>나의_인터뷰_메이트</title>
     <link href="/src/index.css" rel="stylesheet" />
   </head>
