@@ -23,7 +23,7 @@ export default function MyPage() {
 
   return (
     <>
-      <div className="flex justify-between w-ful px-10 py-3 bg-white rounded-4xl my-10 ">
+      <div className="flex justify-between w-ful px-10 py-3 bg-white rounded-4xl mb-10 ">
         <div
           className={`flex items-center px-5 cursor-pointer gap-5 ${activeTab === 'dashboard' ? 'text-black' : 'text-gray-400'}`}
           onClick={() => setActiveTab('dashboard')}
