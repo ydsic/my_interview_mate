@@ -1,13 +1,14 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
 import addQuestionIcon from '../../assets/ic-add-question.svg';
+import micIcon from '../../assets/micIcon.png';
 import { SubmitButton } from '../common/Button';
 import { H2_content_title } from '../common/HTagStyle';
 import { useState, useEffect } from 'react';
 import { OpenAIApi } from '../../api/prompt';
 import { useToast } from '../../hooks/useToast';
 import { VoiceRecording } from '../../utils/voiceRecording';
-import micIcon from '../../assets/micIcon.png';
+import WaitingMessage from './WaitingMessage';
 
 interface AnswerInputProps {
   question: string;
@@ -22,14 +23,18 @@ export default function AnswerInput({
 }: AnswerInputProps) {
   const [answer, setAnswer] = useState('');
   const isEmpty = answer.trim() === '';
+
   const [loading, setLoading] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+
   const toast = useToast();
+  const isFollowUpDisabled = isEmpty || disabled;
   const [voiceRecording, setVoiceRecording] = useState<VoiceRecording | null>(
     null,
   );
 
+  // 1) VoiceRecording 세팅
   useEffect(() => {
     const recording = new VoiceRecording({
       onStart: () => {
@@ -56,26 +61,14 @@ export default function AnswerInput({
         setIsRecording(false);
       },
     });
-
     setVoiceRecording(recording);
-
-    return () => {
-      recording.cleanup();
-    };
+    return () => recording.cleanup();
   }, [toast]);
 
-  const handleMicClick = () => {
-    if (!voiceRecording || disabled || isProcessing) return;
-    if (isRecording) {
-      voiceRecording.stopRecording();
-    } else {
-      voiceRecording.startRecording();
-    }
-  };
-
+  // 2) 피드백 요청
   const handleFeedback = async () => {
     if (isEmpty) {
-      toast('먼저 질문에 대한 답변을 해주세요.');
+      toast('먼저 질문에 대한 답변을 해주세요.', 'info');
       return;
     }
     setLoading(true);
@@ -91,42 +84,52 @@ export default function AnswerInput({
     }
   };
 
+  // 3) 추가 질문
   const handleFollowUp = () => {
     if (isEmpty) {
-      toast('먼저 질문에 대한 답변을 해주세요!');
+      toast('먼저 질문에 대한 답변을 해주세요.', 'info');
       return;
     }
     toast('추가 질문을 전송했어요!', 'success');
   };
 
+  // 4) 마이크 토글
+  const handleMicClick = () => {
+    if (!voiceRecording || disabled || isProcessing) return;
+    if (isRecording) voiceRecording.stopRecording();
+    else voiceRecording.startRecording();
+  };
+
   return (
-    <div className="p-5 rounded-xl border border-gray-300 bg-white shadow-sm space-y-4 mt-3">
+    <div className="p-5 rounded-xl border border-gray-300 bg-white shadow-sm space-y-4 mt-3 relative">
+      {/* 로딩 모달 */}
+      {loading && <WaitingMessage />}
+
       <div className="flex justify-between mb-5">
         <H2_content_title>내 답변</H2_content_title>
       </div>
 
+      {/* 답변 입력 + 음성 UI */}
       <div className="relative">
         <textarea
           rows={4}
           className="w-full min-h-[120px] p-4 border border-gray-200 rounded-xl resize-none focus:outline-none pr-12"
-          placeholder="답변을 작성해 주세요."
+          placeholder="답변을 작성하거나 음성으로 대답해주세요."
           value={answer}
           onChange={(e) => setAnswer(e.target.value)}
           disabled={disabled || isRecording || isProcessing}
         />
-
-        {/* 마이크 버튼 */}
         <button
           type="button"
           onClick={handleMicClick}
-          className={`absolute bottom-3 right-3 p-1 rounded-full transition ${
-            isRecording ? 'bg-red-500' : 'bg-white hover:bg-gray-200'
-          } ${disabled || isProcessing ? 'cursor-not-allowed' : ''}`}
+          className={`
+            absolute bottom-3 right-3 p-1 rounded-full transition
+            ${isRecording ? 'bg-red-500' : 'bg-white hover:bg-gray-200'}
+            ${disabled || isProcessing ? 'cursor-not-allowed' : ''}
+          `}
         >
           <img src={micIcon} alt="마이크 아이콘" className="w-8 h-8" />
         </button>
-
-        {/* 상태 표시 */}
         {isProcessing ? (
           <div className="absolute bottom-6 right-16 text-xs text-blue-500 font-medium">
             🔄 음성 처리 중...
@@ -138,7 +141,6 @@ export default function AnswerInput({
         ) : null}
       </div>
 
-      {/* 피드백 받기 버튼 */}
       <div className="flex justify-end gap-4">
         <SubmitButton
           onClick={handleFeedback}
@@ -152,21 +154,15 @@ export default function AnswerInput({
         </SubmitButton>
 
         {/* 추가 질문 버튼 */}
+
         <button
-          disabled={isEmpty || disabled || isRecording || isProcessing}
           onClick={handleFollowUp}
-          className={`flex items-center gap-2 border border-gray-200 rounded-xl 
-            px-3 py-1 cursor-pointer hover:bg-gray-50 transition ${
-              isEmpty || disabled || isRecording || isProcessing
-                ? 'opacity-50 cursor-not-allowed'
-                : 'hover:bg-gray-50'
-            }`}
+          className={`
+            flex items-center gap-2 border border-gray-200 rounded-xl px-3 py-1 transition cursor-pointer
+            ${isFollowUpDisabled ? 'opacity-50 cursor-pointer' : 'hover:bg-gray-50'}
+          `}
         >
-          <img
-            src={addQuestionIcon}
-            alt="추가 질문하기 아이콘"
-            className="w-4 h-4"
-          />
+          <img src={addQuestionIcon} alt="" className="w-4 h-4" />
           추가 질문하기
         </button>
       </div>
