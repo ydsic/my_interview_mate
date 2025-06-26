@@ -75,7 +75,7 @@ export default function InterviewPage() {
             disabled={showFeedback}
           />
         </div>
-        <div>
+        <div className="flex justify-center items-center">
           <Button className="w-55 h-15 mt-8" onClick={handleNext}>
             다음 질문
           </Button>
