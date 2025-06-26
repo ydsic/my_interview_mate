@@ -3,7 +3,7 @@ import { useUserDataStore } from '../../store/userData';
 import Button from '../common/Button';
 import { H2_content_title } from '../common/HTagStyle';
 import { useToast } from '../../hooks/useToast';
-import defaultProfileImg from '../assets/profile_default_img.png';
+import defaultImg from '../../assets/profile_default_img.png';
 
 type UserData = {
   user_id: string;
@@ -16,18 +16,20 @@ type UserData = {
 
 type FormData = Omit<UserData, 'user_id' | 'email'>;
 
-export default function Profile(): React.JSX.Element {
+export default function Profile() {
   const toast = useToast();
   const userData = useUserDataStore((state) => state.userData); // 사용자 정보 불러오기
 
   const [formData, setFormData] = useState<FormData>({
-    nickname: userData.nickname,
-    job: userData.job,
-    goal: userData.goal,
-    profile_img: userData.profile_img,
+    nickname: '',
+    job: '',
+    goal: '',
+    profile_img: defaultImg,
   });
 
-  const [previewImg, setPreviewImg] = useState<string>(userData.profile_img);
+  const profileImg = userData.profile_img || defaultImg;
+  const [previewImg, setPreviewImg] = useState<string>(profileImg);
+
   const [isEditing, setIsEditing] = useState(false); // '수정하기' - 편집 상태 확인
 
   useEffect(() => {
@@ -35,10 +37,11 @@ export default function Profile(): React.JSX.Element {
       nickname: userData.nickname,
       job: userData.job,
       goal: userData.goal,
-      profile_img: userData.profile_img,
+      profile_img: profileImg,
     });
-    setPreviewImg(userData.profile_img);
-  }, [userData]);
+
+    setPreviewImg(profileImg);
+  }, [userData, profileImg]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -57,9 +60,9 @@ export default function Profile(): React.JSX.Element {
       nickname: userData.nickname,
       job: userData.job,
       goal: userData.goal,
-      profile_img: userData.profile_img,
+      profile_img: profileImg,
     });
-    setPreviewImg(userData.profile_img);
+    setPreviewImg(profileImg);
   };
 
   // 수정 모드
@@ -172,18 +175,21 @@ export default function Profile(): React.JSX.Element {
       </div>
 
       <div className="flex justify-end mt-auto gap-5">
-        {isEditing && (
-          <button
-            className="px-10 py-3 bg-gray-25 text-gray-70 font-semibold rounded-xl cursor-pointer hover:bg-gray-40"
-            onClick={endEditing}
-          >
-            되돌리기
-          </button>
+        {isEditing ? (
+          <>
+            <button
+              className="px-10 py-3 bg-gray-25 text-gray-70 font-semibold rounded-xl cursor-pointer hover:bg-gray-40"
+              onClick={endEditing}
+            >
+              되돌리기
+            </button>
+            <Button onClick={saveChanges}> 저장하기</Button>
+          </>
+        ) : (
+          <>
+            <Button onClick={startEditing}> 프로필 수정 </Button>
+          </>
         )}
-
-        <Button onClick={isEditing ? saveChanges : startEditing}>
-          {isEditing ? '저장하기' : '프로필 수정'}
-        </Button>
       </div>
     </form>
   );
