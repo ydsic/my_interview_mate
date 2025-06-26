@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useUserDataStore } from '../../store/userData';
 import Button from '../common/Button';
 import { H2_content_title } from '../common/HTagStyle';
+import { useToast } from '../../hooks/useToast';
 
 type UserData = {
   user_id: string;
@@ -15,6 +16,7 @@ type UserData = {
 type FormData = Omit<UserData, 'user_id' | 'email'>;
 
 export default function Profile(): React.JSX.Element {
+  const toast = useToast();
   const userData = useUserDataStore((state) => state.userData); // 사용자 정보 불러오기
 
   const [formData, setFormData] = useState<FormData>({
@@ -74,6 +76,7 @@ export default function Profile(): React.JSX.Element {
     console.log('저장된 FormData : ', formData);
     setIsEditing(false);
     /*** API 코드 추가하기 ***/
+    toast('프로필 수정을 완료했어요!', 'success');
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
