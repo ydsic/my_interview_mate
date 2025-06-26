@@ -5,7 +5,7 @@ export async function elevenLabsSTT(audioBlob: Blob): Promise<string> {
   const url = 'https://api.elevenlabs.io/v1/speech-to-text';
 
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 30000);
+  const timeoutId = setTimeout(() => controller.abort(), 60000);
 
   if (audioBlob.size === 0) {
     throw new Error('오디오 파일이 비어있습니다.');
@@ -33,7 +33,9 @@ export async function elevenLabsSTT(audioBlob: Blob): Promise<string> {
         'xi-api-key': apiKey,
       },
       body: formData,
+      signal: controller.signal,
     });
+    clearTimeout(timeoutId);
 
     if (!response.ok) {
       const responseText = await response.text();
