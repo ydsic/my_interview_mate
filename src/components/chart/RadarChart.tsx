@@ -1,12 +1,16 @@
 import { Radar } from 'react-chartjs-2';
 import '../../chartConfig';
 
-export default function RadarChart() {
-  const data = {
+type RadarChartProps = {
+  data: number[];
+};
+
+export default function RadarChart({ data }: RadarChartProps) {
+  const RadarData = {
     labels: ['논리적 일관성', '명료성', '구조화', '기술적 정확성', '심층성'],
     datasets: [
       {
-        data: [80, 85, 87, 88, 90],
+        data: data,
         fill: true,
         backgroundColor: '#3600F917',
         borderColor: '#8B5CF6',
@@ -36,7 +40,7 @@ export default function RadarChart() {
   return (
     <div className="w-[450px] h-[300px] justify-self-center">
       <Radar
-        data={data}
+        data={RadarData}
         options={{
           ...options,
           maintainAspectRatio: false,

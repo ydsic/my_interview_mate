@@ -1,11 +1,16 @@
 import { Line } from 'react-chartjs-2';
 
-export default function LineChart() {
-  const data = {
-    labels: ['6/13', '6/14', '6/15', '6/16', '6/17', '6/18', '6/19'],
+type LineChartProps = {
+  days: string[];
+  data: number[];
+};
+
+export default function LineChart({ days, data }: LineChartProps) {
+  const chartData = {
+    labels: days,
     datasets: [
       {
-        data: [70, 82, 85, 92, 88, 75, 60],
+        data: data,
         backgroundColor: '#3C82F6',
         borderColor: '#3C82F6',
         pointBorderColor: '#fff',
@@ -30,7 +35,7 @@ export default function LineChart() {
 
   return (
     <div className="w-full p-5">
-      <Line data={data} options={options} />
+      <Line data={chartData} options={options} />
     </div>
   );
 }
