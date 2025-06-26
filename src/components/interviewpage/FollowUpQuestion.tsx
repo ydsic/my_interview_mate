@@ -1,1 +1,1 @@
-export default function FolloUpQuestion() {}
+export default function FollowUpQuestion() {}
