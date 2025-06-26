@@ -1,11 +1,29 @@
 import { create } from 'zustand';
 
+type ProblemResult = {
+  question: string;
+  input: string;
+  scores: number[];
+  average: number;
+  feedback: string[];
+  summary: string;
+  answer: string;
+};
+
+type ProblemItem = {
+  id: number;
+  category: string;
+  problemData: ProblemResult[];
+};
+
 type dbUserDataType = {
   email: string;
   nickname: string;
   profile_img: string;
   job: string;
   goal: string;
+  history: ProblemItem[];
+  bookmark: ProblemItem[];
 };
 
 type UserDataStore = {
@@ -26,6 +44,8 @@ export const useUserDataStore = create<UserDataStore>((set) => ({
     profile_img: '',
     job: '',
     goal: '',
+    history: [],
+    bookmark: [],
   },
 
   setUserData: (dbUserData: dbUserDataType) =>
@@ -39,6 +59,8 @@ export const useUserDataStore = create<UserDataStore>((set) => ({
         profile_img: '',
         job: '',
         goal: '',
+        history: [],
+        bookmark: [],
       },
     }),
 }));

@@ -9,6 +9,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useLoggedInStore, useUserDataStore } from '../store/userData';
 import Input from '../components/common/Input';
 import { supabase } from '../supabaseClient';
+import { loginUserInfo } from '../api/userInfo';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -37,12 +38,8 @@ export default function LoginPage() {
       return;
     }
 
-    // 추가 정보(profile) 조회
-    const { data: profile } = await supabase
-      .from('profile')
-      .select('*')
-      .eq('email', email)
-      .single();
+    // profile 조회
+    const { data: profile } = await loginUserInfo(email);
 
     setUserData({
       nickname: profile?.nickname ?? '',
