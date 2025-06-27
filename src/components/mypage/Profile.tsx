@@ -1,8 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useUserDataStore } from '../../store/userData';
 import Button from '../common/Button';
+import defaultProfileImg from '../../assets/profile_default_img.png';
+import { uploadAndSetUserImage } from '../../api/userInfo';
+import { supabase } from '../../supabaseClient';
+import { loginUserInfo } from '../../api/userInfo';
 import { useToast } from '../../hooks/useToast';
-import defaultImg from '../../assets/profile_default_img.png';
 import InputOrText from './InputOrText';
 
 type UserData = {
@@ -19,15 +22,16 @@ type FormData = Omit<UserData, 'user_id' | 'email'>;
 export default function Profile() {
   const toast = useToast();
   const userData = useUserDataStore((state) => state.userData); // 사용자 정보 불러오기
+  const setUserData = useUserDataStore((state) => state.setUserData);
 
   const [formData, setFormData] = useState<FormData>({
     nickname: '',
     job: '',
     goal: '',
-    profile_img: defaultImg,
+    profile_img: defaultProfileImg,
   });
 
-  const profileImg = userData.profile_img || defaultImg;
+  const profileImg = userData.profile_img || defaultProfileImg;
   const [previewImg, setPreviewImg] = useState<string>(profileImg);
 
   const [isEditing, setIsEditing] = useState(false); // '수정하기' - 편집 상태 확인
@@ -48,11 +52,18 @@ export default function Profile() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     setPreviewImg(URL.createObjectURL(file));
-    setFormData((prev) => ({ ...prev, profile_img: file.name }));
+    console.log(await supabase.auth.getUser());
+    try {
+      const publicUrl = await uploadAndSetUserImage(file, userData.email);
+      setFormData((prev) => ({ ...prev, profile_img: publicUrl }));
+    } catch (err) {
+      console.log(err);
+      alert('프로필 이미지 업로드 실패');
+    }
   };
 
   const resetForm = () => {
@@ -76,11 +87,23 @@ export default function Profile() {
     setIsEditing(false);
   };
 
-  const saveChanges = () => {
+  const saveChanges = async () => {
     console.log('저장된 FormData : ', formData);
+    await setUserData({
+      ...userData,
+      ...formData,
+    });
+    const { data, error } = await loginUserInfo(userData.email);
+
+    if (data) {
+      setUserData(data);
+      toast('프로필 수정을 완료했어요!', 'success');
+    }
     setIsEditing(false);
     /*** API 코드 추가하기 ***/
-    toast('프로필 수정을 완료했어요!', 'success');
+    if (error) {
+      console.log(error);
+    }
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -99,7 +122,9 @@ export default function Profile() {
         <div className="relative">
           <img
             className="h-20 w-20 rounded-full object-cover"
-            src={previewImg}
+            src={
+              previewImg && previewImg !== '' ? previewImg : defaultProfileImg
+            }
             alt="프로필 사진"
           />
           {isEditing && (
