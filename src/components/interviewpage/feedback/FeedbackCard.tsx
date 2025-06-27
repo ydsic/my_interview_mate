@@ -44,9 +44,9 @@ export default function FeedbackCard({ feedback, answer }: FeedbackCardProps) {
         </div>
       </div>
       {selectedTab === 'feedback' ? (
-        <AiFeedback feedbackData={feedbackObj} answer={answer} />
+        <AiFeedback feedbackData={feedbackObj} />
       ) : (
-        <Answer feedbackData={feedbackObj} answer={answer} />
+        <Answer feedbackData={feedbackObj} />
       )}
     </div>
   );

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import Button, { SubmitButton } from '../components/common/Button';
+import { SubmitButton } from '../components/common/Button';
 import {
   H1_big_title,
   H3_sub_detail,
@@ -50,12 +50,14 @@ export default function SignupPage() {
       },
     ]);
     setLoading(false);
+
     if (profileError) {
       alert('프로필 정보 저장 중 오류가 발생했습니다.');
       return;
     }
-    alert('회원가입 성공! 이메일 인증 후 로그인하세요.');
+
     navigate('/login');
+    alert('회원가입 성공! 이메일 인증 후 로그인하세요.');
   };
 
   return (

@@ -6,16 +6,13 @@ import {
   H4_placeholder,
 } from '../components/common/HTagStyle';
 import { Link, useNavigate } from 'react-router-dom';
-import { useLoggedInStore, useUserDataStore } from '../store/userData';
 import Input from '../components/common/Input';
 import { supabase } from '../supabaseClient';
+import { setUserProfileByEmail } from '../api/setUserProfile';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [userPassword, setUserPassword] = useState('');
-
-  const setUserData = useUserDataStore((state) => state.setUserData);
-  const setIsLoggedIn = useLoggedInStore((state) => state.setIsLoggedIn);
 
   const navigate = useNavigate();
 
@@ -37,21 +34,8 @@ export default function LoginPage() {
       return;
     }
 
-    // 추가 정보(profile) 조회
-    const { data: profile } = await supabase
-      .from('profile')
-      .select('*')
-      .eq('email', email)
-      .single();
-
-    setUserData({
-      nickname: profile?.nickname ?? '',
-      email,
-      profile_img: profile?.profile_img ?? '',
-      job: profile?.job ?? '',
-      goal: profile?.goal ?? '',
-    });
-    setIsLoggedIn(true);
+    // profile 조회
+    await setUserProfileByEmail(email);
     navigate('/');
   };
 
