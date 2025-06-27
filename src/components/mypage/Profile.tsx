@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useUserDataStore } from '../../store/userData';
 import Button from '../common/Button';
-import { H2_content_title } from '../common/HTagStyle';
 import defaultProfileImg from '../../assets/profile_default_img.png';
 import { uploadAndSetUserImage } from '../../api/userInfo';
 import { supabase } from '../../supabaseClient';
 import { loginUserInfo } from '../../api/userInfo';
+import { useToast } from '../../hooks/useToast';
+import InputOrText from './InputOrText';
 
 type UserData = {
   user_id: string;
@@ -18,18 +19,21 @@ type UserData = {
 
 type FormData = Omit<UserData, 'user_id' | 'email'>;
 
-export default function Profile(): React.JSX.Element {
+export default function Profile() {
+  const toast = useToast();
   const userData = useUserDataStore((state) => state.userData); // 사용자 정보 불러오기
   const setUserData = useUserDataStore((state) => state.setUserData);
 
   const [formData, setFormData] = useState<FormData>({
-    nickname: userData.nickname,
-    job: userData.job,
-    goal: userData.goal,
-    profile_img: userData.profile_img,
+    nickname: '',
+    job: '',
+    goal: '',
+    profile_img: defaultProfileImg,
   });
 
-  const [previewImg, setPreviewImg] = useState<string>(userData.profile_img);
+  const profileImg = userData.profile_img || defaultProfileImg;
+  const [previewImg, setPreviewImg] = useState<string>(profileImg);
+
   const [isEditing, setIsEditing] = useState(false); // '수정하기' - 편집 상태 확인
 
   useEffect(() => {
@@ -37,10 +41,11 @@ export default function Profile(): React.JSX.Element {
       nickname: userData.nickname,
       job: userData.job,
       goal: userData.goal,
-      profile_img: userData.profile_img,
+      profile_img: profileImg,
     });
-    setPreviewImg(userData.profile_img);
-  }, [userData]);
+
+    setPreviewImg(profileImg);
+  }, [userData, profileImg]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -66,9 +71,9 @@ export default function Profile(): React.JSX.Element {
       nickname: userData.nickname,
       job: userData.job,
       goal: userData.goal,
-      profile_img: userData.profile_img,
+      profile_img: profileImg,
     });
-    setPreviewImg(userData.profile_img);
+    setPreviewImg(profileImg);
   };
 
   // 수정 모드
@@ -92,9 +97,10 @@ export default function Profile(): React.JSX.Element {
 
     if (data) {
       setUserData(data);
+      toast('프로필 수정을 완료했어요!', 'success');
     }
     setIsEditing(false);
-
+    /*** API 코드 추가하기 ***/
     if (error) {
       console.log(error);
     }
@@ -135,77 +141,60 @@ export default function Profile(): React.JSX.Element {
         </div>
 
         <div className="flex flex-col grow-1 justify-between h-full py-0.5">
-          {isEditing ? (
-            <input
-              name="nickname"
-              type="text"
-              value={formData.nickname}
-              className="font-semibold bg-gray-15 px-5 py-3 rounded-xl focus:outline-none w-full"
-              placeholder={userData.nickname}
-              maxLength={15}
-              onChange={handleInputChange}
-            />
-          ) : (
-            <H2_content_title>{userData.nickname}</H2_content_title>
-          )}
+          <InputOrText
+            isEditing={isEditing}
+            name="nickname"
+            value={formData.nickname}
+            placeholder={userData.nickname}
+            maxLength={15}
+            onChange={handleInputChange}
+          />
           <p className="text-sm text-gray-70">{userData.email}</p>
         </div>
       </div>
 
       <div className="flex flex-col gap-5">
         <div className="flex w-full gap-8 px-2 items-center">
-          <p> 희망 직무</p>
-
-          {isEditing ? (
-            <input
-              name="job"
-              type="text"
-              className="bg-gray-15 grow-1 px-5 py-3 focus:outline-none rounded-2xl"
-              value={formData.job}
-              placeholder={userData.job}
-              maxLength={20}
-              onChange={handleInputChange}
-            />
-          ) : (
-            <p className="bg-gray-15 grow-1 px-5 py-3 focus:outline-none rounded-2xl">
-              {userData.job}
-            </p>
-          )}
+          <p className="flex-shrink-0"> 희망 직무</p>
+          <InputOrText
+            isEditing={isEditing}
+            name="job"
+            value={formData.job}
+            placeholder={userData.job}
+            maxLength={20}
+            onChange={handleInputChange}
+          />
         </div>
 
         <div className="flex w-full gap-8 px-2 items-center">
-          <p> 면접 목표</p>
-          {isEditing ? (
-            <input
-              name="goal"
-              type="text"
-              className="bg-gray-15 grow-1 px-5 py-3 focus:outline-none rounded-2xl"
-              value={formData.goal}
-              placeholder={userData.goal}
-              maxLength={50}
-              onChange={handleInputChange}
-            />
-          ) : (
-            <p className="bg-gray-15 grow-1 px-5 py-3 focus:outline-none rounded-2xl">
-              {userData.goal}
-            </p>
-          )}
+          <p className="flex-shrink-0"> 면접 목표</p>
+          <InputOrText
+            isEditing={isEditing}
+            name="goal"
+            value={formData.goal}
+            placeholder={userData.goal}
+            maxLength={50}
+            onChange={handleInputChange}
+          />
         </div>
       </div>
 
       <div className="flex justify-end mt-auto gap-5">
-        {isEditing && (
-          <button
-            className="px-10 py-3 bg-gray-25 text-gray-70 font-semibold rounded-xl cursor-pointer hover:bg-gray-40"
-            onClick={endEditing}
-          >
-            되돌리기
-          </button>
+        {isEditing ? (
+          <>
+            <button
+              className="px-10 py-3 bg-gray-25 text-gray-70 font-semibold rounded-xl cursor-pointer hover:bg-gray-40"
+              onClick={endEditing}
+            >
+              되돌리기
+            </button>
+            <Button onClick={saveChanges}> 저장하기</Button>
+          </>
+        ) : (
+          <>
+            <Button onClick={startEditing}> 프로필 수정 </Button>
+          </>
         )}
-
-        <Button onClick={isEditing ? saveChanges : startEditing}>
-          {isEditing ? '저장하기' : '프로필 수정'}
-        </Button>
       </div>
     </form>
   );
