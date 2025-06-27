@@ -120,7 +120,7 @@ export default function UserMain() {
             </div>
           </div>
 
-          <Link to="/interview">
+          <Link to={`/interview/${selectedTopic.topic.category.toLowerCase()}`}>
             <Button> 면접 시작하기 </Button>
           </Link>
         </div>

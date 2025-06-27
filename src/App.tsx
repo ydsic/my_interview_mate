@@ -41,7 +41,7 @@ export default function App() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/mypage" element={<MyPage />} />
             <Route path="/signup" element={<SignupPage />} />
-            <Route path="/interview" element={<InterviewPage />} />
+            <Route path="/interview/:category" element={<InterviewPage />} />
           </Routes>
         </DefaultLayout>
       </BrowserRouter>

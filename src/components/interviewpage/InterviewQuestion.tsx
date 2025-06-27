@@ -12,7 +12,7 @@ import type {
 } from '../../types/interview';
 
 const CATEGORY_FIELDS: Record<CategoryKey, string> = {
-  react: 'front-end 분야',
+  'front-end': 'Front-end 분야',
   cs: 'CS 분야',
   git: 'Git 분야',
 };
@@ -21,7 +21,7 @@ const CATEGORY_STYLES: Record<
   string,
   { bg: string; text: string; question_bg: string }
 > = {
-  react: {
+  'front-end': {
     bg: 'front-bg-tag',
     text: 'front-text-tag',
     question_bg: 'front-bg',
