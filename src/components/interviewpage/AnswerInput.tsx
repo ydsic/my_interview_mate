@@ -9,6 +9,7 @@ import { OpenAIApi } from '../../api/prompt';
 import { useToast } from '../../hooks/useToast';
 import { VoiceRecording } from '../../utils/voiceRecording';
 import WaitingMessage from './WaitingMessage';
+import { useRadarChartData } from '../../store/radarchartData';
 
 interface AnswerInputProps {
   question: string;
@@ -36,6 +37,8 @@ export default function AnswerInput({
   const [recordingTime, setRecordingTime] = useState(60);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const voiceRecordingRef = useRef<VoiceRecording | null>(null);
+
+  const setRadarData = useRadarChartData((state) => state.setRadarData);
 
   // VoiceRecording 세팅
   useEffect(() => {
@@ -138,6 +141,10 @@ export default function AnswerInput({
     try {
       const feedback = await OpenAIApi(question, answer);
       onFeedback(answer, feedback);
+
+      const scores = JSON.parse(feedback).scores;
+      setRadarData(scores);
+
       toast('피드백을 가져왔어요!', 'success');
     } catch (e) {
       console.error('피드백 요청 실패:', e);
