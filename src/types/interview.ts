@@ -1,4 +1,4 @@
-export type CategoryKey = 'react' | 'cs' | 'git';
+export type CategoryKey = 'front-end' | 'cs' | 'git';
 
 export interface InterviewQuestionProps {
   category: CategoryKey;
