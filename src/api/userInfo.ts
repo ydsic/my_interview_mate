@@ -1,3 +1,4 @@
+import Dashboard from '../components/mypage/Dashboard';
 import { supabase } from '../supabaseClient';
 
 // 이메일로 프로필 전체 정보 조회
@@ -37,9 +38,53 @@ export async function getUserGoal(email: string) {
     .single();
 }
 
-// 이메일로 목표 업데이트
+// 목표 업데이트
 export async function updateUserGoal(email: string, goal: string) {
   return await supabase.from('profile').update({ goal }).eq('email', email);
+}
+
+// dashboard 조회
+export async function getUserDashboard(email: string) {
+  return await supabase
+    .from('profile')
+    .select('dashboard')
+    .eq('email', email)
+    .single();
+}
+// dashboard 업데이트
+export async function updateUserDashboard(email: string, dashboard: string[]) {
+  return await supabase
+    .from('profile')
+    .update({ dashboard })
+    .eq('email', email);
+}
+
+// history 조회
+export async function getUserhistory(email: string) {
+  return await supabase
+    .from('profile')
+    .select('history')
+    .eq('email', email)
+    .single();
+}
+
+// history 업데이트
+export async function updateUserhistory(email: string, history: string[]) {
+  return await supabase.from('profile').update({ history }).eq('email', email);
+}
+
+// bookmark 조회
+export async function getUserBookmark(email: string) {
+  return await supabase
+    .from('profile')
+    .select('bookmark')
+    .eq('email', email)
+    .single();
+}
+
+// bookmark 업데이트
+export async function updateUserBookmark(email: string, bookmark: string[]) {
+  return await supabase.from('profile').update({ bookmark }).eq('email', email);
 }
 
 // 이메일로 프로필 사진 조회
