@@ -1,5 +1,5 @@
 type ScoresType = {
-  data: number[];
+  data?: number[];
 };
 
 export default function EvaluationItems({ data }: ScoresType) {
@@ -10,9 +10,13 @@ export default function EvaluationItems({ data }: ScoresType) {
     return (
       <div className={itemClass}>
         <span className="text-gray-700 font-medium">{label}</span>
-        <span className="font-bold text-gray-900">{score}점</span>
+        <span className="font-bold text-gray-900">{score ?? '-'}점</span>
       </div>
     );
+  }
+
+  if (!Array.isArray(data) || data.length < 5) {
+    return <div className="text-red-500 p-2">데이터가 없습니다.</div>;
   }
 
   return (

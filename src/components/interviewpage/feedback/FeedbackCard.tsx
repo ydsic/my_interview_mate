@@ -3,18 +3,18 @@ import AiFeedback from './AiFeedback';
 import Answer from './Answer';
 
 type FeedbackCardProps = {
-  feedback: string;
+  feedback: any;
   answer: string;
 };
 
-export default function FeedbackCard({ feedback, answer }: FeedbackCardProps) {
+export default function FeedbackCard({ feedback }: FeedbackCardProps) {
   const [selectedTab, setSelectedTab] = useState<'feedback' | 'answer'>(
     'feedback',
   );
 
   let feedbackObj;
   try {
-    feedbackObj = JSON.parse(feedback);
+    feedbackObj = feedback;
   } catch {
     feedbackObj = {
       average:

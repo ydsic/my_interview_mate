@@ -139,12 +139,10 @@ export default function AnswerInput({
     }
     setLoading(true);
     try {
-      const feedback = await OpenAIApi(question, answer);
-      onFeedback(answer, feedback);
-
-      const scores = JSON.parse(feedback).scores;
+      const feedbackObj = await OpenAIApi(question, answer);
+      onFeedback(answer, feedbackObj);
+      const scores = feedbackObj.scores;
       setRadarData(scores);
-
       toast('피드백을 가져왔어요!', 'success');
     } catch (e) {
       console.error('피드백 요청 실패:', e);
