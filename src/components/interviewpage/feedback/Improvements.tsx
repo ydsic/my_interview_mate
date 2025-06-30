@@ -3,7 +3,9 @@ type FeedbackType = {
 };
 
 export default function Improvements({ data }: FeedbackType) {
-  const suggestions = data.filter((sugg) => !!sugg && sugg.trim() !== '');
+  const suggestions = Array.isArray(data)
+    ? data.filter((sugg) => !!sugg && sugg.trim() !== '')
+    : [];
 
   return (
     <div className="bg-yellow-10 border border-gray-200 rounded-xl p-4">
