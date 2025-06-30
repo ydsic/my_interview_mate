@@ -1,24 +1,16 @@
 // 이 코드 파일 하단에 STT에 대한 고찰과 각종 설명이 적혀있습니다.
 
+import { supabase } from '../supabaseClient'; // supabase 인스턴스 import 필요
+
 export async function elevenLabsSTT(audioBlob: Blob): Promise<string> {
-  const apiKey = 'sk_7e6fb3d574ba157e3c87e1ace98e545245507ae2e52b6cef';
-  const url = 'https://api.elevenlabs.io/v1/speech-to-text';
-
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 60000);
-
   if (audioBlob.size === 0) {
     throw new Error('오디오 파일이 비어있습니다.');
   }
 
   let fileName = 'audio.webm';
-  if (audioBlob.type.includes('mp4')) {
-    fileName = 'audio.mp4';
-  } else if (audioBlob.type.includes('wav')) {
-    fileName = 'audio.wav';
-  } else if (audioBlob.type.includes('ogg')) {
-    fileName = 'audio.ogg';
-  }
+  if (audioBlob.type.includes('mp4')) fileName = 'audio.mp4';
+  else if (audioBlob.type.includes('wav')) fileName = 'audio.wav';
+  else if (audioBlob.type.includes('ogg')) fileName = 'audio.ogg';
 
   const formData = new FormData();
   formData.append('file', audioBlob, fileName);
@@ -26,65 +18,51 @@ export async function elevenLabsSTT(audioBlob: Blob): Promise<string> {
   formData.append('language_code', 'ko');
   formData.append('timestamps_granularity', 'word');
 
+  // JWT 토큰 가져오기
+  const { data } = await supabase.auth.getSession();
+  const accessToken = data.session?.access_token;
+  if (!accessToken) throw new Error('로그인이 필요합니다.');
+
+  // 타임아웃 및 네트워크 예외 처리
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 60000);
+
   try {
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'xi-api-key': apiKey,
+    const response = await fetch(
+      'https://vlowdzoigoyaudsydqam.functions.supabase.co/elevenlabs-stt',
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: formData,
+        signal: controller.signal,
       },
-      body: formData,
-      signal: controller.signal,
-    });
+    );
     clearTimeout(timeoutId);
 
     if (!response.ok) {
       const responseText = await response.text();
-      console.error('STT API Error:', {
-        status: response.status,
-        statusText: response.statusText,
-        body: responseText,
-      });
-
-      let errorMsg = `STT API 요청 실패 (${response.status})`;
-
-      try {
-        const errData = JSON.parse(responseText);
-        if (errData.error) {
-          errorMsg += `: ${errData.error}`;
-        } else if (errData.message) {
-          errorMsg += `: ${errData.message}`;
-        }
-      } catch {
-        if (responseText) {
-          errorMsg += `: ${responseText.substring(0, 100)}`;
-        }
-      }
-      throw new Error(errorMsg);
+      throw new Error(
+        `STT API 요청 실패 (${response.status}): ${responseText}`,
+      );
     }
 
     const data = await response.json();
-    console.log('STT Response data:', data);
 
     let text = '';
-    if (data.text) {
-      text = data.text;
-    } else if (data.transcript) {
-      text = data.transcript;
-    } else if (typeof data === 'string') {
-      text = data;
-    } else {
-      console.warn('Unexpected response format:', data);
-      throw new Error('응답에서 텍스트를 찾을 수 없습니다.');
-    }
+    if (data.text) text = data.text;
+    else if (data.transcript) text = data.transcript;
+    else if (typeof data === 'string') text = data;
+    else throw new Error('응답에서 텍스트를 찾을 수 없습니다.');
 
     return text.trim();
-  } catch (error) {
-    console.error('STT API 호출 중 오류:', error);
+  } catch (error: any) {
+    clearTimeout(timeoutId);
 
     if (error.name === 'AbortError') {
       throw new Error('요청 시간이 초과되었습니다. 다시 시도해주세요.');
     }
-
     if (error instanceof Error) {
       throw error;
     } else {
