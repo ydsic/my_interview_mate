@@ -40,6 +40,7 @@ const CATEGORY_STYLES: Record<
 
 export default function InterviewQuestion({
   category,
+  topic,
   question,
   isBookmarked = false,
   onToggleBookmark,
@@ -62,9 +63,9 @@ export default function InterviewQuestion({
         <div className="flex items-center gap-4">
           {/* 왼쪽 상단 - 카테고리 */}
           <div
-            className={`flex items-center px-6 py-1 rounded-md ${categoryStyle.bg} ${categoryStyle.text}`}
+            className={`flex items-center px-6 pt-2 pb-3 rounded-md ${categoryStyle.bg} ${categoryStyle.text}`}
           >
-            <H3_sub_detail>{category}</H3_sub_detail>
+            <H3_sub_detail>{topic}</H3_sub_detail>
           </div>
           {/* 면접 질문 / 분야 */}
           <div className="text-left">

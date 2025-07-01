@@ -15,12 +15,16 @@ interface AnswerInputProps {
   question: string;
   onFeedback: (answer: string, feedback: string) => void;
   disabled?: boolean;
+  isFollowUpOpen: boolean;
+  onFollowUpToggle: () => void;
 }
 
 export default function AnswerInput({
   question,
   onFeedback,
   disabled,
+  isFollowUpOpen,
+  onFollowUpToggle,
 }: AnswerInputProps) {
   const [answer, setAnswer] = useState('');
   const isEmpty = answer.trim() === '';
@@ -30,7 +34,6 @@ export default function AnswerInput({
   const [isProcessing, setIsProcessing] = useState(false);
 
   const toast = useToast();
-  const isFollowUpDisabled = isEmpty || disabled || isRecording || isProcessing;
   const [voiceRecording, setVoiceRecording] = useState<VoiceRecording | null>(
     null,
   );
@@ -151,16 +154,6 @@ export default function AnswerInput({
       setLoading(false);
     }
   };
-
-  // 추가 질문
-  const handleFollowUp = () => {
-    if (isEmpty) {
-      toast('먼저 질문에 대한 답변을 해주세요.', 'info');
-      return;
-    }
-    toast('추가 질문을 전송했어요!', 'success');
-  };
-
   return (
     <div className="p-5 rounded-xl border border-gray-300 bg-white shadow-sm space-y-4 mt-3 relative">
       {/* 로딩 모달 */}
@@ -219,19 +212,18 @@ export default function AnswerInput({
 
         {/* 추가 질문 버튼 */}
         <button
-          onClick={handleFollowUp}
-          disabled={isFollowUpDisabled}
-          className={`
+          onClick={onFollowUpToggle}
+          className="
             flex items-center gap-2 border border-gray-200 rounded-xl px-3 py-1 transition
-            ${isFollowUpDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-gray-50 cursor-pointer'}
-          `}
+            hover:bg-gray-40 cursor-pointer
+          "
         >
           <img
             src={addQuestionIcon}
             alt="추가 질문하기 아이콘"
             className="w-4 h-4"
           />
-          추가 질문하기
+          {isFollowUpOpen ? '추가 질문 닫기' : '추가 질문하기'}
         </button>
       </div>
     </div>
