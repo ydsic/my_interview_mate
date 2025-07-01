@@ -1,115 +1,120 @@
-import Dashboard from '../components/mypage/Dashboard';
+//import Dashboard from '../components/mypage/Dashboard';
 import { supabase } from '../supabaseClient';
 
 // 이메일로 프로필 전체 정보 조회
-export async function loginUserInfo(email: string) {
-  return await supabase.from('profile').select('*').eq('email', email).single();
+export async function loginUserInfo(userId: string) {
+  return await supabase.from('user').select('*').eq('user_id', userId).single();
 }
 
 // 이메일로 닉네임 조회
-export async function getUserNickname(email: string) {
+export async function getUserNickname(userId: string) {
   return await supabase
-    .from('profile')
+    .from('user')
     .select('nickname')
-    .eq('email', email)
+    .eq('user_id', userId)
     .single();
 }
 
 // 이메일로 직업 조회
-export async function getUserJob(email: string) {
+export async function getUserJob(userId: string) {
   return await supabase
-    .from('profile')
+    .from('user')
     .select('job')
-    .eq('email', email)
+    .eq('user_id', userId)
     .single();
 }
 
 // 이메일로 직업 업데이트
-export async function updateUserJob(email: string, job: string) {
-  return await supabase.from('profile').update({ job }).eq('email', email);
+export async function updateUserJob(userId: string, job: string) {
+  return await supabase.from('user').update({ job }).eq('user_id', userId);
 }
 
 // 이메일로 목표 조회
-export async function getUserGoal(email: string) {
+export async function getUserGoal(userId: string) {
   return await supabase
-    .from('profile')
+    .from('user')
     .select('goal')
-    .eq('email', email)
+    .eq('user_id', userId)
     .single();
 }
 
 // 목표 업데이트
-export async function updateUserGoal(email: string, goal: string) {
-  return await supabase.from('profile').update({ goal }).eq('email', email);
+export async function updateUserGoal(userId: string, goal: string) {
+  return await supabase.from('user').update({ goal }).eq('user_id', userId);
 }
 
 // dashboard 조회
-export async function getUserDashboard(email: string) {
+export async function getUserDashboard(userId: string) {
   return await supabase
-    .from('profile')
+    .from('user')
     .select('dashboard')
-    .eq('email', email)
+    .eq('user_id', userId)
     .single();
 }
 // dashboard 업데이트
-export async function updateUserDashboard(email: string, dashboard: string[]) {
+export async function updateUserDashboard(userId: string, dashboard: string[]) {
   return await supabase
-    .from('profile')
+    .from('user')
     .update({ dashboard })
-    .eq('email', email);
+    .eq('user_id', userId);
 }
 
 // history 조회
-export async function getUserhistory(email: string) {
+export async function getUserhistory(userId: string) {
   return await supabase
     .from('profile')
     .select('history')
-    .eq('email', email)
+    .eq('user_id', userId)
     .single();
 }
 
 // history 업데이트
-export async function updateUserhistory(email: string, history: string[]) {
-  return await supabase.from('profile').update({ history }).eq('email', email);
+export async function updateUserhistory(userId: string, history: string[]) {
+  return await supabase
+    .from('profile')
+    .update({ history })
+    .eq('user_id', userId);
 }
 
 // bookmark 조회
-export async function getUserBookmark(email: string) {
+export async function getUserBookmark(userId: string) {
   return await supabase
-    .from('profile')
-    .select('bookmark')
-    .eq('email', email)
-    .single();
+    .from('bookmark')
+    .select('question_id, created_at')
+    .eq('user_id', userId);
 }
 
 // bookmark 업데이트
-export async function updateUserBookmark(email: string, bookmark: string[]) {
-  return await supabase.from('profile').update({ bookmark }).eq('email', email);
+export async function updateUserBookmark(userId: string, bookmark: string[]) {
+  return await supabase
+    .from('bookmark')
+    .update({ bookmark })
+    .eq('user_id', userId);
 }
 
 // 이메일로 프로필 사진 조회
-export async function getUserImage(email: string) {
+export async function getUserImage(userId: string) {
   return await supabase
-    .from('profile')
+    .from('user')
     .select('profile_img')
-    .eq('email', email)
+    .eq('user_id', userId)
     .single();
 }
 
 // 이메일로 프로필 사진 업데이트
-export async function updateUserImage(email: string, imageUrl: string) {
+export async function updateUserImage(userId: string, imageUrl: string) {
   return await supabase
-    .from('profile')
+    .from('user')
     .update({ profile_img: imageUrl })
-    .eq('email', email);
+    .eq('user_id', userId);
 }
 
 // Storage에 이미지 업로드 후 publicUrl을 user profile 테이블에 저장
-export async function uploadAndSetUserImage(file: File, email: string) {
-  const safeEmail = email.replace(/[^a-zA-Z0-9]/g, '_');
+export async function uploadAndSetUserImage(file: File, userId: string) {
+  const safeuserId = userId.replace(/[^a-zA-Z0-9]/g, '_');
   const fileExt =
     file.name.split('.').pop() || file.type.split('/').pop() || 'png';
-  const filePath = `profile/${safeEmail}.${fileExt}`;
+  const filePath = `profile/${safeuserId}.${fileExt}`;
   console.log('file:', file, 'fileExt:', fileExt, 'filePath:', filePath);
   const { error: uploadError } = await supabase.storage
     .from('profile-images')
@@ -124,13 +129,17 @@ export async function uploadAndSetUserImage(file: File, email: string) {
   const { error: updateError } = await supabase
     .from('profile')
     .update({ profile_img: publicUrl })
-    .eq('email', email);
+    .eq('user_id', userId);
   if (updateError) throw updateError;
 
   return publicUrl;
 }
 
 // 필요시: 모든 컬럼을 한 번에
-export async function getUserAllFields(email: string) {
-  return await supabase.from('profile').select('*').eq('email', email).single();
+export async function getUserAllFields(userId: string) {
+  return await supabase
+    .from('profile')
+    .select('*')
+    .eq('user_id', userId)
+    .single();
 }

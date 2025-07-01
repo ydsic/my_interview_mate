@@ -10,17 +10,17 @@ const categoryStyles: Record<
   string,
   { bg: string; text: string; ring: string }
 > = {
-  'Front-end': {
+  'front-end': {
     bg: 'bg-front-bg-tag',
     text: 'text-front-text-tag',
     ring: 'text-front-text-tag',
   },
-  CS: {
+  cs: {
     bg: 'bg-cs-bg-tag',
     text: 'text-cs-text-tag',
     ring: 'text-cs-text-tag',
   },
-  Git: {
+  git: {
     bg: 'bg-git-bg-tag',
     text: 'text-git-text-tag',
     ring: 'text-git-text-tag',
@@ -120,7 +120,7 @@ export default function UserMain() {
             </div>
           </div>
           <Link
-            to={`/interview/${selectedTopic.topic.category.toLowerCase()}?topic=${selectedTopic.item.topicKey}`}
+            to={`/interview/${selectedTopic.topic.category}?topic=${selectedTopic.item.topicKey}`}
           >
             <Button> 면접 시작하기 </Button>
           </Link>
