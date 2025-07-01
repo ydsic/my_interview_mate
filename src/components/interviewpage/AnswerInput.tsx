@@ -15,12 +15,14 @@ interface AnswerInputProps {
   question: string;
   onFeedback: (answer: string, feedback: string) => void;
   disabled?: boolean;
+  onFollowUpClick?: () => void;
 }
 
 export default function AnswerInput({
   question,
   onFeedback,
   disabled,
+  onFollowUpClick,
 }: AnswerInputProps) {
   const [answer, setAnswer] = useState('');
   const isEmpty = answer.trim() === '';
@@ -150,12 +152,6 @@ export default function AnswerInput({
       setLoading(false);
     }
   };
-
-  // 추가 질문
-  const handleFollowUp = () => {
-    toast('추가 질문을 전송했어요!', 'success');
-  };
-
   return (
     <div className="p-5 rounded-xl border border-gray-300 bg-white shadow-sm space-y-4 mt-3 relative">
       {/* 로딩 모달 */}
@@ -214,7 +210,7 @@ export default function AnswerInput({
 
         {/* 추가 질문 버튼 */}
         <button
-          onClick={handleFollowUp}
+          onClick={onFollowUpClick}
           className="
             flex items-center gap-2 border border-gray-200 rounded-xl px-3 py-1 transition
             hover:bg-gray-40 cursor-pointer

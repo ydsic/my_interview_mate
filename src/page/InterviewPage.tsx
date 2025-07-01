@@ -15,7 +15,6 @@ function isCategoryKey(value: unknown): value is CategoryKey {
 }
 
 export default function InterviewPage() {
-  //const toast = useToast();
   const { category: rawCategory } = useParams<{ category: string }>();
   const [searchParams] = useSearchParams();
   const topicParam = searchParams.get('topic');
@@ -30,6 +29,8 @@ export default function InterviewPage() {
     category: initialCategory,
     question: '질문을 불러오는 중입니다...',
   });
+  // 추가 질문하기
+  const [showFollowUp, setShowFollowUp] = useState(false);
 
   // 질문 불러오기 get요청
   useEffect(() => {
@@ -103,12 +104,26 @@ export default function InterviewPage() {
             question={question.question}
             onFeedback={handleFeedback}
             disabled={showFeedback}
+            onFollowUpClick={() => setShowFollowUp(true)}
           />
         </div>
         <div>
-          <FollowUpQuestion
-            questions={['추가질문1.', '추가질문2.', '추가질문3.']}
-          />
+          {showFollowUp && (
+            <FollowUpQuestion
+              questions={['추가질문1.', '추가질문2.', '추가질문3.']}
+              onSelect={(selected) => {
+                setQuestion({
+                  category: question.category,
+                  question: selected,
+                });
+                setAnswer('');
+                setFeedbackContent('');
+                setShowFeedback(false);
+                setShowFollowUp(false);
+              }}
+              onClose={() => setShowFollowUp(false)}
+            />
+          )}
         </div>
         <div className="flex justify-center items-center">
           <Button className="w-55 h-15 mt-8" onClick={handleNext}>

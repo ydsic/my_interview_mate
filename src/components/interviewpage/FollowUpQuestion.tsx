@@ -7,7 +7,11 @@ interface FollowUpQuestionProps {
   onClose: () => void;
 }
 
-export default function FolloUpQuestion({ questions }: FollowUpQuestionProps) {
+export default function FolloUpQuestion({
+  questions,
+  onSelect,
+  onClose,
+}: FollowUpQuestionProps) {
   return (
     <div className="w-full rounded-xl border p-5 border-gray-300 bg-white shadow-sm  space-y-2 mt-4">
       <div className="mb-3">
@@ -25,12 +29,12 @@ export default function FolloUpQuestion({ questions }: FollowUpQuestionProps) {
           <H4_placeholder className="font-normal text-gray-500 mx-8 mb-3">
             질문을 클릭하면 해당 질문으로 이동합니다
           </H4_placeholder>
-          <p></p>
         </div>
       </div>
       {questions.map((q, idx) => (
         <button
           key={idx}
+          onClick={() => onSelect(q)}
           className="w-full text-left my-2 p-2 rounded-lg bg-orange-10 hover:bg-git-bg-tag border border-gray-300 transition cursor-pointer"
         >
           <div className="inline-block w-fit border border-gray-300 rounded-full px-3 m-1 text-gray-100">
@@ -41,7 +45,14 @@ export default function FolloUpQuestion({ questions }: FollowUpQuestionProps) {
           </H4_placeholder>
         </button>
       ))}
-      <div className="flex justify-end pt-2"></div>
+      <div className="flex justify-end pt-2">
+        <button
+          onClick={onClose}
+          className="text-sm text-gray-400 hover:underline"
+        >
+          닫기
+        </button>
+      </div>
     </div>
   );
 }
