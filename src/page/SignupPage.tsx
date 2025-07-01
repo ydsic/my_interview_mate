@@ -8,28 +8,100 @@ import {
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 import Input from '../components/common/Input';
+import { validateField } from '../utils/validation';
+
+type FormDataType = {
+  email: string;
+  password: string;
+  confirmPassword: string;
+  nickname: string;
+  job: string;
+  goal: string;
+};
+
+type FormErrors = {
+  email: string | null;
+  password: string | null;
+  confirmPassword: string | null;
+  nickname: string | null;
+  job: string | null;
+  goal: string | null;
+};
 
 export default function SignupPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [nickname, setNickname] = useState('');
-  const [job, setJob] = useState('');
-  const [goal, setGoal] = useState('');
+  const [formData, setFormData] = useState<FormDataType>({
+    email: '',
+    password: '',
+    confirmPassword: '',
+    nickname: '',
+    job: '',
+    goal: '',
+  });
+
+  const [formErrors, setFormErrors] = useState<FormErrors>({
+    email: null,
+    password: null,
+    confirmPassword: null,
+    nickname: null,
+    job: null,
+    goal: null,
+  });
+
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+
+    setFormData((prev) => {
+      const updated = { ...prev, [name]: value };
+
+      const error = validateField(name, value, {
+        password: name === 'confirmPassword' ? prev.password : value,
+      });
+
+      const updatedErrors = {
+        ...formErrors,
+        [name]: error,
+      };
+
+      // 비밀번호 변경 시 → 비밀번호 확인도 재검증
+      if (name === 'password' && prev.confirmPassword) {
+        updatedErrors.confirmPassword = validateField(
+          'confirmPassword',
+          prev.confirmPassword,
+          {
+            password: value,
+          },
+        );
+      }
+
+      setFormErrors(updatedErrors);
+      return updated;
+    });
+  };
 
   const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (loading) return;
-    if (!password || !nickname || !email) {
+
+    // 유효성 검사
+    if (!formData.password || !formData.nickname || !formData.email) {
       alert('비밀번호, 닉네임, 이메일을 모두 입력하세요.');
       return;
     }
+
+    const hasError = Object.values(formErrors).some((error) => error != null);
+    if (hasError) {
+      alert('입력란을 다시 확인해주세요!');
+      return;
+    }
+
     setLoading(true);
     // Supabase Auth 회원가입
     const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
+      email: formData.email,
+      password: formData.password,
     });
     if (error) {
       setLoading(false);
@@ -43,10 +115,10 @@ export default function SignupPage() {
     // 추가 정보 저장 (예: profile 테이블)
     const { error: profileError } = await supabase.from('profile').insert([
       {
-        email,
-        nickname,
-        job: job || '',
-        goal: goal || '',
+        email: formData.email,
+        nickname: formData.nickname,
+        job: formData.job || '',
+        goal: formData.goal || '',
       },
     ]);
     setLoading(false);
@@ -66,7 +138,7 @@ export default function SignupPage() {
       <H3_sub_detail>정보를 입력해 주세요</H3_sub_detail>
       <form
         onSubmit={handleSignup}
-        className="space-y-6 w-1/2 bg-gray-50 p-8 rounded-2xl border-2 border-gray-300 shadow-sm"
+        className="space-y-6 w-1/2 bg-white p-8 rounded-2xl border-2 border-gray-300 shadow-sm"
       >
         <div>
           <label className="flex font-medium text-gray-700 mb-2">
@@ -75,9 +147,11 @@ export default function SignupPage() {
           <H4_placeholder>
             <Input
               type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
               placeholder="이메일을 입력하세요"
+              error={formErrors.email}
               required
             />
           </H4_placeholder>
@@ -89,11 +163,30 @@ export default function SignupPage() {
           <H4_placeholder>
             <Input
               type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
               placeholder="비밀번호를 입력하세요"
               autoComplete="off"
               required
+              error={formErrors.password}
+            />
+          </H4_placeholder>
+        </div>
+        <div>
+          <label className="flex font-medium text-gray-700 mb-2">
+            비밀번호 확인<span className="text-red-500 ml-1">*</span>
+          </label>
+          <H4_placeholder>
+            <Input
+              name="confirmPassword"
+              type="password"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              placeholder="비밀번호를 확인헤주세요."
+              autoComplete="off"
+              required
+              error={formErrors.confirmPassword}
             />
           </H4_placeholder>
         </div>
@@ -104,10 +197,12 @@ export default function SignupPage() {
           <H4_placeholder>
             <Input
               type="text"
-              value={nickname}
-              onChange={(e) => setNickname(e.target.value)}
+              name="nickname"
+              value={formData.nickname}
+              onChange={handleChange}
               placeholder="닉네임을 입력하세요"
               required
+              error={formErrors.nickname}
             />
           </H4_placeholder>
         </div>
@@ -116,9 +211,11 @@ export default function SignupPage() {
           <H4_placeholder>
             <Input
               type="text"
-              value={job}
-              onChange={(e) => setJob(e.target.value)}
+              name="job"
+              value={formData.job}
+              onChange={handleChange}
               placeholder="직업을 입력하세요"
+              error={formErrors.job}
             />
           </H4_placeholder>
         </div>
@@ -127,9 +224,11 @@ export default function SignupPage() {
           <H4_placeholder>
             <Input
               type="text"
-              value={goal}
-              onChange={(e) => setGoal(e.target.value)}
+              name="goal"
+              value={formData.goal}
+              onChange={handleChange}
               placeholder="목표를 입력하세요"
+              error={formErrors.goal}
             />
           </H4_placeholder>
         </div>
