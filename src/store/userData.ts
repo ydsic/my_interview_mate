@@ -5,30 +5,13 @@ import {
   updateUserImage,
 } from '../api/userInfo';
 
-type ProblemResult = {
-  question: string;
-  input: string;
-  scores: number[];
-  average: number;
-  feedback: string[];
-  summary: string;
-  answer: string;
-};
-
-type ProblemItem = {
-  id: number;
-  category: string;
-  problemData: ProblemResult[];
-};
-
 type dbUserDataType = {
-  email: string;
+  user_id: string;
   nickname: string;
   profile_img: string;
   job: string;
   goal: string;
-  history: ProblemItem[];
-  bookmark: ProblemItem[];
+  admin: boolean;
 };
 
 type UserDataStore = {
@@ -44,24 +27,24 @@ type LoggedInType = {
 
 export const useUserDataStore = create<UserDataStore>((set) => ({
   userData: {
-    email: '',
+    user_id: '',
     nickname: '',
     profile_img: '',
     job: '',
     goal: '',
-    history: [],
-    bookmark: [],
+    admin: false,
   },
 
   setUserData: async (dbUserData: dbUserDataType) => {
     set({ userData: { ...dbUserData } });
     // DB 동기화
-    if (dbUserData.email) {
-      if (dbUserData.job) await updateUserJob(dbUserData.email, dbUserData.job);
+    if (dbUserData.user_id) {
+      if (dbUserData.job)
+        await updateUserJob(dbUserData.user_id, dbUserData.job);
       if (dbUserData.goal)
-        await updateUserGoal(dbUserData.email, dbUserData.goal);
+        await updateUserGoal(dbUserData.user_id, dbUserData.goal);
       if (dbUserData.profile_img)
-        await updateUserImage(dbUserData.email, dbUserData.profile_img);
+        await updateUserImage(dbUserData.user_id, dbUserData.profile_img);
       // 추가 업데이트 필요시 여기에
     }
   },
@@ -69,13 +52,12 @@ export const useUserDataStore = create<UserDataStore>((set) => ({
   clearUserData: () =>
     set({
       userData: {
-        email: '',
+        user_id: '',
         nickname: '',
         profile_img: '',
         job: '',
         goal: '',
-        history: [],
-        bookmark: [],
+        admin: false,
       },
     }),
 }));

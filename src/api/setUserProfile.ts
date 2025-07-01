@@ -6,13 +6,12 @@ export async function setUserProfileByEmail(email: string) {
   const setIsLoggedIn = useLoggedInStore.getState().setIsLoggedIn;
   const { data: profile } = await loginUserInfo(email);
   setUserData({
-    email: profile?.email ?? '',
+    user_id: profile?.user_id ?? '',
     nickname: profile?.nickname ?? '',
     profile_img: profile?.profile_img ?? '',
     job: profile?.job ?? '',
     goal: profile?.goal ?? '',
-    history: profile?.history ?? [],
-    bookmark: profile?.bookmark ?? [],
+    admin: profile?.admin ?? false,
   });
   setIsLoggedIn(true);
 }
