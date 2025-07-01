@@ -13,7 +13,7 @@ export type Topic = {
 
 export const topics: Topic[] = [
   {
-    category: 'Front-end',
+    category: 'front-end',
     subText: '프론트엔드 개발 기술',
     colorClass: 'text-front-text-tag',
     items: [
@@ -35,7 +35,7 @@ export const topics: Topic[] = [
     ],
   },
   {
-    category: 'CS',
+    category: 'cs',
     subText: '컴퓨터 사이언스 기초',
     colorClass: 'text-cs-text-tag',
     items: [
@@ -52,7 +52,7 @@ export const topics: Topic[] = [
     ],
   },
   {
-    category: 'Git',
+    category: 'git',
     subText: '버전 관리 시스템',
     colorClass: 'text-git-text-tag',
     items: [

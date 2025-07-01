@@ -1,5 +1,6 @@
 import { supabase } from '../supabaseClient';
 
+// 카테고리와 토픽별로 질문 받아오는 API
 export const getQuestionsByCategoryAndTopic = async (
   category: string,
   topic: string,

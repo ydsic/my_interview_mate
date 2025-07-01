@@ -17,7 +17,7 @@ export default function InterviewPage() {
   //const toast = useToast();
   const { category: rawCategory } = useParams<{ category: string }>();
   const [searchParams] = useSearchParams();
-  const topicParam = searchParams.get('topic');
+  const topicParam = searchParams.get('topic')?.trim();
   const initialCategory: CategoryKey = isCategoryKey(rawCategory)
     ? rawCategory
     : 'front-end';
@@ -30,8 +30,11 @@ export default function InterviewPage() {
     question: '질문을 불러오는 중입니다...',
   });
 
+  // 질문 불러오기
   useEffect(() => {
     const fetchQuestion = async () => {
+      console.log('rawCategory:', rawCategory);
+      console.log('topicParam:', topicParam);
       if (!isCategoryKey(rawCategory) || !topicParam) {
         setQuestion({
           category: rawCategory as CategoryKey,
@@ -45,6 +48,8 @@ export default function InterviewPage() {
           rawCategory,
           topicParam,
         );
+        console.log('불러온 질문 수:', data.length);
+        console.log('data 내용:', data);
         if (!data.length) throw new Error('질문 없음');
         const random = Math.floor(Math.random() * data.length);
         const randomQuestion = data[random];
