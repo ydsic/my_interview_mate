@@ -4,6 +4,7 @@ import Button from '../components/common/Button';
 import AnswerInput from '../components/interviewpage/AnswerInput';
 import InterviewQuestion from '../components/interviewpage/InterviewQuestion';
 import FeedbackCard from '../components/interviewpage/feedback/FeedbackCard';
+import FollowUpQuestion from '../components/interviewpage/FollowUpQuestion';
 import type { QuestionData, CategoryKey } from '../types/interview';
 import { getQuestionsByCategoryAndTopic } from '../api/questionAPI';
 
@@ -92,6 +93,7 @@ export default function InterviewPage() {
         <div>
           <InterviewQuestion
             category={question.category}
+            topic={topicParam || ''}
             question={question.question}
             onToggleBookmark={() => {}}
           />
@@ -101,6 +103,11 @@ export default function InterviewPage() {
             question={question.question}
             onFeedback={handleFeedback}
             disabled={showFeedback}
+          />
+        </div>
+        <div>
+          <FollowUpQuestion
+            questions={['추가질문1.', '추가질문2.', '추가질문3.']}
           />
         </div>
         <div className="flex justify-center items-center">
