@@ -119,8 +119,9 @@ export default function UserMain() {
               <p className="text-sm text-gray-70"> 선택된 면접 주제 </p>
             </div>
           </div>
-
-          <Link to={`/interview/${selectedTopic.topic.category.toLowerCase()}`}>
+          <Link
+            to={`/interview/${selectedTopic.topic.category.toLowerCase()}?topic=${selectedTopic.item.topicKey}`}
+          >
             <Button> 면접 시작하기 </Button>
           </Link>
         </div>

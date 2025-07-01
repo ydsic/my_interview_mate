@@ -1,19 +1,23 @@
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import Button from '../components/common/Button';
 import AnswerInput from '../components/interviewpage/AnswerInput';
 import InterviewQuestion from '../components/interviewpage/InterviewQuestion';
 import FeedbackCard from '../components/interviewpage/feedback/FeedbackCard';
 import type { QuestionData, CategoryKey } from '../types/interview';
-//import { useToast } from '../hooks/useToast';
+import { getQuestionsByCategoryAndTopic } from '../api/questionAPI';
 
-function isCategoryKey(value: any): value is CategoryKey {
-  return ['front-end', 'cs', 'git'].includes(value);
+function isCategoryKey(value: unknown): value is CategoryKey {
+  return (
+    typeof value === 'string' && ['front-end', 'cs', 'git'].includes(value)
+  );
 }
 
 export default function InterviewPage() {
   //const toast = useToast();
   const { category: rawCategory } = useParams<{ category: string }>();
+  const [searchParams] = useSearchParams();
+  const topicParam = searchParams.get('topic');
   const initialCategory: CategoryKey = isCategoryKey(rawCategory)
     ? rawCategory
     : 'front-end';
@@ -26,47 +30,40 @@ export default function InterviewPage() {
     question: '질문을 불러오는 중입니다...',
   });
 
-  /**
-   * fetchQuestion
-   * - 면접 질문 API 호출 로직
-   * - 성공/ 실패시 예외처리 및 토스트 알림
-   */
-
-  // useEffect(() => {
-  //   const fetchQuestion = async () => {
-  //     try {
-  //       const res = await fetch('/api/interview/question');
-  //       if (!res.ok) throw new Error('Network response was not ok');
-  //       const data: QuestionData = await res.json();
-  //       setQuestion(data);
-  //       toast('새 질문을 불러왔어요!', 'success');
-  //     } catch (e) {
-  //       console.error('질문 로드 실패:', e);
-  //       setQuestion({
-  //         category: 'git',
-  //         question: '질문을 불러오는 데 실패했습니다.',
-  //       });
-  //       toast('질문을 불러오는 데 실패했어요.', 'error');
-  //     }
-  //   };
-
-  //   fetchQuestion();
-  // }, [toast]);
-
-  // category가 바뀔 때마다 질문 로드
   useEffect(() => {
-    if (!isCategoryKey(rawCategory)) {
-      // 잘못된 카테고리 처리: 에러 UI 띄우거나 기본값 사용
-      setQuestion({ category: rawCategory as CategoryKey, question: '' });
-      return;
-    }
+    const fetchQuestion = async () => {
+      if (!isCategoryKey(rawCategory) || !topicParam) {
+        setQuestion({
+          category: rawCategory as CategoryKey,
+          question: '잘못된 접근입니다.',
+        });
+        return;
+      }
 
-    // 실제로는 여기서 API 호출
-    setQuestion({
-      category: rawCategory,
-      question: `${rawCategory} 분야의 새로운 질문을 불러왔어요!`,
-    });
-  }, [rawCategory]);
+      try {
+        const data = await getQuestionsByCategoryAndTopic(
+          rawCategory,
+          topicParam,
+        );
+        if (!data.length) throw new Error('질문 없음');
+        const random = Math.floor(Math.random() * data.length);
+        const randomQuestion = data[random];
+
+        setQuestion({
+          category: rawCategory,
+          question: randomQuestion.content,
+        });
+      } catch (e) {
+        console.error(e);
+        setQuestion({
+          category: rawCategory,
+          question: '질문을 불러오는 데 실패했습니다.',
+        });
+      }
+    };
+
+    fetchQuestion();
+  }, [rawCategory, topicParam]);
 
   const handleFeedback = async (answerText: string, feedback: string) => {
     setAnswer(answerText);
