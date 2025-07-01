@@ -17,7 +17,7 @@ export default function InterviewPage() {
   //const toast = useToast();
   const { category: rawCategory } = useParams<{ category: string }>();
   const [searchParams] = useSearchParams();
-  const topicParam = searchParams.get('topic')?.trim();
+  const topicParam = searchParams.get('topic');
   const initialCategory: CategoryKey = isCategoryKey(rawCategory)
     ? rawCategory
     : 'front-end';
@@ -30,7 +30,7 @@ export default function InterviewPage() {
     question: '질문을 불러오는 중입니다...',
   });
 
-  // 질문 불러오기
+  // 질문 불러오기 get요청
   useEffect(() => {
     const fetchQuestion = async () => {
       console.log('rawCategory:', rawCategory);

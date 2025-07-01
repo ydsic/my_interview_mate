@@ -62,7 +62,7 @@ export default function InterviewQuestion({
         <div className="flex items-center gap-4">
           {/* 왼쪽 상단 - 카테고리 */}
           <div
-            className={`flex items-center px-6 py-1 rounded-md ${categoryStyle.bg} ${categoryStyle.text}`}
+            className={`flex items-center px-6 pt-1 pb-2 rounded-md ${categoryStyle.bg} ${categoryStyle.text}`}
           >
             <H3_sub_detail>{category}</H3_sub_detail>
           </div>
