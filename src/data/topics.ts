@@ -1,6 +1,7 @@
 export type TopicItem = {
   title: string;
   description: string;
+  topicKey: string;
 };
 
 export type Topic = {
@@ -19,14 +20,17 @@ export const topics: Topic[] = [
       {
         title: 'React',
         description: '컴포넌트, Hooks, 상태관리',
+        topicKey: 'react',
       },
       {
         title: 'JavaScript',
         description: 'ES6+, 비동기, 클로저',
+        topicKey: 'javascript',
       },
       {
         title: 'Next.js',
         description: 'SSR, SSG, 라우팅',
+        topicKey: 'nextjs',
       },
     ],
   },
@@ -38,10 +42,12 @@ export const topics: Topic[] = [
       {
         title: '네트워크 & HTTP',
         description: '네트워크 계층, 프로토콜',
+        topicKey: 'network',
       },
       {
         title: '브라우저 렌더링',
-        description: '네트워크 계층, 프로토콜',
+        description: '렌더링 과정, Critical Path',
+        topicKey: 'rendering',
       },
     ],
   },
@@ -53,6 +59,7 @@ export const topics: Topic[] = [
       {
         title: 'Git',
         description: '브랜치, 머지, 리베이스',
+        topicKey: 'git',
       },
     ],
   },
