@@ -29,14 +29,25 @@ export default function InterviewPage() {
     category: initialCategory,
     question: '질문을 불러오는 중입니다...',
   });
-  // 추가 질문하기
+  // 추가 질문하기 토글
   const [showFollowUp, setShowFollowUp] = useState(false);
+  const toggleFollowUp = () => setShowFollowUp((prev) => !prev);
+  // 추가 질문 useSate
+  const [followUpQuestions, setFollowUpQuestions] = useState<string[]>([]);
+
+  // 추가 질문 랜덤 함수
+  function getRandomItems<T>(array: T[], count: number): T[] {
+    const shuffled = [...array].sort(() => 0.5 - Math.random());
+    return shuffled.slice(0, count);
+  }
 
   // 질문 불러오기 get요청
   useEffect(() => {
     const fetchQuestion = async () => {
+      // API 요청 확인용
       console.log('rawCategory:', rawCategory);
       console.log('topicParam:', topicParam);
+
       if (!isCategoryKey(rawCategory) || !topicParam) {
         setQuestion({
           category: rawCategory as CategoryKey,
@@ -50,8 +61,10 @@ export default function InterviewPage() {
           rawCategory,
           topicParam,
         );
+        // API 요청 확인용
         console.log('불러온 질문 수:', data.length);
         console.log('data 내용:', data);
+
         if (!data.length) throw new Error('질문 없음');
         const random = Math.floor(Math.random() * data.length);
         const randomQuestion = data[random];
@@ -60,12 +73,20 @@ export default function InterviewPage() {
           category: rawCategory,
           question: randomQuestion.content,
         });
+
+        // 추가 질문 나머지 질문 목록에서 랜덤으로 3개 뽑기
+        const otherQuestions = data
+          .filter((_, i) => i !== random)
+          .map((q) => q.content);
+
+        setFollowUpQuestions(getRandomItems(otherQuestions, 3));
       } catch (e) {
         console.error(e);
         setQuestion({
           category: rawCategory,
           question: '질문을 불러오는 데 실패했습니다.',
         });
+        setFollowUpQuestions([]);
       }
     };
 
@@ -91,6 +112,7 @@ export default function InterviewPage() {
           showFeedback ? 'w-1/2' : 'w-full'
         }`}
       >
+        {/* 인터뷰 질문 컴포넌트 */}
         <div>
           <InterviewQuestion
             category={question.category}
@@ -99,18 +121,27 @@ export default function InterviewPage() {
             onToggleBookmark={() => {}}
           />
         </div>
+        {/* 답변 컴포넌트 */}
         <div>
           <AnswerInput
             question={question.question}
             onFeedback={handleFeedback}
             disabled={showFeedback}
-            onFollowUpClick={() => setShowFollowUp(true)}
+            isFollowUpOpen={showFollowUp}
+            onFollowUpToggle={toggleFollowUp}
           />
         </div>
-        <div>
+
+        {/* 추가 질문 컴포넌트 */}
+        <div
+          className={`
+            transition-all duration-500 ease-in-out
+            ${showFollowUp ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'}
+          `}
+        >
           {showFollowUp && (
             <FollowUpQuestion
-              questions={['추가질문1.', '추가질문2.', '추가질문3.']}
+              questions={followUpQuestions}
               onSelect={(selected) => {
                 setQuestion({
                   category: question.category,
@@ -131,6 +162,7 @@ export default function InterviewPage() {
           </Button>
         </div>
       </div>
+
       <div
         className={`flex-1 flex justify-center items-start transition-all duration-700 ${
           showFeedback

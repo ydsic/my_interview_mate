@@ -10,7 +10,6 @@ interface FollowUpQuestionProps {
 export default function FolloUpQuestion({
   questions,
   onSelect,
-  onClose,
 }: FollowUpQuestionProps) {
   return (
     <div className="w-full rounded-xl border p-5 border-gray-300 bg-white shadow-sm  space-y-2 mt-4">
@@ -45,14 +44,6 @@ export default function FolloUpQuestion({
           </H4_placeholder>
         </button>
       ))}
-      <div className="flex justify-end pt-2">
-        <button
-          onClick={onClose}
-          className="text-sm text-gray-400 hover:underline"
-        >
-          닫기
-        </button>
-      </div>
     </div>
   );
 }

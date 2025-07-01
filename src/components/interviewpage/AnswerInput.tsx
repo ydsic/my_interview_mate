@@ -15,14 +15,16 @@ interface AnswerInputProps {
   question: string;
   onFeedback: (answer: string, feedback: string) => void;
   disabled?: boolean;
-  onFollowUpClick?: () => void;
+  isFollowUpOpen: boolean;
+  onFollowUpToggle: () => void;
 }
 
 export default function AnswerInput({
   question,
   onFeedback,
   disabled,
-  onFollowUpClick,
+  isFollowUpOpen,
+  onFollowUpToggle,
 }: AnswerInputProps) {
   const [answer, setAnswer] = useState('');
   const isEmpty = answer.trim() === '';
@@ -210,7 +212,7 @@ export default function AnswerInput({
 
         {/* 추가 질문 버튼 */}
         <button
-          onClick={onFollowUpClick}
+          onClick={onFollowUpToggle}
           className="
             flex items-center gap-2 border border-gray-200 rounded-xl px-3 py-1 transition
             hover:bg-gray-40 cursor-pointer
@@ -221,7 +223,7 @@ export default function AnswerInput({
             alt="추가 질문하기 아이콘"
             className="w-4 h-4"
           />
-          추가 질문하기
+          {isFollowUpOpen ? '추가 질문 닫기' : '추가 질문하기'}
         </button>
       </div>
     </div>
