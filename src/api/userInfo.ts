@@ -109,30 +109,70 @@ export async function updateUserImage(userId: string, imageUrl: string) {
     .eq('user_id', userId);
 }
 
-// Storage에 이미지 업로드 후 publicUrl을 user profile 테이블에 저장
-export async function uploadAndSetUserImage(file: File, userId: string) {
+// Storage에만 업로드하고 publicUrl 반환하는 간단한 함수로 정리
+export async function uploadUserImageOnly(file: File, userId: string) {
   const safeuserId = userId.replace(/[^a-zA-Z0-9]/g, '_');
-  const fileExt =
+
+  const rawExt =
     file.name.split('.').pop() || file.type.split('/').pop() || 'png';
-  const filePath = `profile/${safeuserId}.${fileExt}`;
-  console.log('file:', file, 'fileExt:', fileExt, 'filePath:', filePath);
+
+  const fileExt = rawExt.toLowerCase();
+  const unique = Date.now();
+  const filePath = `profile/${safeuserId}_${unique}.${fileExt}`;
+
   const { error: uploadError } = await supabase.storage
     .from('profile-images')
     .upload(filePath, file, { upsert: true, contentType: file.type });
+
   if (uploadError) throw uploadError;
 
   const { data: urlData } = supabase.storage
     .from('profile-images')
     .getPublicUrl(filePath);
-  const publicUrl = urlData.publicUrl;
 
-  const { error: updateError } = await supabase
-    .from('profile')
-    .update({ profile_img: publicUrl })
+  return `${urlData.publicUrl}?t=${unique}`;
+}
+
+// 되돌리기 클릭 시 storage에서 이미지 삭제
+export async function deleteImageFromStorage(userId: string) {
+  const safeuserId = userId.replace(/[^a-zA-Z0-9]/g, '_');
+
+  const { data: files, error: listErr } = await supabase.storage
+    .from('profile-images')
+    .list('profile');
+
+  if (listErr) throw listErr;
+
+  const targets = files
+    .filter((f) => f.name.startsWith(safeuserId))
+    .map((f) => `profile/${f.name}`);
+
+  if (targets.length === 0) return;
+
+  const { error } = await supabase.storage
+    .from('profile-images')
+    .remove(targets);
+
+  if (error) throw error;
+}
+
+// 프로필 정보 업데이트
+export async function updateUserProfile(
+  userId: string,
+  updatedData: {
+    nickname: string;
+    job: string;
+    goal: string;
+    profile_img: string;
+  },
+) {
+  const { data, error } = await supabase
+    .from('user')
+    .update(updatedData)
     .eq('user_id', userId);
-  if (updateError) throw updateError;
 
-  return publicUrl;
+  if (error) throw error;
+  return data;
 }
 
 // 필요시: 모든 컬럼을 한 번에

@@ -1,9 +1,13 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from 'react';
 import { useUserDataStore } from '../../store/userData';
 import Button from '../common/Button';
 import defaultProfileImg from '../../assets/profile_default_img.png';
-import { uploadAndSetUserImage } from '../../api/userInfo';
-import { supabase } from '../../supabaseClient';
+import {
+  deleteImageFromStorage,
+  updateUserProfile,
+  uploadUserImageOnly,
+} from '../../api/userInfo';
 import { loginUserInfo } from '../../api/userInfo';
 import { useToast } from '../../hooks/useToast';
 import InputOrText from './InputOrText';
@@ -21,31 +25,49 @@ type FormData = Omit<UserData, 'user_id' | 'email'>;
 
 export default function Profile() {
   const toast = useToast();
-  const userData = useUserDataStore((state) => state.userData); // 사용자 정보 불러오기
-  const setUserData = useUserDataStore((state) => state.setUserData);
+  const user_id = useUserDataStore((state) => state.userData.user_id);
 
+  // 받아오는 데이터는 userData
+  // 보낼거는 formData
+  const [userData, setUserData] = useState<UserData | null>(null);
   const [formData, setFormData] = useState<FormData>({
     nickname: '',
     job: '',
     goal: '',
-    profile_img: defaultProfileImg,
+    profile_img: '',
   });
 
-  const profileImg = userData.profile_img || defaultProfileImg;
-  const [previewImg, setPreviewImg] = useState<string>(profileImg);
-
+  const [previewImg, setPreviewImg] = useState<string>(defaultProfileImg);
   const [isEditing, setIsEditing] = useState(false); // '수정하기' - 편집 상태 확인
 
   useEffect(() => {
-    setFormData({
-      nickname: userData.nickname,
-      job: userData.job,
-      goal: userData.goal,
-      profile_img: profileImg,
-    });
+    const fetchUserData = async () => {
+      try {
+        const { data, error } = await loginUserInfo(user_id);
 
-    setPreviewImg(profileImg);
-  }, [userData, profileImg]);
+        if (error) throw error;
+
+        const user = data?.[0];
+
+        if (user) {
+          setUserData(user);
+          setFormData({
+            nickname: user.nickname,
+            job: user.job,
+            goal: user.goal,
+            profile_img: user.profile_img,
+          });
+
+          setPreviewImg(user.profile_img || defaultProfileImg);
+        }
+      } catch (err: any) {
+        console.log('유저 정보 불러오기 실패 : ', err);
+        toast('유저 정보를 불러오는 데 실패 했습니다.', 'error');
+      }
+    };
+
+    if (user_id) fetchUserData();
+  }, [user_id, toast]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -54,26 +76,41 @@ export default function Profile() {
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file) return;
+    if (!file || !userData) return;
+
     setPreviewImg(URL.createObjectURL(file));
-    console.log(await supabase.auth.getUser());
+
     try {
-      const publicUrl = await uploadAndSetUserImage(file, userData.email);
-      setFormData((prev) => ({ ...prev, profile_img: publicUrl }));
-    } catch (err) {
-      console.log(err);
-      alert('프로필 이미지 업로드 실패');
+      const publicUrl = await uploadUserImageOnly(file, userData.user_id);
+      setFormData((prev) => ({
+        ...prev,
+        profile_img: publicUrl,
+      }));
+    } catch (err: any) {
+      console.log('이미지 업로드 실패 : ', err);
     }
   };
 
-  const resetForm = () => {
+  const resetForm = async () => {
+    if (!userData) return;
+
+    if (formData.profile_img && formData.profile_img !== userData.profile_img) {
+      try {
+        await deleteImageFromStorage(userData.user_id);
+        console.log('임시 이미지 삭제 완료');
+      } catch (err) {
+        console.error('이미지 삭제 실패:', err);
+      }
+    }
+
     setFormData({
       nickname: userData.nickname,
       job: userData.job,
       goal: userData.goal,
-      profile_img: profileImg,
+      profile_img: userData.profile_img,
     });
-    setPreviewImg(profileImg);
+
+    setPreviewImg(userData.profile_img || defaultProfileImg);
   };
 
   // 수정 모드
@@ -88,21 +125,16 @@ export default function Profile() {
   };
 
   const saveChanges = async () => {
-    console.log('저장된 FormData : ', formData);
-    await setUserData({
-      ...userData,
-      ...formData,
-    });
-    const { data, error } = await loginUserInfo(userData.email);
+    if (!userData) return;
 
-    if (data) {
-      setUserData(data);
-      toast('프로필 수정을 완료했어요!', 'success');
-    }
-    setIsEditing(false);
-    /*** API 코드 추가하기 ***/
-    if (error) {
-      console.log(error);
+    try {
+      await updateUserProfile(userData.user_id, formData);
+
+      toast('프로필이 성공적으로 저장되었습니다.', 'success');
+
+      setIsEditing(false);
+    } catch (err: any) {
+      console.log('프로필 저장 실패 : ', err);
     }
   };
 
@@ -145,11 +177,11 @@ export default function Profile() {
             isEditing={isEditing}
             name="nickname"
             value={formData.nickname}
-            placeholder={userData.nickname}
+            placeholder={userData?.nickname || ''}
             maxLength={15}
             onChange={handleInputChange}
           />
-          <p className="text-sm text-gray-70">{userData.email}</p>
+          <p className="text-sm text-gray-70">{userData?.user_id}</p>
         </div>
       </div>
 
@@ -160,7 +192,7 @@ export default function Profile() {
             isEditing={isEditing}
             name="job"
             value={formData.job}
-            placeholder={userData.job}
+            placeholder={userData?.job || ''}
             maxLength={20}
             onChange={handleInputChange}
           />
@@ -172,7 +204,7 @@ export default function Profile() {
             isEditing={isEditing}
             name="goal"
             value={formData.goal}
-            placeholder={userData.goal}
+            placeholder={userData?.goal || ''}
             maxLength={50}
             onChange={handleInputChange}
           />
@@ -188,7 +220,7 @@ export default function Profile() {
             >
               되돌리기
             </button>
-            <Button onClick={saveChanges}> 저장하기</Button>
+            <Button type="submit"> 저장하기</Button>
           </>
         ) : (
           <>
