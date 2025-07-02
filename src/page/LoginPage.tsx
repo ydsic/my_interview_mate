@@ -8,13 +8,17 @@ import {
 import { Link, useNavigate } from 'react-router-dom';
 import Input from '../components/common/Input';
 import { supabase } from '../supabaseClient';
-import { setUserProfileByEmail } from '../api/setUserProfile';
+
+import { getUserNickname } from '../api/userInfo';
+import { useLoggedInStore, useUserDataStore } from '../store/userData';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [userPassword, setUserPassword] = useState('');
 
   const navigate = useNavigate();
+  const setUserData = useUserDataStore((state) => state.setUserData);
+  const setIsLoggedIn = useLoggedInStore((state) => state.setIsLoggedIn);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -23,20 +27,38 @@ export default function LoginPage() {
       return;
     }
 
-    // Supabase Auth로 로그인
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password: userPassword,
-    });
+    try {
+      // Supabase Auth로 로그인
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password: userPassword,
+      });
 
-    if (error) {
-      alert(error.message || '이메일 또는 비밀번호가 올바르지 않습니다.');
-      return;
+      if (error) {
+        alert(error.message || '이메일 또는 비밀번호가 올바르지 않습니다.');
+        return;
+      }
+
+      const { data: nicknameData, error: nicknameError } =
+        await getUserNickname(email);
+
+      if (nicknameError || !nicknameData) {
+        throw new Error('닉네임 정보를 불러오지 못했습니다.');
+      }
+
+      setUserData({
+        user_id: email,
+        nickname: nicknameData.nickname,
+      });
+      setIsLoggedIn(true);
+
+      setTimeout(() => {
+        navigate('/');
+      }, 0);
+    } catch (err: any) {
+      alert(err.message || '알 수 없는 오류가 발생했습니다.');
+      console.log('로그인 에러 : ', err);
     }
-
-    // profile 조회
-    await setUserProfileByEmail(email);
-    navigate('/');
   };
 
   return (

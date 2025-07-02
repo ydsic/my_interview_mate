@@ -1,39 +1,14 @@
 import { create } from 'zustand';
-import {
-  updateUserJob,
-  updateUserGoal,
-  updateUserImage,
-} from '../api/userInfo';
+import { persist } from 'zustand/middleware';
 
-type ProblemResult = {
-  question: string;
-  input: string;
-  scores: number[];
-  average: number;
-  feedback: string[];
-  summary: string;
-  answer: string;
-};
-
-type ProblemItem = {
-  id: number;
-  category: string;
-  problemData: ProblemResult[];
-};
-
-type dbUserDataType = {
-  email: string;
+type UserData = {
+  user_id: string;
   nickname: string;
-  profile_img: string;
-  job: string;
-  goal: string;
-  history: ProblemItem[];
-  bookmark: ProblemItem[];
 };
 
 type UserDataStore = {
-  userData: dbUserDataType;
-  setUserData: (data: dbUserDataType) => void;
+  userData: UserData;
+  setUserData: (data: UserData) => void;
   clearUserData: () => void;
 };
 
@@ -42,45 +17,38 @@ type LoggedInType = {
   setIsLoggedIn: (status: boolean) => void;
 };
 
-export const useUserDataStore = create<UserDataStore>((set) => ({
-  userData: {
-    email: '',
-    nickname: '',
-    profile_img: '',
-    job: '',
-    goal: '',
-    history: [],
-    bookmark: [],
-  },
-
-  setUserData: async (dbUserData: dbUserDataType) => {
-    set({ userData: { ...dbUserData } });
-    // DB 동기화
-    if (dbUserData.email) {
-      if (dbUserData.job) await updateUserJob(dbUserData.email, dbUserData.job);
-      if (dbUserData.goal)
-        await updateUserGoal(dbUserData.email, dbUserData.goal);
-      if (dbUserData.profile_img)
-        await updateUserImage(dbUserData.email, dbUserData.profile_img);
-      // 추가 업데이트 필요시 여기에
-    }
-  },
-
-  clearUserData: () =>
-    set({
+// user_id(email), nickname만 저장
+export const useUserDataStore = create<UserDataStore>()(
+  persist(
+    (set) => ({
       userData: {
-        email: '',
+        user_id: '',
         nickname: '',
-        profile_img: '',
-        job: '',
-        goal: '',
-        history: [],
-        bookmark: [],
       },
+      setUserData: (data) => set({ userData: data }),
+      clearUserData: () =>
+        set({
+          userData: {
+            user_id: '',
+            nickname: '',
+          },
+        }),
     }),
-}));
+    {
+      name: 'user-storage',
+    },
+  ),
+);
 
-export const useLoggedInStore = create<LoggedInType>((set) => ({
-  isLoggedIn: false,
-  setIsLoggedIn: (status) => set({ isLoggedIn: status }),
-}));
+// 로그인 상태
+export const useLoggedInStore = create<LoggedInType>()(
+  persist(
+    (set) => ({
+      isLoggedIn: false,
+      setIsLoggedIn: (status) => set({ isLoggedIn: status }),
+    }),
+    {
+      name: 'login-status',
+    },
+  ),
+);
