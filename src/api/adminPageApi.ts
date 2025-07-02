@@ -21,12 +21,19 @@ export async function fetchQuestions() {
 }
 
 // 질문 추가
-export async function addQuestion(data: any) {
-  return await supabase.from('question').insert([data]);
+export async function addQuestion(data: {
+  category: string;
+  topic: string;
+  content: string;
+}) {
+  return await supabase.from('questions').insert([data]);
 }
 
 // 질문 수정
-export async function updateQuestion(question_id: number, data: any) {
+export async function updateQuestion(
+  question_id: number,
+  data: { content: string },
+) {
   return await supabase
     .from('questions')
     .update(data)
