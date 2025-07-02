@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import Button from '../components/common/Button';
 import AnswerInput from '../components/interviewpage/AnswerInput';
@@ -8,6 +8,7 @@ import FollowUpQuestion from '../components/interviewpage/FollowUpQuestion';
 import type { QuestionData, CategoryKey } from '../types/interview';
 import { getQuestionsByCategoryAndTopic } from '../api/questionAPI';
 import { useToast } from '../hooks/useToast';
+import debounce from 'lodash.debounce';
 
 function isCategoryKey(value: unknown): value is CategoryKey {
   return (
@@ -82,7 +83,7 @@ export default function InterviewPage() {
       // 추가 질문 나머지 질문 목록에서 랜덤으로 3개 뽑기
       setFollowUpQuestions(
         getRandomItems(
-          data.filter((q) => q.content !== pick.content).map((q) => q.contetn),
+          data.filter((q) => q.content !== pick.content).map((q) => q.content),
           3,
         ),
       );
@@ -103,6 +104,17 @@ export default function InterviewPage() {
     }
   }, [rawCategory, topicParam, toast]);
 
+  const debouncedFetch = useMemo(
+    () => debounce(fetchQuestion, 500, { leading: true, trailing: false }),
+    [fetchQuestion],
+  );
+
+  useEffect(() => {
+    return () => {
+      debouncedFetch.cancel();
+    };
+  }, [debouncedFetch]);
+
   useEffect(() => {
     fetchQuestion();
   }, [fetchQuestion]);
@@ -118,7 +130,7 @@ export default function InterviewPage() {
     setAnswer('');
     setFeedbackContent('');
     setShowFollowUp(false);
-    fetchQuestion();
+    debouncedFetch();
   };
 
   return (
