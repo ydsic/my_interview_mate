@@ -22,16 +22,34 @@ export default function App() {
 
   /*
   useEffect(() => {
+    // 최초 마운트 시 세션 복원
     const restoreSession = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+      const sessionResult = await supabase.auth.getSession();
+      const session = sessionResult.data.session;
+      let user = session?.user ?? undefined;
+      if (!user) {
+        const { data } = await supabase.auth.getUser();
+        user = data?.user ?? undefined;
+      }
       if (user && user.email) {
-        console.log('[확인] : ', user.email);
-        // await setUserProfileByEmail(user.email);
+        setUserProfileByEmail(user.email);
       }
     };
     restoreSession();
+
+    // 토큰이 갱신되거나 세션이 변경될 때마다 유저 데이터 저장
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_, session) => {
+      const user = session?.user;
+      if (user && user.email) {
+        setUserProfileByEmail(user.email);
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   */
@@ -49,6 +67,7 @@ export default function App() {
             <Route path="/mypage" element={<MyPage />} />
             <Route path="/signup" element={<SignupPage />} />
             <Route path="/interview/:category" element={<InterviewPage />} />
+            <Route path="/admin" element={<AdminPage />} />
           </Routes>
         </DefaultLayout>
       </BrowserRouter>

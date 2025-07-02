@@ -24,6 +24,7 @@ export default function Nav() {
 
       {isLoggedIn ? (
         <div className="flex gap-15 font-heavy">
+          {admin && <Link to="/admin">관리자페이지</Link>}
           <Link to="/mypage">마이페이지</Link>
           <button onClick={handleLogout} className="cursor-pointer">
             <img src={logoutIcon} alt="로그아웃 아이콘" className="w-4 h-4" />
