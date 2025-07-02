@@ -196,6 +196,17 @@ export default function AnswerInput({
     () => debounce(handleFeedback, 300, { leading: true, trailing: false }),
     [handleFeedback],
   );
+
+  // 새로운 질문에 대한 답변을 위한 입력 초기화.
+  useEffect(() => {
+    setAnswer('');
+    setIsDirty(false);
+    setIsRecording(false);
+    setIsProcessing(false);
+    setRecordingTime(60);
+
+    controllerRef.current?.abort();
+  }, [question]);
   return (
     <div className="p-5 rounded-xl border border-gray-300 bg-white shadow-sm space-y-4 mt-3 relative">
       {/* 로딩 모달 */}
