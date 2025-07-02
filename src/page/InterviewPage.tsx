@@ -69,11 +69,9 @@ export default function InterviewPage() {
       console.log('data 내용:', data);
 
       if (!data.length) throw new Error('질문 없음');
-      const random = data.filter((q) => q.content !== question.question);
 
-      const others = random.length ? random : data;
-
-      const pick = others[Math.floor(Math.random() * others.length)];
+      const idx = Math.floor(Math.random() * data.length);
+      const pick = data[idx];
 
       setQuestion({
         category: rawCategory,
@@ -83,7 +81,7 @@ export default function InterviewPage() {
       // 추가 질문 나머지 질문 목록에서 랜덤으로 3개 뽑기
       setFollowUpQuestions(
         getRandomItems(
-          data.filter((q) => q.content !== pick.content).map((q) => q.content),
+          data.filter((_, i) => i !== idx).map((q) => q.content),
           3,
         ),
       );
@@ -105,7 +103,7 @@ export default function InterviewPage() {
   }, [rawCategory, topicParam, toast]);
 
   const debouncedFetch = useMemo(
-    () => debounce(fetchQuestion, 500, { leading: true, trailing: false }),
+    () => debounce(fetchQuestion, 1000, { leading: true, trailing: false }),
     [fetchQuestion],
   );
 
