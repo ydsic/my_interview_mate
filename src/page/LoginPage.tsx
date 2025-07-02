@@ -9,7 +9,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import Input from '../components/common/Input';
 import { supabase } from '../supabaseClient';
 
-import { getUserNickname } from '../api/userInfo';
+import { loginUserInfo } from '../api/userInfo';
 import { useLoggedInStore, useUserDataStore } from '../store/userData';
 
 export default function LoginPage() {
@@ -39,16 +39,17 @@ export default function LoginPage() {
         return;
       }
 
-      const { data: nicknameData, error: nicknameError } =
-        await getUserNickname(email);
+      const { data: userInfo, error: userInfoError } =
+        await loginUserInfo(email);
 
-      if (nicknameError || !nicknameData) {
-        throw new Error('닉네임 정보를 불러오지 못했습니다.');
+      if (userInfoError || !userInfo || userInfo.length === 0) {
+        throw new Error('유저 정보를 불러오지 못했습니다.');
       }
 
       setUserData({
         user_id: email,
-        nickname: nicknameData.nickname,
+        nickname: userInfo[0].nickname,
+        admin: userInfo[0].admin ?? false,
       });
       setIsLoggedIn(true);
 

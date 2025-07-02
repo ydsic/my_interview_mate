@@ -1,10 +1,10 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-
 type UserData = {
   user_id: string;
   nickname: string;
+  admin: boolean;
 };
 
 type UserDataStore = {
@@ -25,7 +25,7 @@ export const useUserDataStore = create<UserDataStore>()(
       userData: {
         user_id: '',
         nickname: '',
-
+        admin: false,
       },
       setUserData: (data) => set({ userData: data }),
       clearUserData: () =>
@@ -33,6 +33,7 @@ export const useUserDataStore = create<UserDataStore>()(
           userData: {
             user_id: '',
             nickname: '',
+            admin: false,
           },
         }),
     }),
