@@ -6,12 +6,12 @@ import {
   H4_placeholder,
 } from '../components/common/HTagStyle';
 import { Link, useNavigate } from 'react-router-dom';
-import { supabase } from '../supabaseClient';
 import Input from '../components/common/Input';
 import { validateField } from '../utils/validation';
+import { signUpUser } from '../api/authAPI';
 
 type FormDataType = {
-  email: string;
+  userId: string;
   password: string;
   confirmPassword: string;
   nickname: string;
@@ -20,7 +20,7 @@ type FormDataType = {
 };
 
 type FormErrors = {
-  email: string | null;
+  userId: string | null;
   password: string | null;
   confirmPassword: string | null;
   nickname: string | null;
@@ -30,7 +30,7 @@ type FormErrors = {
 
 export default function SignupPage() {
   const [formData, setFormData] = useState<FormDataType>({
-    email: '',
+    userId: '',
     password: '',
     confirmPassword: '',
     nickname: '',
@@ -39,7 +39,7 @@ export default function SignupPage() {
   });
 
   const [formErrors, setFormErrors] = useState<FormErrors>({
-    email: null,
+    userId: null,
     password: null,
     confirmPassword: null,
     nickname: null,
@@ -81,12 +81,22 @@ export default function SignupPage() {
     });
   };
 
+  const resetFromData = () => {
+    setFormData({
+      userId: '',
+      password: '',
+      confirmPassword: '',
+      nickname: '',
+      job: '',
+      goal: '',
+    });
+  };
+
   const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (loading) return;
 
-    // 유효성 검사
-    if (!formData.password || !formData.nickname || !formData.email) {
+    if (!formData.password || !formData.nickname || !formData.userId) {
       alert('비밀번호, 닉네임, 이메일을 모두 입력하세요.');
       return;
     }
@@ -98,38 +108,25 @@ export default function SignupPage() {
     }
 
     setLoading(true);
-    // Supabase Auth 회원가입
-    const { data, error } = await supabase.auth.signUp({
-      email: formData.email,
-      password: formData.password,
-    });
-    if (error) {
-      setLoading(false);
-      if (error.message.includes('already registered')) {
-        alert('이미 가입된 이메일입니다.');
-      } else {
-        alert(error.message || '회원가입 중 오류가 발생했습니다.');
-      }
-      return;
-    }
-    // 추가 정보 저장 (예: profile 테이블)
-    const { error: profileError } = await supabase.from('profile').insert([
-      {
-        email: formData.email,
+
+    try {
+      await signUpUser({
+        userId: formData.userId,
+        password: formData.password,
         nickname: formData.nickname,
         job: formData.job || '',
         goal: formData.goal || '',
-      },
-    ]);
-    setLoading(false);
+        profile_img: '',
+      });
 
-    if (profileError) {
-      alert('프로필 정보 저장 중 오류가 발생했습니다.');
-      return;
+      alert('회원가입 성공!! 이메일 인증 후 로그인하세요.');
+      navigate('/login');
+    } catch (err: any) {
+      alert(err.message || '회원가입 중 오류가 발생했습니다.');
+    } finally {
+      setLoading(false);
+      resetFromData();
     }
-
-    navigate('/login');
-    alert('회원가입 성공! 이메일 인증 후 로그인하세요.');
   };
 
   return (
@@ -147,11 +144,11 @@ export default function SignupPage() {
           <H4_placeholder>
             <Input
               type="email"
-              name="email"
-              value={formData.email}
+              name="userId"
+              value={formData.userId}
               onChange={handleChange}
               placeholder="이메일을 입력하세요"
-              error={formErrors.email}
+              error={formErrors.userId}
               required
             />
           </H4_placeholder>
@@ -207,7 +204,9 @@ export default function SignupPage() {
           </H4_placeholder>
         </div>
         <div>
-          <label className="flex font-medium text-gray-700 mb-2">직업</label>
+          <label className="flex font-medium text-gray-700 mb-2">
+            희망 직무
+          </label>
           <H4_placeholder>
             <Input
               type="text"
@@ -220,7 +219,9 @@ export default function SignupPage() {
           </H4_placeholder>
         </div>
         <div>
-          <label className="flex font-medium text-gray-700 mb-2">목표</label>
+          <label className="flex font-medium text-gray-700 mb-2">
+            면접 목표
+          </label>
           <H4_placeholder>
             <Input
               type="text"

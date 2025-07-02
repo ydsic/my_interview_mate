@@ -7,11 +7,12 @@ export default function Nav() {
   const isLoggedIn = useLoggedInStore((state) => state.isLoggedIn);
   const setIsLoggedIn = useLoggedInStore((state) => state.setIsLoggedIn);
   const navigate = useNavigate();
-  const admin = useUserDataStore((state) => state.userData.admin);
+  const clearUserData = useUserDataStore((state) => state.clearUserData);
 
   const handleLogout = async () => {
     await supabase.auth.signOut(); // 로그아웃 시 인증 토큰 삭제
     setIsLoggedIn(false);
+    clearUserData();
     navigate('/');
   };
 
