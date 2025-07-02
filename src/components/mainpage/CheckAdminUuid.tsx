@@ -1,17 +1,55 @@
 import { Navigate } from 'react-router-dom';
-import { useUserDataStore } from '../../store/userData';
-import { isValidUUID } from '../../utils/checkUuid';
+import { useEffect, useState } from 'react';
+import { supabase } from '../../supabaseClient';
 
 export default function CheckAdminUuid({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const admin = useUserDataStore((state) => state.userData.admin);
-  const uuid = useUserDataStore((state) => state.userData.uuid);
+  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
 
-  if (!admin || !isValidUUID(uuid)) {
+  useEffect(() => {
+    const checkAdmin = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+
+        if (!session) {
+          setIsAdmin(false);
+          return;
+        }
+
+        const response = await fetch(
+          `${import.meta.env.VITE_SUPABASE_FUNCTIONS_URL}/check-admin-role`,
+          {
+            method: 'GET',
+            headers: {
+              'Authorization': `Bearer ${session.access_token}`,
+            },
+          },
+        );
+
+        if (response.ok) {
+          setIsAdmin(true);
+        } else {
+          setIsAdmin(false);
+        }
+      } catch (error) {
+        console.error('Error checking admin role:', error);
+        setIsAdmin(false);
+      }
+    };
+
+    checkAdmin();
+  }, []);
+
+  if (isAdmin === null) {
+    return null; // 로딩 중
+  }
+
+  if (!isAdmin) {
     return <Navigate to="/" replace />;
   }
+
   return <>{children}</>;
 }
