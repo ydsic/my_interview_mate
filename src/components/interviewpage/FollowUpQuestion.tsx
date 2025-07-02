@@ -1,9 +1,10 @@
 import addQuestionIcon from '../../assets/ic-add-question.svg';
+import type { QuestionData } from '../../types/interview';
 
 import { H2_content_title, H4_placeholder } from '../common/HTagStyle';
 interface FollowUpQuestionProps {
-  questions: string[];
-  onSelect: (question: string) => void;
+  questions: QuestionData[];
+  onSelect: (question: QuestionData) => void;
   onClose: () => void;
 }
 
@@ -40,7 +41,7 @@ export default function FolloUpQuestion({
             질문 {idx + 1}
           </div>
           <H4_placeholder className="text-gray-100 text-sm font-light px-2 py-1">
-            {q}
+            {q.question}
           </H4_placeholder>
         </button>
       ))}

@@ -30,14 +30,18 @@ export default function InterviewPage() {
   const toast = useToast();
   const isFirstLoad = useRef(true);
   const [question, setQuestion] = useState<QuestionData>({
+    questionId: 0,
     category: initialCategory,
+    topic: topicParam || '',
     question: '질문을 불러오는 중입니다...',
   });
   // 추가 질문하기 토글
   const [showFollowUp, setShowFollowUp] = useState(false);
   const toggleFollowUp = () => setShowFollowUp((prev) => !prev);
   // 추가 질문 useSate
-  const [followUpQuestions, setFollowUpQuestions] = useState<string[]>([]);
+  const [followUpQuestions, setFollowUpQuestions] = useState<QuestionData[]>(
+    [],
+  );
 
   // 추가 질문 랜덤 함수
   function getRandomItems<T>(array: T[], count: number): T[] {
@@ -52,7 +56,9 @@ export default function InterviewPage() {
 
     if (!isCategoryKey(rawCategory) || !topicParam) {
       setQuestion({
+        questionId: 0,
         category: rawCategory as CategoryKey,
+        topic: topicParam || '',
         question: '잘못된 접근입니다.',
       });
       setFollowUpQuestions([]);
@@ -74,17 +80,23 @@ export default function InterviewPage() {
       const pick = data[idx];
 
       setQuestion({
-        category: rawCategory,
+        questionId: pick.question_id,
+        category: rawCategory as CategoryKey,
+        topic: pick.topic,
         question: pick.content,
       });
 
       // 추가 질문 나머지 질문 목록에서 랜덤으로 3개 뽑기
-      setFollowUpQuestions(
-        getRandomItems(
-          data.filter((_, i) => i !== idx).map((q) => q.content),
-          3,
-        ),
-      );
+      const otherQuestion = data
+        .filter((_, i) => i !== idx)
+        .map((q) => ({
+          questionId: q.question_id,
+          category: rawCategory as CategoryKey,
+          topic: q.topic,
+          question: q.content,
+        }));
+
+      setFollowUpQuestions(getRandomItems(otherQuestion, 3));
 
       if (isFirstLoad.current) {
         isFirstLoad.current = false;
@@ -94,7 +106,9 @@ export default function InterviewPage() {
     } catch (e) {
       console.error(e);
       setQuestion({
-        category: rawCategory,
+        questionId: 0,
+        category: rawCategory as CategoryKey,
+        topic: topicParam || '',
         question: '질문을 불러오는 데 실패했습니다.',
       });
       setFollowUpQuestions([]);
@@ -142,7 +156,7 @@ export default function InterviewPage() {
         <div>
           <InterviewQuestion
             category={question.category}
-            topic={topicParam || ''}
+            topic={question.topic}
             question={question.question}
             onToggleBookmark={() => {}}
           />
@@ -151,6 +165,7 @@ export default function InterviewPage() {
         <div>
           <AnswerInput
             question={question.question}
+            questionId={question.questionId}
             onFeedback={handleFeedback}
             disabled={showFeedback}
             isFollowUpOpen={showFollowUp}
@@ -169,10 +184,7 @@ export default function InterviewPage() {
             <FollowUpQuestion
               questions={followUpQuestions}
               onSelect={(selected) => {
-                setQuestion({
-                  category: question.category,
-                  question: selected,
-                });
+                setQuestion(selected);
                 setAnswer('');
                 setFeedbackContent('');
                 setShowFeedback(false);
