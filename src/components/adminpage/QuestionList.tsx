@@ -30,9 +30,9 @@ export default function QuestionList({ setView }: setViewType) {
   const [editContent, setEditContent] = useState('');
 
   const categoryTopicMap: Record<string, string[]> = {
-    Frontend: ['react', 'javascript', 'nextjs'],
-    CS: ['network', 'rendering'],
-    Git: ['git'],
+    'front-end': ['react', 'javascript', 'nextjs'],
+    cs: ['network', 'rendering'],
+    git: ['git'],
   };
 
   useEffect(() => {
