@@ -11,9 +11,12 @@ import { VoiceRecording } from '../../utils/voiceRecording';
 import WaitingMessage from './WaitingMessage';
 import { useRadarChartData } from '../../store/radarchartData';
 import debounce from 'lodash.debounce';
+import { saveAnswer } from '../../api/answerAPI';
+import { supabase } from '../../supabaseClient';
 
 interface AnswerInputProps {
   question: string;
+  questionId: number;
   onFeedback: (answer: string, feedback: string) => void;
   disabled?: boolean;
   isFollowUpOpen: boolean;
@@ -22,6 +25,7 @@ interface AnswerInputProps {
 
 export default function AnswerInput({
   question,
+  questionId,
   onFeedback,
   disabled,
   isFollowUpOpen,
@@ -165,8 +169,25 @@ export default function AnswerInput({
     controllerRef.current = new AbortController();
 
     setLoading(true);
+
     try {
-      // true 일 경우 abort 처리
+      // 유저 ID 가져오기
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
+
+      console.log('getUser error:', userError);
+      console.log('getUser user object:', user);
+      console.log('getUser user.id:', user?.id);
+      if (userError || !user) throw new Error('로그인 정보 없음');
+      const userId = user.id;
+
+      // 답변 저장하기
+      const answerId = await saveAnswer(userId, questionId, answer);
+      console.log('answerId:', answerId);
+      toast('답변 저장 완료!', 'success');
+
       const feedbackObj = await OpenAIApi(
         question,
         answer,
@@ -189,13 +210,24 @@ export default function AnswerInput({
     } finally {
       setLoading(false);
     }
-  }, [answer, question, toast, onFeedback]);
+  }, [answer, question, questionId, toast, onFeedback]);
 
   // 디바운스 처리,
   const debounceRequest = useMemo(
     () => debounce(handleFeedback, 300, { leading: true, trailing: false }),
     [handleFeedback],
   );
+
+  // 새로운 질문에 대한 답변을 위한 입력 초기화.
+  useEffect(() => {
+    setAnswer('');
+    setIsDirty(false);
+    setIsRecording(false);
+    setIsProcessing(false);
+    setRecordingTime(60);
+
+    controllerRef.current?.abort();
+  }, [question]);
   return (
     <div className="p-5 rounded-xl border border-gray-300 bg-white shadow-sm space-y-4 mt-3 relative">
       {/* 로딩 모달 */}

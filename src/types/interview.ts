@@ -7,7 +7,14 @@ export interface InterviewQuestionProps {
   isBookmarked?: boolean;
   onToggleBookmark?: () => void;
 }
-export type QuestionData = Pick<
-  InterviewQuestionProps,
-  'category' | 'question'
->;
+// export type QuestionData = Pick<
+//   InterviewQuestionProps,
+//   'category' | 'question'
+// >;
+
+export interface QuestionData {
+  questionId: number;
+  category: CategoryKey;
+  topic: string;
+  question: string;
+}

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import Button from '../components/common/Button';
 import AnswerInput from '../components/interviewpage/AnswerInput';
@@ -7,6 +7,8 @@ import FeedbackCard from '../components/interviewpage/feedback/FeedbackCard';
 import FollowUpQuestion from '../components/interviewpage/FollowUpQuestion';
 import type { QuestionData, CategoryKey } from '../types/interview';
 import { getQuestionsByCategoryAndTopic } from '../api/questionAPI';
+import { useToast } from '../hooks/useToast';
+import debounce from 'lodash.debounce';
 
 function isCategoryKey(value: unknown): value is CategoryKey {
   return (
@@ -25,15 +27,21 @@ export default function InterviewPage() {
   const [showFeedback, setShowFeedback] = useState(false);
   const [feedbackContent, setFeedbackContent] = useState('');
   const [answer, setAnswer] = useState('');
+  const toast = useToast();
+  const isFirstLoad = useRef(true);
   const [question, setQuestion] = useState<QuestionData>({
+    questionId: 0,
     category: initialCategory,
+    topic: topicParam || '',
     question: '질문을 불러오는 중입니다...',
   });
   // 추가 질문하기 토글
   const [showFollowUp, setShowFollowUp] = useState(false);
   const toggleFollowUp = () => setShowFollowUp((prev) => !prev);
   // 추가 질문 useSate
-  const [followUpQuestions, setFollowUpQuestions] = useState<string[]>([]);
+  const [followUpQuestions, setFollowUpQuestions] = useState<QuestionData[]>(
+    [],
+  );
 
   // 추가 질문 랜덤 함수
   function getRandomItems<T>(array: T[], count: number): T[] {
@@ -42,56 +50,86 @@ export default function InterviewPage() {
   }
 
   // 질문 불러오기 get요청
-  useEffect(() => {
-    const fetchQuestion = async () => {
+  const fetchQuestion = useCallback(async () => {
+    // API 요청 확인용
+    console.log('rawCategory:', rawCategory, 'topicParam:', topicParam);
+
+    if (!isCategoryKey(rawCategory) || !topicParam) {
+      setQuestion({
+        questionId: 0,
+        category: rawCategory as CategoryKey,
+        topic: topicParam || '',
+        question: '잘못된 접근입니다.',
+      });
+      setFollowUpQuestions([]);
+      return;
+    }
+
+    try {
+      const data = await getQuestionsByCategoryAndTopic(
+        rawCategory,
+        topicParam,
+      );
       // API 요청 확인용
-      console.log('rawCategory:', rawCategory);
-      console.log('topicParam:', topicParam);
+      console.log('불러온 질문 수:', data.length);
+      console.log('data 내용:', data);
 
-      if (!isCategoryKey(rawCategory) || !topicParam) {
-        setQuestion({
+      if (!data.length) throw new Error('질문 없음');
+
+      const idx = Math.floor(Math.random() * data.length);
+      const pick = data[idx];
+
+      setQuestion({
+        questionId: pick.question_id,
+        category: rawCategory as CategoryKey,
+        topic: pick.topic,
+        question: pick.content,
+      });
+
+      // 추가 질문 나머지 질문 목록에서 랜덤으로 3개 뽑기
+      const otherQuestion = data
+        .filter((_, i) => i !== idx)
+        .map((q) => ({
+          questionId: q.question_id,
           category: rawCategory as CategoryKey,
-          question: '잘못된 접근입니다.',
-        });
-        return;
+          topic: q.topic,
+          question: q.content,
+        }));
+
+      setFollowUpQuestions(getRandomItems(otherQuestion, 3));
+
+      if (isFirstLoad.current) {
+        isFirstLoad.current = false;
+      } else {
+        toast('새로운 질문이 도착했어요!', 'success');
       }
+    } catch (e) {
+      console.error(e);
+      setQuestion({
+        questionId: 0,
+        category: rawCategory as CategoryKey,
+        topic: topicParam || '',
+        question: '질문을 불러오는 데 실패했습니다.',
+      });
+      setFollowUpQuestions([]);
+      toast('질문 로딩에 실패했어요...', 'error');
+    }
+  }, [rawCategory, topicParam, toast]);
 
-      try {
-        const data = await getQuestionsByCategoryAndTopic(
-          rawCategory,
-          topicParam,
-        );
-        // API 요청 확인용
-        console.log('불러온 질문 수:', data.length);
-        console.log('data 내용:', data);
+  const debouncedFetch = useMemo(
+    () => debounce(fetchQuestion, 1000, { leading: true, trailing: false }),
+    [fetchQuestion],
+  );
 
-        if (!data.length) throw new Error('질문 없음');
-        const random = Math.floor(Math.random() * data.length);
-        const randomQuestion = data[random];
-
-        setQuestion({
-          category: rawCategory,
-          question: randomQuestion.content,
-        });
-
-        // 추가 질문 나머지 질문 목록에서 랜덤으로 3개 뽑기
-        const otherQuestions = data
-          .filter((_, i) => i !== random)
-          .map((q) => q.content);
-
-        setFollowUpQuestions(getRandomItems(otherQuestions, 3));
-      } catch (e) {
-        console.error(e);
-        setQuestion({
-          category: rawCategory,
-          question: '질문을 불러오는 데 실패했습니다.',
-        });
-        setFollowUpQuestions([]);
-      }
+  useEffect(() => {
+    return () => {
+      debouncedFetch.cancel();
     };
+  }, [debouncedFetch]);
 
+  useEffect(() => {
     fetchQuestion();
-  }, [rawCategory, topicParam]);
+  }, [fetchQuestion]);
 
   const handleFeedback = async (answerText: string, feedback: string) => {
     setAnswer(answerText);
@@ -103,6 +141,8 @@ export default function InterviewPage() {
     setShowFeedback(false);
     setAnswer('');
     setFeedbackContent('');
+    setShowFollowUp(false);
+    debouncedFetch();
   };
 
   return (
@@ -116,7 +156,7 @@ export default function InterviewPage() {
         <div>
           <InterviewQuestion
             category={question.category}
-            topic={topicParam || ''}
+            topic={question.topic}
             question={question.question}
             onToggleBookmark={() => {}}
           />
@@ -125,6 +165,7 @@ export default function InterviewPage() {
         <div>
           <AnswerInput
             question={question.question}
+            questionId={question.questionId}
             onFeedback={handleFeedback}
             disabled={showFeedback}
             isFollowUpOpen={showFollowUp}
@@ -143,10 +184,7 @@ export default function InterviewPage() {
             <FollowUpQuestion
               questions={followUpQuestions}
               onSelect={(selected) => {
-                setQuestion({
-                  category: question.category,
-                  question: selected,
-                });
+                setQuestion(selected);
                 setAnswer('');
                 setFeedbackContent('');
                 setShowFeedback(false);
