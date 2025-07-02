@@ -9,6 +9,7 @@ import Nav from './components/common/Nav';
 import InterviewPage from './page/InterviewPage';
 import ToastProvider from './components/common/ToastProvider';
 import AdminPage from './page/AdminPage';
+import CheckAdminUuid from './components/mainpage/CheckAdminUuid';
 
 export default function App() {
   return (
@@ -24,7 +25,14 @@ export default function App() {
             <Route path="/mypage" element={<MyPage />} />
             <Route path="/signup" element={<SignupPage />} />
             <Route path="/interview/:category" element={<InterviewPage />} />
-            <Route path="/admin" element={<AdminPage />} />
+            <Route
+              path="/admin"
+              element={
+                <CheckAdminUuid>
+                  <AdminPage />
+                </CheckAdminUuid>
+              }
+            />
           </Routes>
         </DefaultLayout>
       </BrowserRouter>

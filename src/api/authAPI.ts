@@ -15,7 +15,7 @@ export async function signUpUser({
   goal: string | null;
   profile_img: string | null;
 }) {
-  const { error: authError } = await supabase.auth.signUp({
+  const { data, error: authError } = await supabase.auth.signUp({
     email: userId,
     password,
   });
@@ -27,13 +27,21 @@ export async function signUpUser({
     throw authError;
   }
 
+  const user = data.user;
+
+  if (!user) {
+    throw new Error('회원가입에 실패했습니다. 다시 시도해 주세요.');
+  }
+
   const { error: insertError } = await supabase.from('user').insert({
+    uuid: user.id,
     user_id: userId,
     nickname,
     job,
     goal,
     created_at: new Date(),
     profile_img,
+    admin: false,
   });
 
   if (insertError) {

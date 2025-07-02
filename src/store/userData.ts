@@ -5,6 +5,7 @@ type UserData = {
   user_id: string;
   nickname: string;
   admin: boolean;
+  uuid: string;
 };
 
 type UserDataStore = {
@@ -26,6 +27,7 @@ export const useUserDataStore = create<UserDataStore>()(
         user_id: '',
         nickname: '',
         admin: false,
+        uuid: '',
       },
       setUserData: (data) => set({ userData: data }),
       clearUserData: () =>
@@ -34,6 +36,7 @@ export const useUserDataStore = create<UserDataStore>()(
             user_id: '',
             nickname: '',
             admin: false,
+            uuid: '',
           },
         }),
     }),

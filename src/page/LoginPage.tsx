@@ -50,6 +50,7 @@ export default function LoginPage() {
         user_id: email,
         nickname: userInfo[0].nickname,
         admin: userInfo[0].admin ?? false,
+        uuid: userInfo[0].uuid,
       });
       setIsLoggedIn(true);
 
