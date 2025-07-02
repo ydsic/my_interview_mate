@@ -9,25 +9,32 @@ import Nav from './components/common/Nav';
 import InterviewPage from './page/InterviewPage';
 import ToastProvider from './components/common/ToastProvider';
 
-import { supabase } from './supabaseClient';
-import { useEffect } from 'react';
-import { setUserProfileByEmail } from './api/setUserProfile';
+// import { supabase } from './supabaseClient';
+// import { useEffect } from 'react';
+// import { setUserProfileByEmail } from './api/setUserProfile';
 
 export default function App() {
   // Supabase Auth는 기본적으로 세션을 브라우저의 localStorage에 저장해서 새로고침/재접속 시 자동 로그인 지원
   // 그래서 App.tsx에 supabase.auth.getUser()로 유저 정보를 확인해서 다시 저장
 
+  // ->
+  // zustand persist로 로그인 상태와 사용자 정보가 localStorage에 자동 저장되므로 useEffect 제거
+
+  /*
   useEffect(() => {
     const restoreSession = async () => {
       const {
         data: { user },
       } = await supabase.auth.getUser();
       if (user && user.email) {
-        await setUserProfileByEmail(user.email);
+        console.log('[확인] : ', user.email);
+        // await setUserProfileByEmail(user.email);
       }
     };
     restoreSession();
   }, []);
+
+  */
 
   return (
     <>
