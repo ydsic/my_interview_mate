@@ -3,7 +3,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const allowedOrigins = [
   'http://localhost:5173', // 개발
-  'https://my-interview-mate.vercel.app/', // 실제 배포 도메인(예시, 실제 도메인으로 교체)
+  'https://my-interview-mate.vercel.app', // 실제 배포 도메인(예시, 실제 도메인으로 교체)
 ];
 
 serve(async (req) => {
