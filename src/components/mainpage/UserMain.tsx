@@ -5,6 +5,7 @@ import clsx from 'clsx';
 import { topics } from '../../data/topics';
 import type { Topic, TopicItem } from '../../data/topics';
 import { Link } from 'react-router-dom';
+import { useUserDataStore } from '../../store/userData';
 
 const categoryStyles: Record<
   string,
@@ -39,6 +40,8 @@ export default function UserMain() {
   const currentCategory = selectedTopic.topic.category;
   const style = categoryStyles[currentCategory];
 
+  const { nickname } = useUserDataStore((state) => state.userData);
+
   const handleSelect = (topic: Topic, item: TopicItem) => {
     setSelectedTopic({ topic, item });
   };
@@ -46,7 +49,7 @@ export default function UserMain() {
   return (
     <div className="flex flex-col w-full px-10 py-6 gap-10">
       <div className="bg-gradient-to-br from-blue-50 to-purple-50 p-10 rounded-4xl shadow-2xs space-y-4">
-        <H2_content_title> 안녕하세요 김면접님! 👋 </H2_content_title>
+        <H2_content_title> 안녕하세요 {nickname} 님! 👋 </H2_content_title>
         <p> 오늘도 프론트엔드 개발자 면접 준비를 시작해볼까요? </p>
       </div>
 
