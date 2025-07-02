@@ -3,7 +3,7 @@ import { supabase } from '../supabaseClient';
 
 // 이메일로 프로필 전체 정보 조회
 export async function loginUserInfo(userId: string) {
-  return await supabase.from('user').select('*').eq('user_id', userId).single();
+  return await supabase.from('user').select('*').eq('user_id', userId);
 }
 
 // 이메일로 닉네임 조회
