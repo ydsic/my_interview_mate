@@ -1,15 +1,15 @@
 import { supabase } from '../supabaseClient';
 
 // 답변 데이터 입력 api
-export const saveAnswer = async (
-  user_id: string,
-  question_id: number,
-  content: string,
-) => {
-  // insert, update 둘 다 가능한 upsert
+export const saveAnswer = async (question_id: number, content: string) => {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error('User not authenticated for saving answer.');
+
   const { data, error } = await supabase
     .from('answers')
-    .upsert([{ user_id, question_id, content }], {
+    .upsert([{ user_id: user.id, question_id, content }], {
       onConflict: 'user_id,question_id',
     })
     .select()
