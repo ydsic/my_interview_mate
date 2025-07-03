@@ -46,16 +46,17 @@ export async function updateUserGoal(userId: string, goal: string) {
 // dashboard 조회
 export async function getUserDashboard(userId: string) {
   return await supabase
-    .from('user')
-    .select('dashboard')
+    .from('userStats')
+    .select('*')
     .eq('user_id', userId)
     .single();
 }
-// dashboard 업데이트
-export async function updateUserDashboard(userId: string, dashboard: string[]) {
+
+// dashboard score_trand 조회
+export async function getScoreTrend(userId: string) {
   return await supabase
-    .from('user')
-    .update({ dashboard })
+    .from('score_trend_view')
+    .select('date, avg_score')
     .eq('user_id', userId);
 }
 
