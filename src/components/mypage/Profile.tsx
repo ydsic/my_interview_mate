@@ -192,7 +192,7 @@ export default function Profile() {
             isEditing={isEditing}
             name="job"
             value={formData.job}
-            placeholder={userData?.job || ''}
+            placeholder={userData?.job || '희망 직무를 작성해보세요.'}
             maxLength={20}
             onChange={handleInputChange}
           />
@@ -203,8 +203,8 @@ export default function Profile() {
           <InputOrText
             isEditing={isEditing}
             name="goal"
-            value={formData.goal}
-            placeholder={userData?.goal || ''}
+            value={formData?.goal}
+            placeholder={userData?.goal || '희망 목표를 작성해보세요.'}
             maxLength={50}
             onChange={handleInputChange}
           />
