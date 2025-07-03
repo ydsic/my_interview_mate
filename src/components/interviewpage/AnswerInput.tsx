@@ -9,6 +9,7 @@ import { OpenAIApi } from '../../api/prompt';
 import { useToast } from '../../hooks/useToast';
 import { VoiceRecording } from '../../utils/voiceRecording';
 import WaitingMessage from './WaitingMessage';
+import { saveFeedback } from '../../api/feedbackApi';
 import { useRadarChartData } from '../../store/radarchartData';
 import debounce from 'lodash.debounce';
 import { saveAnswer } from '../../api/answerAPI';
@@ -186,7 +187,7 @@ export default function AnswerInput({
       const userEmail: string = user.email;
 
       // 답변 저장하기
-      const answerId = await saveAnswer(userEmail, questionId, answer);
+      const answerId = await saveAnswer(user.id, questionId, answer);
       console.log('answerId:', answerId);
       toast('답변 저장 완료!', 'success');
 
@@ -196,7 +197,14 @@ export default function AnswerInput({
         controllerRef.current.signal,
       );
       onFeedback(answer, feedbackObj);
-      const scores = feedbackObj.scores;
+      const { scores, feedback, summary } = feedbackObj;
+
+      try {
+        await saveFeedback(answerId, questionId, scores, feedback, summary);
+        toast('피드백을 성공적으로 저장했어요!', 'success');
+      } catch (error) {
+        toast((error as Error).message, 'error');
+      }
 
       setRadarData(scores);
       toast('피드백을 가져왔어요!', 'success');
