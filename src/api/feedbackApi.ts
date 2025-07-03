@@ -14,7 +14,7 @@ export const saveFeedback = async (
     {
       feedback_id: feedbackId,
       answers_id: answerId,
-      questions_id: String(questionId), // Convert number to string for feedback.questions_id
+      questions_id: questionId,
       average: Math.round(scores.reduce((a, b) => a + b, 0) / scores.length),
       feedback,
       summary,
