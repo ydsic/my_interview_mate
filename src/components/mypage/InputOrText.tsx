@@ -34,9 +34,10 @@ export default function InputOrText({
         name === 'nickname'
           ? 'text-[24px] font-bold h-[36px]'
           : 'px-5 py-3 bg-gray-15',
+        value.trim() === '' && 'text-gray-70',
       )}
     >
-      {value}
+      {value.trim() === '' ? ' 아직 입력되지 않았어요! ' : value}
     </p>
   );
 }
