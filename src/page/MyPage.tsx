@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import Dashboard from '../components/mypage/Dashboard';
-import InterviewLog from '../components/mypage/InterviewLog';
+import InterviewLog from '../components/mypage/InterviewHistory';
 import Favorites from '../components/mypage/Favorites';
 import Profile from '../components/mypage/Profile';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
