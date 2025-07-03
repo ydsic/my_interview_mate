@@ -179,12 +179,14 @@ export default function AnswerInput({
 
       console.log('getUser error:', userError);
       console.log('getUser user object:', user);
-      console.log('getUser user.id:', user?.id);
-      if (userError || !user) throw new Error('로그인 정보 없음');
-      const userId = user.id;
+      console.log('getUser user.email:', user?.email);
+      if (!user || !user.email) {
+        throw new Error('로그인 정보가 없습니다.');
+      }
+      const userEmail: string = user.email;
 
       // 답변 저장하기
-      const answerId = await saveAnswer(userId, questionId, answer);
+      const answerId = await saveAnswer(userEmail, questionId, answer);
       console.log('answerId:', answerId);
       toast('답변 저장 완료!', 'success');
 
