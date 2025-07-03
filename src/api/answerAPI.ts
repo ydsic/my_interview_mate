@@ -15,9 +15,6 @@ export const saveAnswer = async (
     .select()
     .single();
 
-  console.log('upsert data:', data);
-  console.log('upsert error:', error);
-
   if (error) throw error;
   return data.answer_id;
 };
