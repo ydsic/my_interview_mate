@@ -19,6 +19,8 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCaretLeft } from '@fortawesome/free-solid-svg-icons';
 import { H4_placeholder } from '../common/HTagStyle';
+import ToastItem from '../common/ToastMessage';
+import { useToast } from '../../hooks/useToast';
 
 export default function QuestionList({ setView }: setViewType) {
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -28,6 +30,8 @@ export default function QuestionList({ setView }: setViewType) {
   const [adding, setAdding] = useState(false);
   const [editId, setEditId] = useState<number | null>(null);
   const [editContent, setEditContent] = useState('');
+
+  const toast = useToast();
 
   const categoryTopicMap: Record<string, string[]> = {
     'front-end': ['react', 'javascript', 'nextjs'],
@@ -51,7 +55,7 @@ export default function QuestionList({ setView }: setViewType) {
 
   const handleAddQuestion = async () => {
     if (!selectedCategory || !selectedTopic || !newContent.trim()) {
-      alert('카테고리, 토픽, 질문 내용을 모두 입력하세요.');
+      toast('카테고리, 토픽, 질문 내용 모두 입력해주세요!', 'info');
       return;
     }
 
@@ -63,7 +67,7 @@ export default function QuestionList({ setView }: setViewType) {
     });
     setAdding(false);
     if (res.error) {
-      alert('질문 추가 실패: ' + res.error.message);
+      toast('질문 추가 실패:' + res.error.message, 'error');
       return;
     }
 
@@ -80,7 +84,7 @@ export default function QuestionList({ setView }: setViewType) {
 
   const handleEditSave = async (question_id: number) => {
     if (!editContent.trim()) {
-      alert('질문 내용을 입력하세요.');
+      toast('질문 내용을 입력하세요', 'info');
       return;
     }
     const res = await updateQuestion(question_id, {
@@ -94,6 +98,7 @@ export default function QuestionList({ setView }: setViewType) {
     setEditContent('');
     fetchQuestions().then((res) => {
       if (res.data) setQuestions(res.data);
+      toast('수정 완료!', 'success');
     });
   };
 
