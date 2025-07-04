@@ -8,6 +8,7 @@ export interface InterviewHistoryItem {
   feedback: { average: number } | null;
 }
 
+// 면접 기록 조회 api
 export async function getInterviewHistory(userEmail: string) {
   const { data, error } = await supabase
     .from('answers')
@@ -44,4 +45,29 @@ export async function getInterviewHistory(userEmail: string) {
       feedback: f,
     };
   });
+}
+
+// 면접 기록 삭제 api
+export async function deleteInterviewHistory(answerId: number) {
+  //feedback에서 먼저 삭제
+  const { error: fbErr } = await supabase
+    .from('feedback')
+    .delete()
+    .eq('answers_id', answerId);
+
+  if (fbErr) {
+    console.error('피드백 삭제 실패:', fbErr);
+    throw fbErr;
+  }
+
+  //answers에서 삭제
+  const { error: ansErr } = await supabase
+    .from('answers')
+    .delete()
+    .eq('answer_id', answerId);
+
+  if (ansErr) {
+    console.error('답변 삭제 실패:', ansErr);
+    throw ansErr;
+  }
 }

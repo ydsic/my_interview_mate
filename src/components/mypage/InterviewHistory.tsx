@@ -9,8 +9,12 @@ import {
   H3_sub_detail,
   H4_placeholder,
 } from '../common/HTagStyle';
-import { getInterviewHistory } from '../../api/historyAPI';
+import {
+  deleteInterviewHistory,
+  getInterviewHistory,
+} from '../../api/historyAPI';
 import type { InterviewHistoryItem as RawItem } from '../../api/historyAPI';
+import { useToast } from '../../hooks/useToast';
 
 const CATEGORY_STYLES: Record<
   string,
@@ -35,11 +39,11 @@ const CATEGORY_STYLES: Record<
 
 export default function InterviewHistory() {
   const { user_id } = useUserDataStore((s) => s.userData);
-
   const [items, setItems] = useState<RawItem[]>([]);
   const [editMode, setEditMode] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const toast = useToast();
 
   useEffect(() => {
     if (!user_id) return;
@@ -73,8 +77,14 @@ export default function InterviewHistory() {
   };
 
   // 삭제 로직,
-  const handleDelete = (id: number) => {
-    setItems((prev) => prev.filter((item) => item.answer_id !== id));
+  const handleDelete = async (id: number) => {
+    try {
+      await deleteInterviewHistory(id);
+      setItems((prev) => prev.filter((item) => item.answer_id !== id));
+      toast('면접 기록을 삭제했어요.', 'success');
+    } catch {
+      toast('기록 삭제에 실패했습니다.', 'error');
+    }
   };
 
   return (
