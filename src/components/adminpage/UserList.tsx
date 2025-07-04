@@ -3,6 +3,7 @@ import { fetchUsers, updateUser, deleteUser } from '../../api/adminPageApi';
 import { H4_placeholder } from '../common/HTagStyle';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCaretLeft, faUser } from '@fortawesome/free-solid-svg-icons';
+import Button from '../common/Button';
 
 // Define the type for a user object based on the database schema
 interface User {
@@ -222,33 +223,15 @@ export default function UserList({ setView }: setViewType) {
                   <div className="mt-8 flex space-x-3">
                     {isEditing ? (
                       <>
-                        <button
-                          onClick={handleUpdateUser}
-                          className="px-6 py-2.5 bg-slate-800 text-white rounded-lg hover:bg-slate-700 transition-colors duration-200 font-medium"
-                        >
-                          저장
-                        </button>
-                        <button
-                          onClick={() => setIsEditing(false)}
-                          className="px-6 py-2.5 bg-slate-200 text-slate-700 rounded-lg hover:bg-slate-300 transition-colors duration-200 font-medium"
-                        >
+                        <Button onClick={handleUpdateUser}>저장</Button>
+                        <Button onClick={() => setIsEditing(false)}>
                           취소
-                        </button>
+                        </Button>
                       </>
                     ) : (
-                      <button
-                        onClick={() => setIsEditing(true)}
-                        className="px-6 py-2.5 bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-colors duration-200 font-medium border border-slate-300"
-                      >
-                        수정
-                      </button>
+                      <Button onClick={() => setIsEditing(true)}>수정</Button>
                     )}
-                    <button
-                      onClick={handleDeleteUser}
-                      className="px-6 py-2.5 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors duration-200 font-medium border border-red-200"
-                    >
-                      삭제
-                    </button>
+                    <Button onClick={handleDeleteUser}>삭제</Button>
                   </div>
                 </div>
               )}
