@@ -2,7 +2,7 @@ import { supabase } from '../supabaseClient';
 
 // 유저 전체 조회
 export async function fetchUsers() {
-  return await supabase.from('user').select('*');
+  return await supabase.functions.invoke('get-all-users');
 }
 
 // 유저 정보 수정
