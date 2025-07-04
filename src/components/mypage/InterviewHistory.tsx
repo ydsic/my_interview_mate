@@ -88,7 +88,7 @@ export default function InterviewHistory() {
   };
 
   return (
-    <section className="max-w-5xl mx-auto rounded-xl bg-white p-6 shadow-sm">
+    <section className="max-w-7xl mx-auto rounded-3xl bg-white p-6 shadow-md">
       {/* 제목 */}
       <H3_sub_detail>최근 면접 기록</H3_sub_detail>
 
