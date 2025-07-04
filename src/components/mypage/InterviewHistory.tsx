@@ -1,4 +1,8 @@
 import Button, { WhiteButton } from '../common/Button';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useState } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import {
   H2_content_title,
   H3_sub_detail,
@@ -51,55 +55,93 @@ const mock = [
 ] as const;
 
 export default function InterviewHistory() {
+  const [editMode, setEditMode] = useState(false);
+  const [shrunk, setShrunk] = useState<Record<number, boolean>>({});
+  const BASE_CONTENT_WIDTH = '65%';
+
+  const toggleEditMode = () => {
+    setEditMode((prev) => !prev);
+    if (editMode) setShrunk({});
+  };
+  const handleShrink = (id: number) => {
+    setShrunk((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
+
   return (
-    <section className="rounded-xl bg-white p-6 shadow-sm">
+    <section className="max-w-5xl mx-auto rounded-xl bg-white p-6 shadow-sm">
       {/* 제목 */}
       <H3_sub_detail>최근 면접 기록</H3_sub_detail>
 
       {/* 리스트 */}
-      <ul className="space-y-3 pt-6 pb-13">
-        {mock.map(({ id, question, category, date, score }) => {
-          const { bg, text } = CATEGORY_STYLES[category] ?? {
-            bg: 'bg-gray-200',
-            text: 'text-gray-700',
-          };
-
-          return (
-            <li
-              key={id}
-              className="flex items-center justify-between rounded-md bg-gray-50 shadow-sm px-4 py-5 mb-5"
-            >
-              {/* 면접 질문 / 카테고리 */}
-              <div className="mt-1 flex flex-col gap-4 max-w-[65%]">
-                <H3_sub_detail>{question}</H3_sub_detail>
-                <div className="flex items-center gap-2 text-base font-semibold">
-                  <span
-                    className={`inline-flex justify-center items-center h-7 min-w-28 py-4 rounded-lg text-center ${bg} ${text}`}
+      <ul className="relative space-y-3 pt-6 pb-13">
+        <AnimatePresence>
+          {mock.map(({ id, question, category, date, score }) => {
+            const { bg, text } = CATEGORY_STYLES[category] ?? {
+              bg: 'bg-gray-200',
+              text: 'text-gray-700',
+            };
+            // const isShrunk = shrunk[id] ?? false;
+            return (
+              <motion.li
+                key={id}
+                layout
+                initial={false}
+                animate={{
+                  x: editMode ? 10 : 0,
+                  width: editMode ? '98%' : '100%',
+                }}
+                transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+                style={{ transformOrigin: 'right center' }}
+                className={`flex items-center justify-between rounded-md bg-gray-50 shadow-sm px-4 py-5 mb-5 ${editMode ? 'ml-auto' : 'w-full'}`}
+              >
+                {/* 삭제버튼 */}
+                {editMode && (
+                  <button
+                    type="button"
+                    aria-label="delete history"
+                    // onClick={()=>handleDelete(id)}
+                    className="border rounded-4xl h-7 w-7 absolute -left-10 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 transition-colors cursor-pointer"
                   >
-                    {category === 'front-end'
-                      ? '프론트엔드'
-                      : category.toUpperCase()}
-                  </span>
+                    <FontAwesomeIcon icon={faXmark} className="h-5 w-5" />
+                  </button>
+                )}
 
-                  <H4_placeholder className="ml-2 text-gray-70 font-extralight">
-                    {date}
-                  </H4_placeholder>
+                {/* 면접 질문 / 카테고리 */}
+                <motion.div className="mt-1 flex flex-col gap-4 max-w-[65%]">
+                  <H3_sub_detail>{question}</H3_sub_detail>
+                  <div className="flex items-center gap-2 text-base font-semibold">
+                    <span
+                      className={`inline-flex justify-center items-center h-7 min-w-28 py-4 rounded-lg text-center ${bg} ${text}`}
+                    >
+                      {category === 'front-end'
+                        ? '프론트엔드'
+                        : category.toUpperCase()}
+                    </span>
+
+                    <H4_placeholder className="ml-2 text-gray-70 font-extralight">
+                      {date}
+                    </H4_placeholder>
+                  </div>
+                </motion.div>
+
+                {/* 오른쪽: 점수 & 다시보기 */}
+                <div className="flex items-center gap-3 shrink-0">
+                  <H2_content_title>{score}점</H2_content_title>
+                  <WhiteButton onClick={() => handleShrink(id)}>
+                    {editMode ? '수정하기' : '다시보기'}
+                  </WhiteButton>
                 </div>
-              </div>
-
-              {/* 오른쪽: 점수 & 다시보기 */}
-              <div className="flex items-center gap-3 shrink-0">
-                <H2_content_title>{score}점</H2_content_title>
-                <WhiteButton>다시보기</WhiteButton>
-              </div>
-            </li>
-          );
-        })}
+              </motion.li>
+            );
+          })}
+        </AnimatePresence>
       </ul>
 
       {/* 하단 버튼 */}
       <div className="flex justify-end">
-        <Button>히스토리 수정</Button>
+        <Button onClick={toggleEditMode}>
+          {editMode ? '히스토리 내역 수정' : '히스토리 수정'}
+        </Button>
       </div>
     </section>
   );
