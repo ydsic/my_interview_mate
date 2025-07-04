@@ -32,8 +32,7 @@ export default function Button({
     </button>
   );
 }
-
-/* ---------- 새로 추가한 Submit 전용 Button ---------- */
+/* ---------- Submit 전용 Button ---------- */
 export function SubmitButton({
   children,
   onClick,
@@ -57,6 +56,27 @@ export function SubmitButton({
         backgroundColor: 'var(--color-front-text-tag)',
         opacity: isDisabled ? 0.5 : isHover ? 0.9 : 1,
       }}
+    >
+      {children}
+    </button>
+  );
+}
+
+// 수정 및 일반 버튼
+export function WhiteButton({
+  children,
+  onClick,
+  className = '',
+  type = 'button',
+}: ButtonProps) {
+  return (
+    <button
+      type={type}
+      onClick={onClick}
+      className={`inline-flex items-center justify-center
+        h-9 px-5 text-base font-medium 
+        border border-gray-25 bg-white shadow-sm text-gray-100 rounded-lg cursor-pointer
+        hover:bg-gray-25 transition ${className}`}
     >
       {children}
     </button>
