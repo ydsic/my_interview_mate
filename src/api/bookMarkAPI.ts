@@ -28,3 +28,19 @@ export async function deleteBookMark(userId: string, questionId: number) {
     throw new Error(`북마크 삭제 에러 발생 : ${deleteError.message}`);
   }
 }
+
+// 즐겨찾기 조회
+export async function selectBookMarks(userId: string) {
+  const { data, error } = await supabase
+    .from('user_bookmarked_questions_with_feedback')
+    .select(
+      'question_id, question_content, question_category,bookmarked_at, average_score',
+    )
+    .eq('user_id', userId);
+
+  if (error) {
+    throw new Error(`북마크 질문 조회 에러 발생 : ${error.message}`);
+  }
+
+  return data;
+}
