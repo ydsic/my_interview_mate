@@ -80,86 +80,98 @@ export default function InterviewHistory() {
       {/* 제목 */}
       <H3_sub_detail>최근 면접 기록</H3_sub_detail>
 
-      {/* 리스트 */}
-      <ul className="relative space-y-3 pt-6 pb-13">
-        <AnimatePresence>
-          {items.map(({ id, question, category, date, score }) => {
-            const { bg, text } = CATEGORY_STYLES[category] ?? {
-              bg: 'bg-gray-200',
-              text: 'text-gray-700',
-            };
-            return (
-              <motion.li
-                key={id}
-                layout
-                initial={false}
-                animate={{
-                  x: editMode ? 10 : 0,
-                  width: editMode ? '98%' : '100%',
-                }}
-                exit={{
-                  opacity: 0,
-                  x: -20,
-                  height: 0,
-                  marginTop: 0,
-                  marginBottom: 0,
-                  paddingTop: 0,
-                  paddingBottom: 0,
-                }}
-                transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-                style={{ transformOrigin: 'right center' }}
-                className={`flex items-center justify-between rounded-md bg-gray-50 shadow-sm px-4 py-5 mb-5 ${editMode ? 'ml-auto' : 'w-full'}`}
-              >
-                {/* 삭제버튼 */}
-                {editMode && (
-                  <button
-                    type="button"
-                    onClick={() => handleDelete(id)}
-                    aria-label="delete history"
-                    // onClick={()=>handleDelete(id)}
-                    className="border rounded-4xl h-7 w-7 absolute -left-10 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 transition-colors cursor-pointer"
-                  >
-                    <FontAwesomeIcon icon={faXmark} className="h-5 w-5" />
-                  </button>
-                )}
-
-                {/* 면접 질문 / 카테고리 */}
-                <motion.div className="mt-1 flex flex-col gap-4 max-w-[65%]">
-                  <H3_sub_detail>{question}</H3_sub_detail>
-                  <div className="flex items-center gap-2 text-base font-semibold">
-                    <span
-                      className={`inline-flex justify-center items-center h-7 min-w-28 py-4 rounded-lg text-center ${bg} ${text}`}
+      {/* 면접 질문이 없을 때 */}
+      {items.length === 0 ? (
+        <div className="py-70 text-center text-gray-85">
+          <H2_content_title>면접 기록이 없습니다</H2_content_title>
+        </div>
+      ) : (
+        /* 리스트 */
+        <ul className="relative space-y-3 pt-6 pb-13">
+          <AnimatePresence>
+            {items.map(({ id, question, category, date, score }) => {
+              const { bg, text } = CATEGORY_STYLES[category] ?? {
+                bg: 'bg-gray-200',
+                text: 'text-gray-700',
+              };
+              return (
+                <motion.li
+                  key={id}
+                  layout
+                  initial={false}
+                  animate={{
+                    x: editMode ? 10 : 0,
+                    width: editMode ? '98%' : '100%',
+                  }}
+                  exit={{
+                    opacity: 0,
+                    x: -20,
+                    height: 0,
+                    marginTop: 0,
+                    marginBottom: 0,
+                    paddingTop: 0,
+                    paddingBottom: 0,
+                  }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+                  style={{ transformOrigin: 'right center' }}
+                  className={`flex items-center justify-between rounded-md bg-gray-50 shadow-sm px-4 py-5 mb-5 ${editMode ? 'ml-auto' : 'w-full'}`}
+                >
+                  {/* 삭제버튼 */}
+                  {editMode && (
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(id)}
+                      aria-label="delete history"
+                      // onClick={()=>handleDelete(id)}
+                      className="items-center justify-center flex border rounded-3xl h-7 w-7 absolute -left-10 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 transition-colors cursor-pointer"
                     >
-                      {category === 'front-end'
-                        ? '프론트엔드'
-                        : category.toUpperCase()}
-                    </span>
+                      <FontAwesomeIcon
+                        icon={faXmark}
+                        className="items-center justify-center flex"
+                      />
+                    </button>
+                  )}
 
-                    <H4_placeholder className="ml-2 text-gray-70 font-extralight">
-                      {date}
-                    </H4_placeholder>
+                  {/* 면접 질문 / 카테고리 */}
+                  <div className="mt-1 flex flex-col gap-4 max-w-[65%]">
+                    <H3_sub_detail>{question}</H3_sub_detail>
+                    <div className="flex items-center gap-2 text-base font-semibold">
+                      <span
+                        className={`inline-flex justify-center items-center h-7 min-w-28 py-4 rounded-lg text-center ${bg} ${text}`}
+                      >
+                        {category === 'front-end'
+                          ? '프론트엔드'
+                          : category.toUpperCase()}
+                      </span>
+
+                      <H4_placeholder className="ml-2 text-gray-70 font-extralight">
+                        {date}
+                      </H4_placeholder>
+                    </div>
                   </div>
-                </motion.div>
 
-                {/* 오른쪽: 점수 & 다시보기 */}
-                <div className="flex items-center gap-3 shrink-0">
-                  <H2_content_title>{score}점</H2_content_title>
-                  <WhiteButton>
-                    {editMode ? '수정하기' : '다시보기'}
-                  </WhiteButton>
-                </div>
-              </motion.li>
-            );
-          })}
-        </AnimatePresence>
-      </ul>
+                  {/* 오른쪽: 점수 & 다시보기 */}
+                  <div className="flex items-center gap-3 shrink-0">
+                    <H2_content_title>{score}점</H2_content_title>
+                    <WhiteButton>
+                      {editMode ? '수정하기' : '다시보기'}
+                    </WhiteButton>
+                  </div>
+                </motion.li>
+              );
+            })}
+          </AnimatePresence>
+        </ul>
+      )}
 
       {/* 하단 버튼 */}
-      <div className="flex justify-end">
-        <Button onClick={toggleEditMode}>
-          {editMode ? '히스토리 내역 수정' : '히스토리 수정'}
-        </Button>
-      </div>
+      {items.length > 0 && (
+        <div className="flex justify-end">
+          <Button onClick={toggleEditMode}>
+            {editMode ? '히스토리 내역 수정' : '히스토리 수정'}
+          </Button>
+        </div>
+      )}
     </section>
   );
 }
