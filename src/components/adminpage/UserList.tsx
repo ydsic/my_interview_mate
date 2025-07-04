@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { fetchUsers, updateUser, deleteUser } from '../../api/adminPageApi';
 import { H4_placeholder } from '../common/HTagStyle';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCaretLeft } from '@fortawesome/free-solid-svg-icons';
+import { faCaretLeft, faUser } from '@fortawesome/free-solid-svg-icons';
 
 // Define the type for a user object based on the database schema
 interface User {
@@ -108,7 +108,7 @@ export default function UserList({ setView }: setViewType) {
   }
 
   return (
-    <div className="flex h-screen bg-slate-50">
+    <div className="flex h-full bg-slate-50">
       <div className="w-1/4 bg-white border-r border-slate-200 overflow-y-auto shadow-sm">
         <div className="p-6 border-b border-slate-100 flex items-center justify-between">
           <div
@@ -265,30 +265,12 @@ export default function UserList({ setView }: setViewType) {
             </div>
           </div>
         ) : (
-          <div className="flex items-center justify-center h-full">
-            <div className="text-center">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-slate-100 flex items-center justify-center">
-                <svg
-                  className="w-8 h-8 text-slate-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"
-                  />
-                </svg>
-              </div>
-              <p className="text-slate-500 font-medium">
-                사용자를 선택해주세요.
-              </p>
-              <p className="text-slate-400 text-sm mt-2">
-                좌측 목록에서 사용자를 클릭하여 상세 정보를 확인할 수 있습니다.
-              </p>
-            </div>
+          <div className="flex items-center justify-center h-full flex-col gap-3">
+            <FontAwesomeIcon icon={faUser} size="3x" />
+            <p className="text-slate-500 font-medium">사용자를 선택해주세요.</p>
+            <p className="text-slate-400 text-sm">
+              좌측 목록에서 사용자를 클릭하여 상세 정보를 확인할 수 있습니다.
+            </p>
           </div>
         )}
       </div>
