@@ -187,7 +187,11 @@ export default function AnswerInput({
       const userEmail: string = user.email;
 
       // 답변 저장하기
-      const answerId = await saveAnswer(userEmail, questionId, answer);
+      const { answer_id: answerId } = await saveAnswer(
+        userEmail,
+        questionId,
+        answer,
+      );
       console.log('answerId:', answerId);
       toast('답변 저장 완료!', 'success');
 

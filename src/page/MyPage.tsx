@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import Dashboard from '../components/mypage/Dashboard';
-import InterviewLog from '../components/mypage/InterviewHistory';
 import Favorites from '../components/mypage/Favorites';
 import Profile from '../components/mypage/Profile';
+import InterviewHistory from '../components/mypage/InterviewHistory';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChartSimple } from '@fortawesome/free-solid-svg-icons';
 import { faClockRotateLeft } from '@fortawesome/free-solid-svg-icons';
@@ -11,7 +11,7 @@ import { faUser } from '@fortawesome/free-solid-svg-icons';
 
 const tabComponents: Record<string, React.JSX.Element> = {
   dashboard: <Dashboard />,
-  interview: <InterviewLog />,
+  interview: <InterviewHistory />,
   favorites: <Favorites />,
   profile: <Profile />,
 };

@@ -16,7 +16,7 @@ export const saveFeedback = async (
       answers_id: answerId,
       questions_id: questionId,
       average: Math.round(scores.reduce((a, b) => a + b, 0) / scores.length),
-      feedback,
+      feedback: feedback,
       summary,
       logic_score: Math.round(scores[0]),
       clarity_score: Math.round(scores[1]),
