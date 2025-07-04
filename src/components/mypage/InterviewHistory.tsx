@@ -30,7 +30,15 @@ const CATEGORY_STYLES: Record<
   },
 };
 
-const mock = [
+interface mockItem {
+  id: number;
+  question: string;
+  category: string;
+  date: string;
+  score: number;
+}
+
+const mock: mockItem[] = [
   {
     id: 1,
     question: 'TypeScript를 사용하는 이유는 무엇인가요?',
@@ -55,16 +63,16 @@ const mock = [
 ] as const;
 
 export default function InterviewHistory() {
+  const [items, setItems] = useState<mockItem[]>(mock);
   const [editMode, setEditMode] = useState(false);
-  const [shrunk, setShrunk] = useState<Record<number, boolean>>({});
-  const BASE_CONTENT_WIDTH = '65%';
 
   const toggleEditMode = () => {
     setEditMode((prev) => !prev);
-    if (editMode) setShrunk({});
   };
-  const handleShrink = (id: number) => {
-    setShrunk((prev) => ({ ...prev, [id]: !prev[id] }));
+
+  // 삭제 로직,
+  const handleDelete = (id: number) => {
+    setItems((prev) => prev.filter((item) => item.id !== id));
   };
 
   return (
@@ -75,12 +83,11 @@ export default function InterviewHistory() {
       {/* 리스트 */}
       <ul className="relative space-y-3 pt-6 pb-13">
         <AnimatePresence>
-          {mock.map(({ id, question, category, date, score }) => {
+          {items.map(({ id, question, category, date, score }) => {
             const { bg, text } = CATEGORY_STYLES[category] ?? {
               bg: 'bg-gray-200',
               text: 'text-gray-700',
             };
-            // const isShrunk = shrunk[id] ?? false;
             return (
               <motion.li
                 key={id}
@@ -90,6 +97,15 @@ export default function InterviewHistory() {
                   x: editMode ? 10 : 0,
                   width: editMode ? '98%' : '100%',
                 }}
+                exit={{
+                  opacity: 0,
+                  x: -20,
+                  height: 0,
+                  marginTop: 0,
+                  marginBottom: 0,
+                  paddingTop: 0,
+                  paddingBottom: 0,
+                }}
                 transition={{ type: 'spring', stiffness: 400, damping: 25 }}
                 style={{ transformOrigin: 'right center' }}
                 className={`flex items-center justify-between rounded-md bg-gray-50 shadow-sm px-4 py-5 mb-5 ${editMode ? 'ml-auto' : 'w-full'}`}
@@ -98,6 +114,7 @@ export default function InterviewHistory() {
                 {editMode && (
                   <button
                     type="button"
+                    onClick={() => handleDelete(id)}
                     aria-label="delete history"
                     // onClick={()=>handleDelete(id)}
                     className="border rounded-4xl h-7 w-7 absolute -left-10 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 transition-colors cursor-pointer"
@@ -127,7 +144,7 @@ export default function InterviewHistory() {
                 {/* 오른쪽: 점수 & 다시보기 */}
                 <div className="flex items-center gap-3 shrink-0">
                   <H2_content_title>{score}점</H2_content_title>
-                  <WhiteButton onClick={() => handleShrink(id)}>
+                  <WhiteButton>
                     {editMode ? '수정하기' : '다시보기'}
                   </WhiteButton>
                 </div>
