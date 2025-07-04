@@ -120,18 +120,18 @@ export default function QuestionList({ setView }: setViewType) {
   };
 
   return (
-    <div className="flex flex-col mx-auto mt-6 p-4 bg-white rounded-lg shadow border border-gray-200">
+    <div className="flex flex-col mx-auto mt-6 p-6 bg-white rounded-xl shadow-sm border border-slate-200">
       <div
-        className="flex items-center gap-2 cursor-pointer mb-4 text-gray-500 hover:text-blue-600 w-fit"
+        className="flex items-center gap-2 cursor-pointer mb-6 text-slate-500 hover:text-slate-700 transition-colors duration-200 w-fit"
         onClick={() => setView('main')}
       >
         <FontAwesomeIcon icon={faCaretLeft} size={'lg'} />
         <H4_placeholder>뒤로가기</H4_placeholder>
       </div>
 
-      <div className="mb-4 flex gap-4">
+      <div className="mb-6 flex gap-4">
         <select
-          className="border rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
+          className="border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#427CF5] focus:border-[#427CF5] transition-all duration-200"
           required
           value={selectedCategory}
           onChange={handleCategoryChange}
@@ -146,7 +146,7 @@ export default function QuestionList({ setView }: setViewType) {
           ))}
         </select>
         <select
-          className="border rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
+          className="border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#427CF5] focus:border-[#427CF5] transition-all duration-200"
           required
           value={selectedTopic}
           onChange={(e) => setSelectedTopic(e.target.value)}
@@ -163,13 +163,13 @@ export default function QuestionList({ setView }: setViewType) {
             ))}
         </select>
         <input
-          className="border rounded px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:blue-200 flex-1"
+          className="border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#427CF5] focus:border-[#427CF5] transition-all duration-200 flex-1"
           placeholder="추가할 질문을 입력하세요."
           value={newContent}
           onChange={(e) => setNewContent(e.target.value)}
         />
         <button
-          className="bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-md px-5 py-2 shadow-sm transition-colors duration-150 border border-blue-500 cursor-pointer"
+          className="bg-[#427CF5] hover:bg-[#3b70f4] text-white font-medium rounded-lg px-5 py-2 shadow-sm transition-colors duration-200 border border-[#427CF5] cursor-pointer"
           onClick={handleAddQuestion}
           disabled={adding}
         >
@@ -177,45 +177,49 @@ export default function QuestionList({ setView }: setViewType) {
         </button>
       </div>
       <div>
-        <ul className="flex rounded font-semibold text-gray-700 text-sm mb-1">
-          <li className="flex-[0.9] text-center">#</li>
+        <ul className="flex rounded-lg font-medium text-slate-700 text-sm mb-2 bg-slate-50 py-3">
+          <li className="flex-[0.8] text-center">#</li>
           <li className="flex-[2] text-center">카테고리</li>
           <li className="flex-[2] text-center">토픽</li>
           <li className="flex-[9] text-center pl-5">질문 내용</li>
-          <li className="flex-[1.1] text-center">설정</li>
+          <li className="flex-[1.2] text-center">설정</li>
         </ul>
         {questions.map((q, idx) => (
           <ul
             key={q.question_id}
-            className="flex border-b last:border-b-0 hover:bg-gray-50 text-sm items-center"
+            className="flex border-b border-slate-200 last:border-b-0 hover:bg-slate-50 transition-colors duration-150 text-sm items-center"
           >
-            <li className="flex-[0.9] py-2 text-center text-gray-500">{idx}</li>
-            <li className="flex-[2] text-center">{q.category}</li>
-            <li className="flex-[2] text-center">{q.topic}</li>
-            <li className="flex-[9] text-left pl-5">
+            <li className="flex-[0.8] py-3 text-center text-slate-500">
+              {idx}
+            </li>
+            <li className="flex-[2] text-center text-slate-600">
+              {q.category}
+            </li>
+            <li className="flex-[2] text-center text-slate-600">{q.topic}</li>
+            <li className="flex-[9] text-left pl-5 py-3">
               {editId === q.question_id ? (
                 <input
-                  className="border rounded px-2 py-1 w-full"
+                  className="border border-slate-300 rounded-lg px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-[#427CF5] focus:border-[#427CF5] transition-all duration-200"
                   value={editContent}
                   onChange={(e) => setEditContent(e.target.value)}
                   autoFocus
                 />
               ) : (
-                q.content
+                <span className="text-slate-800">{q.content}</span>
               )}
             </li>
-            <li className="flex-[1.1]">
-              <div className="flex justify-center">
+            <li className="flex-[1.2]">
+              <div className="flex justify-center gap-1">
                 {editId === q.question_id ? (
                   <>
                     <button
-                      className="text-md font-bold text-green-600 px-2 py-1 hover:underline cursor-pointer"
+                      className="text-sm font-medium text-emerald-600 px-2 py-1 hover:bg-emerald-50 rounded transition-colors duration-150 cursor-pointer"
                       onClick={() => handleEditSave(q.question_id)}
                     >
                       저장
                     </button>
                     <button
-                      className="text-md font-bold text-gray-500 px-2 py-1 hover:underline cursor-pointer"
+                      className="text-sm font-medium text-slate-500 px-2 py-1 hover:bg-slate-100 rounded transition-colors duration-150 cursor-pointer"
                       onClick={handleEditCancel}
                     >
                       취소
@@ -224,13 +228,13 @@ export default function QuestionList({ setView }: setViewType) {
                 ) : (
                   <>
                     <button
-                      className="text-md font-bold text-blue-500 px-2 py-1 hover:underline cursor-pointer"
+                      className="text-sm font-medium text-[#427CF5] px-2 py-1 hover:bg-blue-50 rounded transition-colors duration-150 cursor-pointer"
                       onClick={() => handleEditClick(q)}
                     >
                       수정
                     </button>
                     <button
-                      className="text-md font-bold text-red-500 px-2 py-1 hover:underline cursor-pointer"
+                      className="text-sm font-medium text-red-500 px-2 py-1 hover:bg-red-50 rounded transition-colors duration-150 cursor-pointer"
                       onClick={() => handleDelete(q.question_id)}
                     >
                       삭제
