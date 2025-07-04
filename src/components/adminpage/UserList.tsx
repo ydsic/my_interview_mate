@@ -59,6 +59,7 @@ export default function UserList({ setView }: setViewType) {
       if (error) {
         throw new Error('사용자 정보 수정에 실패했습니다.');
       }
+
       const { data } = await fetchUsers();
       setUsers(data || []);
       setSelectedUser((prev) =>
@@ -84,6 +85,7 @@ export default function UserList({ setView }: setViewType) {
       if (error) {
         throw new Error('사용자 삭제에 실패했습니다.');
       }
+
       setUsers(users.filter((u) => u.user_id !== selectedUser.user_id));
       setSelectedUser(null);
       alert('사용자가 삭제되었습니다.');
@@ -154,6 +156,7 @@ export default function UserList({ setView }: setViewType) {
                 사용자 정보
               </button>
               {/* <button
+
                 className={`py-3 px-6 font-medium transition-all duration-200 border-b-2 ${
                   activeTab === 'tab2'
                     ? 'border-[#427CF5] text-slate-800'
