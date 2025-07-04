@@ -9,6 +9,8 @@ import type { QuestionData, CategoryKey } from '../types/interview';
 import { getQuestionsByCategoryAndTopic } from '../api/questionAPI';
 import { useToast } from '../hooks/useToast';
 import debounce from 'lodash.debounce';
+import { useUserDataStore } from '../store/userData';
+import { deleteBookMark, insertBookMark } from '../api/bookMarkAPI';
 
 function isCategoryKey(value: unknown): value is CategoryKey {
   return (
@@ -42,6 +44,11 @@ export default function InterviewPage() {
   const [followUpQuestions, setFollowUpQuestions] = useState<QuestionData[]>(
     [],
   );
+
+  /* 즐겨찾기(bookmark) 등록 부분 */
+  // 유저 아이디 불러오기
+  const user_id = useUserDataStore((state) => state.userData.user_id);
+  const [isBookMarked, setIsBookMarked] = useState<boolean>(false);
 
   // 추가 질문 랜덤 함수
   function getRandomItems<T>(array: T[], count: number): T[] {
@@ -145,6 +152,53 @@ export default function InterviewPage() {
     debouncedFetch();
   };
 
+  // 질문이 바뀌면 즐겨찾기도 바꾸기!
+  useEffect(() => {
+    setIsBookMarked(false);
+  }, [question]);
+
+  // 즐겨찾기 디바운싱
+  const deebounceBookMark = useMemo(
+    () =>
+      debounce(
+        async (
+          userId: string,
+          questionId: number,
+          nextBookmarked: boolean,
+          onError: () => void,
+        ) => {
+          try {
+            if (nextBookmarked) {
+              await insertBookMark(userId, questionId);
+              toast('북마크 등록 완료!', 'success');
+            } else {
+              await deleteBookMark(userId, questionId);
+              toast('북마크 삭제 완료!', 'success');
+            }
+          } catch (err: any) {
+            console.error('[북마크 처리 중 에러] : ', err);
+            onError();
+          }
+        },
+        500,
+      ),
+    [],
+  );
+
+  // 즐겨찾기 등록 토글
+  const handleBookMark = () => {
+    const next = !isBookMarked;
+    const questionId = question.questionId;
+
+    console.log('[북마크 질문 id] : ', questionId);
+
+    setIsBookMarked(next);
+    deebounceBookMark(user_id, questionId, next, () => {
+      setIsBookMarked(!next);
+      toast('북마크 등록에 실패했습니다.', 'error');
+    });
+  };
+
   return (
     <div className="h-full flex flex-row justify-center items-start gap-6 w-full px-8">
       <div
@@ -158,7 +212,8 @@ export default function InterviewPage() {
             category={question.category}
             topic={question.topic}
             question={question.question}
-            onToggleBookmark={() => {}}
+            isBookmarked={isBookMarked}
+            onToggleBookmark={handleBookMark}
           />
         </div>
         {/* 답변 컴포넌트 */}

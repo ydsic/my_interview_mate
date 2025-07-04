@@ -42,7 +42,7 @@ export default function InterviewQuestion({
   category,
   topic,
   question,
-  isBookmarked = false,
+  isBookmarked,
   onToggleBookmark,
 }: InterviewQuestionProps) {
   const field = CATEGORY_FIELDS[category];
@@ -75,8 +75,14 @@ export default function InterviewQuestion({
         </div>
 
         {/* 즐겨찾기 아이콘 */}
-        <button onClick={onToggleBookmark} className="text-[24px]">
-          <FontAwesomeIcon icon={isBookmarked ? solidStar : regularStar} />
+        <button
+          onClick={onToggleBookmark}
+          className="text-[24px] cursor-pointer"
+        >
+          <FontAwesomeIcon
+            icon={isBookmarked ? solidStar : regularStar}
+            className={isBookmarked ? 'text-orange-100' : 'text-gray-100'}
+          />
         </button>
       </div>
 

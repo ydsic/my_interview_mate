@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import Dashboard from '../components/mypage/Dashboard';
-import Favorites from '../components/mypage/Favorites';
+import Bookmark from '../components/mypage/Bookmark';
 import Profile from '../components/mypage/Profile';
 import InterviewHistory from '../components/mypage/InterviewHistory';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -12,7 +12,7 @@ import { faUser } from '@fortawesome/free-solid-svg-icons';
 const tabComponents: Record<string, React.JSX.Element> = {
   dashboard: <Dashboard />,
   interview: <InterviewHistory />,
-  favorites: <Favorites />,
+  favorites: <Bookmark />,
   profile: <Profile />,
 };
 
