@@ -10,6 +10,7 @@ import InterviewPage from './page/InterviewPage';
 import ToastProvider from './components/common/ToastProvider';
 import AdminPage from './page/AdminPage';
 import CheckAdminUuid from './components/mainpage/CheckAdminUuid';
+import NotFound from './page/NotFound';
 
 export default function App() {
   return (
@@ -33,6 +34,7 @@ export default function App() {
                 </CheckAdminUuid>
               }
             />
+            <Route path="/*" element={<NotFound />} />
           </Routes>
         </DefaultLayout>
       </BrowserRouter>
