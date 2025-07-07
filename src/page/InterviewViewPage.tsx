@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { H2_content_title } from '../components/common/HTagStyle';
+import Feedback from '../components/interviewViewpage/Feedback';
 
 export default function InterviewViewPage() {
   const navigate = useNavigate();
@@ -21,7 +22,9 @@ export default function InterviewViewPage() {
       <div className="p-5 rounded-xl border text-center">답변</div>
 
       {/* 피드백 영역 */}
-      <div className="p-5 rounded-xl border text-center">피드백</div>
+      <div className="p-5 rounded-xl text-gray-800 border border-gray-200 text-center bg-white">
+        <Feedback />
+      </div>
     </div>
   );
 }
