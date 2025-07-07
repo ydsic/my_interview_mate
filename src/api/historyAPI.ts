@@ -9,7 +9,14 @@ export interface InterviewHistoryItem {
 }
 
 // 면접 기록 조회 api
-export async function getInterviewHistory(userEmail: string) {
+export async function getInterviewHistory(
+  userEmail: string,
+  page: number,
+  limit = 4,
+) {
+  const from = (page - 1) * limit;
+  const to = from + limit - 1;
+
   const { data, error } = await supabase
     .from('answers')
     .select(
@@ -21,7 +28,8 @@ export async function getInterviewHistory(userEmail: string) {
       feedback!feedback_answers_id_fkey(average)`,
     )
     .eq('user_id', userEmail)
-    .order('updated_at', { ascending: false }); // 최신 수정 순으로 정렬
+    .order('updated_at', { ascending: false }) // 최신 수정 순으로 정렬
+    .range(from, to);
   console.log('raw history data:', data);
 
   if (error) throw error;

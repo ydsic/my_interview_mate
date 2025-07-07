@@ -44,13 +44,15 @@ export default function InterviewHistory() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const toast = useToast();
+  const [page, setPage] = useState(1);
+  const limit = 5;
 
   useEffect(() => {
     if (!user_id) return;
 
     async function fetchHistory() {
       try {
-        const raw = await getInterviewHistory(user_id);
+        const raw = await getInterviewHistory(user_id, page, limit);
         const normalized = raw.map((item) => ({
           ...item,
           question: Array.isArray(item.question)
@@ -69,7 +71,7 @@ export default function InterviewHistory() {
     }
 
     fetchHistory();
-  }, [user_id]);
+  }, [user_id, page]);
 
   // 수정버튼 토글
   const toggleEditMode = () => {
@@ -180,9 +182,11 @@ export default function InterviewHistory() {
       {/* 하단 버튼 */}
       {items.length > 0 && (
         <div className="flex justify-end">
-          <Button onClick={toggleEditMode}>
-            {editMode ? '히스토리 내역 수정' : '히스토리 수정'}
-          </Button>
+          <div>
+            <Button onClick={toggleEditMode}>
+              {editMode ? '히스토리 내역 수정' : '히스토리 수정'}
+            </Button>
+          </div>
         </div>
       )}
     </section>
