@@ -9,8 +9,15 @@ export interface InterviewHistoryItem {
 }
 
 // 면접 기록 조회 api
-export async function getInterviewHistory(userEmail: string) {
-  const { data, error } = await supabase
+export async function getInterviewHistory(
+  userEmail: string,
+  page: number,
+  limit = 4,
+) {
+  const from = (page - 1) * limit;
+  const to = from + limit - 1;
+
+  const { data, error, count } = await supabase
     .from('answers')
     .select(
       `
@@ -19,14 +26,16 @@ export async function getInterviewHistory(userEmail: string) {
       updated_at,                            
       questions!answers_question_id_fkey (content, category),
       feedback!feedback_answers_id_fkey(average)`,
+      { count: 'exact' },
     )
     .eq('user_id', userEmail)
-    .order('updated_at', { ascending: false }); // 최신 수정 순으로 정렬
-  console.log('raw history data:', data);
+    .order('updated_at', { ascending: false }) // 최신 수정 순으로 정렬
+    .range(from, to);
+  console.log('history data:', data);
 
   if (error) throw error;
-  return (data ?? []).map((item) => {
-    console.log('raw item feedback:', item.feedback);
+  const items = (data ?? []).map((item: any) => {
+    console.log('item feedback:', item.feedback);
     // questions: 배열일 수도, 객체일 수도
     const q = Array.isArray(item.questions)
       ? item.questions[0]
@@ -45,6 +54,11 @@ export async function getInterviewHistory(userEmail: string) {
       feedback: f,
     };
   });
+
+  return {
+    data: items,
+    total: count ?? 0,
+  };
 }
 
 // 면접 기록 삭제 api

@@ -44,14 +44,22 @@ export default function InterviewHistory() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const toast = useToast();
+  //페이지 네이션
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState<number>(0);
+  const PAGE_SIZE = 4;
 
   useEffect(() => {
     if (!user_id) return;
 
     async function fetchHistory() {
       try {
-        const raw = await getInterviewHistory(user_id);
-        const normalized = raw.map((item) => ({
+        const { data, total } = await getInterviewHistory(
+          user_id,
+          page,
+          PAGE_SIZE,
+        );
+        const normalized = data.map((item) => ({
           ...item,
           question: Array.isArray(item.question)
             ? item.question[0]
@@ -61,6 +69,7 @@ export default function InterviewHistory() {
             : item.feedback,
         }));
         setItems(normalized);
+        setTotal(total);
       } catch {
         setError('면접 기록을 불러오는 중 오류가 발생했습니다.');
       } finally {
@@ -69,7 +78,7 @@ export default function InterviewHistory() {
     }
 
     fetchHistory();
-  }, [user_id]);
+  }, [user_id, page]);
 
   // 수정버튼 토글
   const toggleEditMode = () => {
@@ -88,7 +97,7 @@ export default function InterviewHistory() {
   };
 
   return (
-    <section className="max-w-5xl mx-auto rounded-xl bg-white p-6 shadow-sm">
+    <section className="max-w-7xl mx-auto rounded-3xl bg-white p-6 shadow-md">
       {/* 제목 */}
       <H3_sub_detail>최근 면접 기록</H3_sub_detail>
 
@@ -179,10 +188,53 @@ export default function InterviewHistory() {
       )}
       {/* 하단 버튼 */}
       {items.length > 0 && (
-        <div className="flex justify-end">
-          <Button onClick={toggleEditMode}>
-            {editMode ? '히스토리 내역 수정' : '히스토리 수정'}
-          </Button>
+        <div className="relative">
+          {/* 수정버튼 */}
+          <div className="absolute  right-0 top-0">
+            <Button onClick={toggleEditMode}>
+              {editMode ? '히스토리 내역 수정' : '히스토리 수정'}
+            </Button>
+          </div>
+
+          {/* 페이지네이션 */}
+          <div className="flex justify-center w-full gap-2">
+            <button
+              onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+              disabled={page === 1}
+              className="px-4 py-2 rounded bg-gray-40 text-black disabled:opacity-50 cursor-pointer"
+            >
+              이전
+            </button>
+
+            {Array.from({ length: Math.ceil(total / PAGE_SIZE) }, (_, idx) => {
+              const pageNumber = idx + 1;
+              const isCurrent = pageNumber === page;
+
+              return (
+                <button
+                  key={pageNumber}
+                  onClick={() => setPage(pageNumber)}
+                  disabled={isCurrent}
+                  className={`w-6 text-center text-base font-semibold cursor-pointer ${
+                    isCurrent ? 'text-black' : 'text-gray-300'
+                  }`}
+                >
+                  {pageNumber}
+                </button>
+              );
+            })}
+
+            <button
+              onClick={() => {
+                const lastPage = Math.ceil(total / PAGE_SIZE);
+                setPage((prev) => Math.min(prev + 1, lastPage));
+              }}
+              disabled={page >= Math.ceil(total / PAGE_SIZE)}
+              className="px-4 py-2 rounded bg-gray-40 text-black disabled:opacity-50 cursor-pointer"
+            >
+              다음
+            </button>
+          </div>
         </div>
       )}
     </section>
