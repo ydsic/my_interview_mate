@@ -11,6 +11,7 @@ import ToastProvider from './components/common/ToastProvider';
 import AdminPage from './page/AdminPage';
 import CheckAdminUuid from './components/mainpage/CheckAdminUuid';
 import NotFound from './page/NotFound';
+import InterviewViewPage from './page/InterviewViewPage';
 
 export default function App() {
   return (
@@ -26,6 +27,10 @@ export default function App() {
             <Route path="/mypage" element={<MyPage />} />
             <Route path="/signup" element={<SignupPage />} />
             <Route path="/interview/:category" element={<InterviewPage />} />
+            <Route
+              path="/interview-view/:answerId"
+              element={<InterviewViewPage />}
+            />
             <Route
               path="/admin"
               element={

@@ -15,6 +15,7 @@ import {
 } from '../../api/historyAPI';
 import type { InterviewHistoryItem as RawItem } from '../../api/historyAPI';
 import { useToast } from '../../hooks/useToast';
+import { useNavigate } from 'react-router-dom';
 
 const CATEGORY_STYLES: Record<
   string,
@@ -48,6 +49,7 @@ export default function InterviewHistory() {
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState<number>(0);
   const PAGE_SIZE = 4;
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!user_id) return;
@@ -177,7 +179,15 @@ export default function InterviewHistory() {
                   <H2_content_title>
                     {feedback?.average ?? '-'}점
                   </H2_content_title>
-                  <WhiteButton>
+                  <WhiteButton
+                    onClick={() =>
+                      navigate(
+                        editMode
+                          ? `/interview-view/${answer_id}?mode=edit`
+                          : `/interview-view/${answer_id}`,
+                      )
+                    }
+                  >
                     {editMode ? '수정하기' : '다시보기'}
                   </WhiteButton>
                 </div>
