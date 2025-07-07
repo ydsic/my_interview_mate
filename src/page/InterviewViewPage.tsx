@@ -1,10 +1,80 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { H2_content_title } from '../components/common/HTagStyle';
 import Feedback from '../components/interviewViewpage/Feedback';
+import { supabase } from '../supabaseClient';
+import InterviewQuestion from '../components/interviewpage/InterviewQuestion';
+import { useState, useEffect } from 'react';
+import AnswerInput from '../components/interviewpage/AnswerInput';
+
+import type { QuestionData } from '../types/interview';
+import type { CategoryKey } from '../types/interview';
+
+type AnswerWithQuestion = {
+  content: string;
+  questions: {
+    question_id: number;
+    content: string;
+    category: CategoryKey;
+    topic: string;
+  };
+};
+
+interface ViewData {
+  answer: string;
+  question: QuestionData;
+}
 
 export default function InterviewViewPage() {
+  const { answerId } = useParams<{ answerId: string }>();
   const navigate = useNavigate();
 
+  const [data, setData] = useState<ViewData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [showFollowUp, setShowFollowUp] = useState(false);
+
+  useEffect(() => {
+    if (!answerId) return;
+
+    (async () => {
+      try {
+        const { data, error } = await supabase
+          .from('answers')
+          .select(
+            `content,
+             questions!answers_question_id_fkey(question_id, content, category, topic)`,
+          )
+          .eq('answer_id', answerId)
+          .single<AnswerWithQuestion>();
+
+        if (error) throw error;
+
+        setData({
+          answer: data.content,
+          question: {
+            questionId: data.questions.question_id,
+            category: data.questions.category,
+            topic: data.questions.topic,
+            question: data.questions.content,
+          },
+        });
+      } catch (e) {
+        console.error(e);
+        setError('질문/답변을 불러오지 못했습니다.');
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [answerId]);
+
+  if (loading) return <div className="py-20 text-center">로딩 중...</div>;
+
+  if (error || !data)
+    return (
+      <div className="py-20 text-center text-red-600 font-semibold">
+        {error ?? '데이터 없음'}
+      </div>
+    );
   return (
     <div className="py-10 px-6 space-y-6">
       {/* ← 돌아가기 */}
@@ -16,11 +86,24 @@ export default function InterviewViewPage() {
       </button>
 
       {/* 질문 영역 */}
-      <div className="p-5 rounded-xl border text-center">질문</div>
+      <InterviewQuestion
+        category={data.question.category}
+        topic={data.question.topic}
+        question={data.question.question}
+        isBookmarked={false}
+        onToggleBookmark={() => {}}
+      />
 
       {/* 답변 영역 */}
-      <div className="p-5 rounded-xl border text-center">답변</div>
-
+      <AnswerInput
+        question={data.question.question}
+        questionId={data.question.questionId}
+        initialAnswer={data.answer}
+        isReviewMode={true}
+        isFollowUpOpen={showFollowUp}
+        onFollowUpToggle={() => setShowFollowUp((v) => !v)}
+        onFeedback={() => {}}
+      />
       {/* 피드백 영역 */}
       <div className="p-5 rounded-xl text-gray-800 border border-gray-200 text-center bg-white">
         <Feedback />

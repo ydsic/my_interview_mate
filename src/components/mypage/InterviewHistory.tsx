@@ -185,6 +185,11 @@ export default function InterviewHistory() {
                         editMode
                           ? `/interview-view/${answer_id}?mode=edit`
                           : `/interview-view/${answer_id}`,
+                        {
+                          state: {
+                            answerId: answer_id,
+                          },
+                        },
                       )
                     }
                   >
