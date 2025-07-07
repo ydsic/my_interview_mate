@@ -52,3 +52,21 @@ export async function selectBookMarks(userId: string, page: number, limit = 4) {
     total: count ?? 0,
   };
 }
+
+// answer_id 찾기
+export async function selectBookmarkedAnswer(
+  userId: string,
+  questionId: number,
+) {
+  const { data: answerIdData, error: answerIdError } = await supabase
+    .from('user_bookmarked_answers')
+    .select('answer_id')
+    .eq('user_id', userId)
+    .eq('question_id', questionId);
+
+  if (answerIdError) {
+    throw new Error(`북마크 answer id 조회 오류 :  ${answerIdError.message}`);
+  }
+
+  return answerIdData[0].answer_id;
+}
