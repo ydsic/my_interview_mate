@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { WhiteButton } from '../common/Button';
 import {
   H2_content_title,
@@ -7,9 +7,10 @@ import {
 } from '../common/HTagStyle';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStar as solidStar } from '@fortawesome/free-solid-svg-icons';
-import { faStar as regularStar } from '@fortawesome/free-regular-svg-icons';
 import { useUserDataStore } from '../../store/userData';
-import { selectBookMarks } from '../../api/bookMarkAPI';
+import { deleteBookMark, selectBookMarks } from '../../api/bookMarkAPI';
+import { useToast } from '../../hooks/useToast';
+import { debounce } from 'lodash';
 
 const CATEGORY_STYLES: Record<
   string,
@@ -42,23 +43,42 @@ interface BookmarkedQuesetions {
 
 export default function Bookmark() {
   const [bookMarkList, setBookMarkList] = useState<BookmarkedQuesetions[]>([]);
-  const [isBookmarked, setIsBookMarked] = useState<boolean>(true);
-
   const user_id = useUserDataStore((state) => state.userData.user_id);
+  const toast = useToast();
+
+  const fetchBookMarks = async () => {
+    try {
+      const bookmarks = await selectBookMarks(user_id);
+      // console.log('북마크 데이터 : ', bookmarks);
+      setBookMarkList(bookmarks);
+    } catch (e) {
+      console.log(e);
+    }
+  };
 
   useEffect(() => {
-    const loadBookmarks = async () => {
-      try {
-        const bookmarks = await selectBookMarks(user_id);
-        console.log('북마크 데이터 : ', bookmarks);
-        setBookMarkList(bookmarks);
-      } catch (e) {
-        console.log(e);
-      }
-    };
-
-    loadBookmarks();
+    fetchBookMarks();
   }, [user_id]);
+
+  const handleBookMark = useMemo(
+    () =>
+      debounce(async (questionId: number) => {
+        const confirmed = window.confirm(
+          '이 질문을 즐겨찾기에서 삭제하시겠습니까?',
+        );
+        if (!confirmed) return;
+
+        try {
+          await deleteBookMark(user_id, questionId);
+          toast('즐겨찾기에서 삭제했어요!', 'success');
+          await fetchBookMarks();
+        } catch (err: any) {
+          console.error('[북마크 삭제 에러] : ', err);
+          toast('북마크 삭제에 실패했어요.', 'error');
+        }
+      }, 500),
+    [user_id],
+  );
 
   return (
     <div className="flex flex-col gap-10 mb-5 bg-white p-[30px] rounded-4xl shadow-md relative">
@@ -85,12 +105,13 @@ export default function Bookmark() {
                 className="flex items-center justify-between rounded-md bg-gray-50 shadow-sm px-4 py-5 mb-5"
               >
                 <div className="flex w-full items-center gap-10 ml-3">
-                  <button className="text-[24px]">
+                  <button
+                    className="text-[24px] cursor-pointer"
+                    onClick={() => handleBookMark(bookmark.question_id)}
+                  >
                     <FontAwesomeIcon
-                      icon={isBookmarked ? solidStar : regularStar}
-                      className={
-                        isBookmarked ? 'text-orange-100' : 'text-gray-100'
-                      }
+                      icon={solidStar}
+                      className="text-orange-100"
                     />
                   </button>
                   {/* 면접 질문 / 카테고리 */}
@@ -106,7 +127,7 @@ export default function Bookmark() {
                       </span>
 
                       <H4_placeholder className="ml-2 text-gray-70 font-extralight">
-                        {bookmark.bookmarked_at.slice(0, 10)}
+                        {new Date(bookmark.bookmarked_at).toLocaleDateString()}
                       </H4_placeholder>
                     </div>
                   </div>
