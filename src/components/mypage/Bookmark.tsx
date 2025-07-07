@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { WhiteButton } from '../common/Button';
 import {
   H2_content_title,
@@ -7,9 +7,10 @@ import {
 } from '../common/HTagStyle';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStar as solidStar } from '@fortawesome/free-solid-svg-icons';
-import { faStar as regularStar } from '@fortawesome/free-regular-svg-icons';
 import { useUserDataStore } from '../../store/userData';
-import { selectBookMarks } from '../../api/bookMarkAPI';
+import { deleteBookMark, selectBookMarks } from '../../api/bookMarkAPI';
+import { useToast } from '../../hooks/useToast';
+import { debounce } from 'lodash';
 
 const CATEGORY_STYLES: Record<
   string,
@@ -42,28 +43,53 @@ interface BookmarkedQuesetions {
 
 export default function Bookmark() {
   const [bookMarkList, setBookMarkList] = useState<BookmarkedQuesetions[]>([]);
-  const [isBookmarked, setIsBookMarked] = useState<boolean>(true);
+  // 페이지네이션
+  const [page, setPage] = useState<number>(1);
+  const [total, setTotal] = useState<number>(0);
+  const PAGE_SIZE = 4;
 
   const user_id = useUserDataStore((state) => state.userData.user_id);
+  const toast = useToast();
+
+  const fetchBookMarks = async () => {
+    try {
+      const { data, total } = await selectBookMarks(user_id, page, PAGE_SIZE);
+      // console.log('[북마크 데이터] : ', data);
+      setBookMarkList(data);
+      setTotal(total);
+    } catch (e) {
+      console.log(e);
+    }
+  };
 
   useEffect(() => {
-    const loadBookmarks = async () => {
-      try {
-        const bookmarks = await selectBookMarks(user_id);
-        console.log('북마크 데이터 : ', bookmarks);
-        setBookMarkList(bookmarks);
-      } catch (e) {
-        console.log(e);
-      }
-    };
+    fetchBookMarks();
+  }, [user_id, page]);
 
-    loadBookmarks();
-  }, [user_id]);
+  const handleBookMark = useMemo(
+    () =>
+      debounce(async (questionId: number) => {
+        const confirmed = window.confirm(
+          '이 질문을 즐겨찾기에서 삭제하시겠습니까?',
+        );
+        if (!confirmed) return;
+
+        try {
+          await deleteBookMark(user_id, questionId);
+          toast('즐겨찾기에서 삭제했어요!', 'success');
+          await fetchBookMarks();
+        } catch (err: any) {
+          console.error('[북마크 삭제 에러] : ', err);
+          toast('북마크 삭제에 실패했어요.', 'error');
+        }
+      }, 500),
+    [user_id],
+  );
 
   return (
-    <div className="flex flex-col gap-10 mb-5 bg-white p-[30px] rounded-4xl shadow-md relative">
-      <p className="font-semibold">즐겨찾기 질문</p>
-      <ul>
+    <div className="flex flex-col gap-7 mb-5 justify-between bg-white p-[30px] h-[750px] rounded-4xl shadow-md relative">
+      <H3_sub_detail>즐겨찾기 질문</H3_sub_detail>
+      <ul className="flex-1">
         {bookMarkList.length === 0 ? (
           <div className="text-center text-gray-70 py-10">
             아직 즐겨찾기한 질문이 없어요! <br />
@@ -85,12 +111,13 @@ export default function Bookmark() {
                 className="flex items-center justify-between rounded-md bg-gray-50 shadow-sm px-4 py-5 mb-5"
               >
                 <div className="flex w-full items-center gap-10 ml-3">
-                  <button className="text-[24px]">
+                  <button
+                    className="text-[24px] cursor-pointer"
+                    onClick={() => handleBookMark(bookmark.question_id)}
+                  >
                     <FontAwesomeIcon
-                      icon={isBookmarked ? solidStar : regularStar}
-                      className={
-                        isBookmarked ? 'text-orange-100' : 'text-gray-100'
-                      }
+                      icon={solidStar}
+                      className="text-orange-100"
                     />
                   </button>
                   {/* 면접 질문 / 카테고리 */}
@@ -106,7 +133,7 @@ export default function Bookmark() {
                       </span>
 
                       <H4_placeholder className="ml-2 text-gray-70 font-extralight">
-                        {bookmark.bookmarked_at.slice(0, 10)}
+                        {new Date(bookmark.bookmarked_at).toLocaleDateString()}
                       </H4_placeholder>
                     </div>
                   </div>
@@ -124,6 +151,44 @@ export default function Bookmark() {
           })
         )}
       </ul>
+      <div className="flex justify-center items-center gap-4">
+        <button
+          onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+          disabled={page === 1}
+          className="px-4 py-2 rounded bg-gray-40 text-black disabled:opacity-50 cursor-pointer"
+        >
+          이전
+        </button>
+
+        {Array.from({ length: Math.ceil(total / PAGE_SIZE) }, (_, idx) => {
+          const pageNumber = idx + 1;
+          const isCurrent = pageNumber === page;
+
+          return (
+            <button
+              key={pageNumber}
+              onClick={() => setPage(pageNumber)}
+              disabled={isCurrent}
+              className={`w-6 text-center text-base font-semibold cursor-pointer ${
+                isCurrent ? 'text-black' : 'text-gray-300'
+              }`}
+            >
+              {pageNumber}
+            </button>
+          );
+        })}
+
+        <button
+          onClick={() => {
+            const lastPage = Math.ceil(total / PAGE_SIZE);
+            setPage((prev) => Math.min(prev + 1, lastPage));
+          }}
+          disabled={page >= Math.ceil(total / PAGE_SIZE)}
+          className="px-4 py-2 rounded bg-gray-40 text-black disabled:opacity-50 cursor-pointer"
+        >
+          다음
+        </button>
+      </div>
     </div>
   );
 }
