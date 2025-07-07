@@ -75,7 +75,6 @@ export default function InterviewViewPage() {
         {error ?? '데이터 없음'}
       </div>
     );
-
   return (
     <div className="py-10 px-6 space-y-6">
       {/* ← 돌아가기 */}
@@ -99,13 +98,12 @@ export default function InterviewViewPage() {
       <AnswerInput
         question={data.question.question}
         questionId={data.question.questionId}
-        initialAnswer={data.answer} // ★ 기존 답변 주입
+        initialAnswer={data.answer}
         isReviewMode={true}
         isFollowUpOpen={showFollowUp}
         onFollowUpToggle={() => setShowFollowUp((v) => !v)}
-        onFeedback={() => {}} // 피드백 기능 안 쓸 거면 빈 함수
+        onFeedback={() => {}}
       />
-
       {/* 피드백 영역 */}
       <div className="p-5 rounded-xl text-gray-800 border border-gray-200 text-center bg-white">
         <Feedback />
