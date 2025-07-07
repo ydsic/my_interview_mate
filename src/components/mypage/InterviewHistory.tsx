@@ -45,7 +45,7 @@ export default function InterviewHistory() {
   const [error, setError] = useState<string | null>(null);
   const toast = useToast();
   const [page, setPage] = useState(1);
-  const limit = 5;
+  const limit = 4;
 
   useEffect(() => {
     if (!user_id) return;
