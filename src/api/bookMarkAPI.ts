@@ -30,17 +30,25 @@ export async function deleteBookMark(userId: string, questionId: number) {
 }
 
 // 즐겨찾기 조회
-export async function selectBookMarks(userId: string) {
-  const { data, error } = await supabase
+export async function selectBookMarks(userId: string, page: number, limit = 4) {
+  const from = (page - 1) * limit;
+  const to = from + limit - 1;
+
+  const { data, error, count } = await supabase
     .from('user_bookmarked_questions_with_feedback')
     .select(
       'question_id, question_content, question_category,bookmarked_at, average_score',
+      { count: 'exact' },
     )
-    .eq('user_id', userId);
+    .eq('user_id', userId)
+    .range(from, to);
 
   if (error) {
     throw new Error(`북마크 질문 조회 에러 발생 : ${error.message}`);
   }
 
-  return data;
+  return {
+    data,
+    total: count ?? 0,
+  };
 }

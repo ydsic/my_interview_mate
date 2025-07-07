@@ -43,14 +43,20 @@ interface BookmarkedQuesetions {
 
 export default function Bookmark() {
   const [bookMarkList, setBookMarkList] = useState<BookmarkedQuesetions[]>([]);
+  // 페이지네이션
+  const [page, setPage] = useState<number>(1);
+  const [total, setTotal] = useState<number>(0);
+  const PAGE_SIZE = 4;
+
   const user_id = useUserDataStore((state) => state.userData.user_id);
   const toast = useToast();
 
   const fetchBookMarks = async () => {
     try {
-      const bookmarks = await selectBookMarks(user_id);
-      // console.log('북마크 데이터 : ', bookmarks);
-      setBookMarkList(bookmarks);
+      const { data, total } = await selectBookMarks(user_id, page, PAGE_SIZE);
+      // console.log('[북마크 데이터] : ', data);
+      setBookMarkList(data);
+      setTotal(total);
     } catch (e) {
       console.log(e);
     }
@@ -58,7 +64,7 @@ export default function Bookmark() {
 
   useEffect(() => {
     fetchBookMarks();
-  }, [user_id]);
+  }, [user_id, page]);
 
   const handleBookMark = useMemo(
     () =>
@@ -81,9 +87,9 @@ export default function Bookmark() {
   );
 
   return (
-    <div className="flex flex-col gap-10 mb-5 bg-white p-[30px] rounded-4xl shadow-md relative">
-      <p className="font-semibold">즐겨찾기 질문</p>
-      <ul>
+    <div className="flex flex-col gap-7 mb-5 justify-between bg-white p-[30px] h-[750px] rounded-4xl shadow-md relative">
+      <H3_sub_detail>즐겨찾기 질문</H3_sub_detail>
+      <ul className="flex-1">
         {bookMarkList.length === 0 ? (
           <div className="text-center text-gray-70 py-10">
             아직 즐겨찾기한 질문이 없어요! <br />
@@ -145,6 +151,44 @@ export default function Bookmark() {
           })
         )}
       </ul>
+      <div className="flex justify-center items-center gap-4">
+        <button
+          onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+          disabled={page === 1}
+          className="px-4 py-2 rounded bg-gray-40 text-black disabled:opacity-50 cursor-pointer"
+        >
+          이전
+        </button>
+
+        {Array.from({ length: Math.ceil(total / PAGE_SIZE) }, (_, idx) => {
+          const pageNumber = idx + 1;
+          const isCurrent = pageNumber === page;
+
+          return (
+            <button
+              key={pageNumber}
+              onClick={() => setPage(pageNumber)}
+              disabled={isCurrent}
+              className={`w-6 text-center text-base font-semibold cursor-pointer ${
+                isCurrent ? 'text-black' : 'text-gray-300'
+              }`}
+            >
+              {pageNumber}
+            </button>
+          );
+        })}
+
+        <button
+          onClick={() => {
+            const lastPage = Math.ceil(total / PAGE_SIZE);
+            setPage((prev) => Math.min(prev + 1, lastPage));
+          }}
+          disabled={page >= Math.ceil(total / PAGE_SIZE)}
+          className="px-4 py-2 rounded bg-gray-40 text-black disabled:opacity-50 cursor-pointer"
+        >
+          다음
+        </button>
+      </div>
     </div>
   );
 }
