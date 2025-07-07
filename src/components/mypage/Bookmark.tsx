@@ -8,9 +8,14 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStar as solidStar } from '@fortawesome/free-solid-svg-icons';
 import { useUserDataStore } from '../../store/userData';
-import { deleteBookMark, selectBookMarks } from '../../api/bookMarkAPI';
+import {
+  deleteBookMark,
+  selectBookmarkedAnswer,
+  selectBookMarks,
+} from '../../api/bookMarkAPI';
 import { useToast } from '../../hooks/useToast';
 import { debounce } from 'lodash';
+import { useNavigate } from 'react-router-dom';
 
 const CATEGORY_STYLES: Record<
   string,
@@ -50,11 +55,12 @@ export default function Bookmark() {
 
   const user_id = useUserDataStore((state) => state.userData.user_id);
   const toast = useToast();
+  const navigation = useNavigate();
 
   const fetchBookMarks = async () => {
     try {
       const { data, total } = await selectBookMarks(user_id, page, PAGE_SIZE);
-      // console.log('[북마크 데이터] : ', data);
+      console.log('[북마크 데이터] : ', data);
       setBookMarkList(data);
       setTotal(total);
     } catch (e) {
@@ -85,6 +91,16 @@ export default function Bookmark() {
       }, 500),
     [user_id],
   );
+
+  const handleButtonClick = async (questionId: number) => {
+    try {
+      const answer_id = await selectBookmarkedAnswer(user_id, questionId);
+      // console.log('answer_id : ', answer_id);
+      navigation(`/interview-view/${answer_id}`);
+    } catch (err: any) {
+      console.error('오류 : ', err);
+    }
+  };
 
   return (
     <div className="flex flex-col gap-7 mb-5 justify-between bg-white p-[30px] h-[750px] rounded-4xl shadow-md relative">
@@ -144,7 +160,11 @@ export default function Bookmark() {
                   <H2_content_title>
                     {bookmark.average_score}점
                   </H2_content_title>
-                  <WhiteButton>다시보기</WhiteButton>
+                  <WhiteButton
+                    onClick={() => handleButtonClick(bookmark.question_id)}
+                  >
+                    다시보기
+                  </WhiteButton>
                 </div>
               </li>
             );
