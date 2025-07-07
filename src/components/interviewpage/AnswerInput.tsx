@@ -19,9 +19,14 @@ interface AnswerInputProps {
   question: string;
   questionId: number;
   onFeedback: (answer: string, feedback: string) => void;
-  disabled?: boolean;
+
   isFollowUpOpen: boolean;
   onFollowUpToggle: () => void;
+
+  initialAnswer?: string;
+  disabled?: boolean;
+
+  isReviewMode?: boolean;
 }
 
 export default function AnswerInput({
@@ -31,8 +36,10 @@ export default function AnswerInput({
   disabled,
   isFollowUpOpen,
   onFollowUpToggle,
+  initialAnswer = '',
+  isReviewMode,
 }: AnswerInputProps) {
-  const [answer, setAnswer] = useState('');
+  const [answer, setAnswer] = useState(initialAnswer ?? '');
 
   const [loading, setLoading] = useState(false);
 
@@ -60,6 +67,8 @@ export default function AnswerInput({
 
   // AbortController 적용
   const controllerRef = useRef<AbortController | null>(null);
+
+  const [editMode, setEditMode] = useState(false);
 
   // VoiceRecording 세팅
   useEffect(() => {
@@ -213,6 +222,7 @@ export default function AnswerInput({
       setRadarData(scores);
       toast('피드백을 가져왔어요!', 'success');
       setHasFeedback(true);
+
       setIsDirty(false);
     } catch (err: unknown) {
       if (err instanceof DOMException && err.name === 'AbortError') {
@@ -234,14 +244,14 @@ export default function AnswerInput({
 
   // 새로운 질문에 대한 답변을 위한 입력 초기화.
   useEffect(() => {
-    setAnswer('');
+    setAnswer(initialAnswer);
     setIsDirty(false);
     setIsRecording(false);
     setIsProcessing(false);
     setRecordingTime(60);
 
     controllerRef.current?.abort();
-  }, [question]);
+  }, [question, initialAnswer]);
   return (
     <div className="p-5 rounded-xl border border-gray-300 bg-white shadow-sm space-y-4 mt-3 relative">
       {/* 로딩 모달 */}
@@ -260,7 +270,7 @@ export default function AnswerInput({
           placeholder="답변을 작성하거나 음성으로 대답해주세요."
           value={answer}
           onChange={handleAnswerChange}
-          readOnly={hasFeedback && !isDirty && isRecording && isProcessing}
+          readOnly={isReviewMode && !editMode}
         />
         <button
           type="button"
@@ -290,42 +300,70 @@ export default function AnswerInput({
       {/* 버튼영역 */}
 
       <div className="flex justify-end gap-4">
-        <SubmitButton
-          onClick={debounceRequest}
-          className="flex items-center gap-2 pl-3 pr-4"
-          isDisabled={
-            isEmpty ||
-            loading ||
-            isRecording ||
-            isProcessing ||
-            (hasFeedback && !isDirty)
-          }
-        >
-          <FontAwesomeIcon icon={faCheck} className="text-white" size="lg" />
-          {loading
-            ? '피드백 생성 중...'
-            : !hasFeedback
-              ? '피드백 받기'
-              : isDirty
-                ? '피드백 다시 받기'
-                : '피드백 받기'}
-        </SubmitButton>
-
-        {/* 추가 질문 버튼 */}
-        <button
-          onClick={onFollowUpToggle}
-          className="
+        {isReviewMode && !editMode ? (
+          <>
+            {/* 다시보기 버튼 */}
+            <button
+              onClick={() => setEditMode(true)}
+              className="
             flex items-center gap-2 border border-gray-200 rounded-xl px-3 py-1 transition
             hover:bg-gray-40 cursor-pointer
           "
-        >
-          <img
-            src={addQuestionIcon}
-            alt="추가 질문하기 아이콘"
-            className="w-4 h-4"
-          />
-          {isFollowUpOpen ? '추가 질문 닫기' : '추가 질문하기'}
-        </button>
+            >
+              <img
+                src={addQuestionIcon}
+                alt="다시 질문하기 아이콘"
+                className="w-4 h-4"
+              />
+              {'답변 수정하기'}
+            </button>
+          </>
+        ) : (
+          <>
+            <SubmitButton
+              onClick={debounceRequest}
+              className="flex items-center gap-2 pl-3 pr-4"
+              isDisabled={
+                isEmpty ||
+                loading ||
+                isRecording ||
+                isProcessing ||
+                (hasFeedback && !isDirty)
+              }
+            >
+              <FontAwesomeIcon
+                icon={faCheck}
+                className="text-white"
+                size="lg"
+              />
+              {loading
+                ? '피드백 생성 중...'
+                : !hasFeedback
+                  ? '피드백 받기'
+                  : isDirty
+                    ? '피드백 다시 받기'
+                    : '피드백 받기'}
+            </SubmitButton>
+
+            {/* 추가 질문 버튼 */}
+            {!isReviewMode && (
+              <button
+                onClick={onFollowUpToggle}
+                className="
+            flex items-center gap-2 border border-gray-200 rounded-xl px-3 py-1 transition
+            hover:bg-gray-40 cursor-pointer
+          "
+              >
+                <img
+                  src={addQuestionIcon}
+                  alt="추가 질문하기 아이콘"
+                  className="w-4 h-4"
+                />
+                {isFollowUpOpen ? '추가 질문 닫기' : '추가 질문하기'}
+              </button>
+            )}
+          </>
+        )}
       </div>
     </div>
   );
