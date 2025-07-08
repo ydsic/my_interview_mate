@@ -70,3 +70,20 @@ export async function selectBookmarkedAnswer(
 
   return answerIdData[0].answer_id;
 }
+
+// feedback_id 찾기
+export async function selectFeedbackData(questionId: number, answerId: string) {
+  const { data: feedbackData, error: feedbackError } = await supabase
+    .from('feedback')
+    .select(
+      'average, feedback, summary, logic_score, clarity_score, technical_score, depth_score, structure_score',
+    )
+    .eq('questions_id', questionId)
+    .eq('answers_id', answerId);
+
+  if (feedbackError) {
+    throw new Error(`피드백 조회 에러 발생 : ${feedbackError.message}`);
+  }
+
+  return feedbackData[0];
+}

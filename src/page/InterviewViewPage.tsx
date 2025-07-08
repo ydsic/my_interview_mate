@@ -8,6 +8,7 @@ import AnswerInput from '../components/interviewpage/AnswerInput';
 
 import type { QuestionData } from '../types/interview';
 import type { CategoryKey } from '../types/interview';
+import { selectFeedbackData } from '../api/bookMarkAPI';
 
 type AnswerWithQuestion = {
   content: string;
@@ -17,6 +18,17 @@ type AnswerWithQuestion = {
     category: CategoryKey;
     topic: string;
   };
+};
+
+type FeedbackData = {
+  average: number;
+  feedback: string;
+  summary: string;
+  logic_score: number;
+  clarity_score: number;
+  technical_score: number;
+  depth_score: number;
+  structure_score: number;
 };
 
 interface ViewData {
@@ -32,6 +44,8 @@ export default function InterviewViewPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showFollowUp, setShowFollowUp] = useState(false);
+
+  const [feedbackData, setFeedbackData] = useState<FeedbackData | null>(null);
 
   useEffect(() => {
     if (!answerId) return;
@@ -66,6 +80,25 @@ export default function InterviewViewPage() {
       }
     })();
   }, [answerId]);
+
+  // 피드백 데이터 가져오기
+  const fetchFeedbackData = async () => {
+    try {
+      const feedback = await selectFeedbackData(
+        data!.question.questionId,
+        answerId!,
+      );
+      console.log('[다시보기 페이지] 피드백 데이터 : ', feedback);
+      setFeedbackData(feedback);
+    } catch (err) {
+      console.error('피드백 조회 에러:', err);
+    }
+  };
+
+  useEffect(() => {
+    if (data?.question.questionId == null || answerId == null) return;
+    fetchFeedbackData();
+  }, [data, answerId]);
 
   if (loading) return <div className="py-20 text-center">로딩 중...</div>;
 
@@ -103,10 +136,11 @@ export default function InterviewViewPage() {
         isFollowUpOpen={showFollowUp}
         onFollowUpToggle={() => setShowFollowUp((v) => !v)}
         onFeedback={() => {}}
+        afterFeedbackSaved={fetchFeedbackData}
       />
       {/* 피드백 영역 */}
       <div className="p-5 rounded-xl text-gray-800 border border-gray-200 text-center bg-white">
-        <Feedback />
+        {feedbackData && <Feedback feedbackData={feedbackData} />}
       </div>
     </div>
   );
