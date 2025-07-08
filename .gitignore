@@ -12,8 +12,8 @@ dist
 dist-ssr
 
 
-*.local
-
+# *.local
+supabase/
 
 .vscode/*
 .gemini/*
