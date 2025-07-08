@@ -25,7 +25,7 @@ type FormData = Omit<UserData, 'user_id' | 'email'>;
 
 export default function Profile() {
   const toast = useToast();
-  const user_id = useUserDataStore((state) => state.userData.user_id);
+  const storeUserData = useUserDataStore((state) => state.userData);
 
   // 받아오는 데이터는 userData
   // 보낼거는 formData
@@ -43,7 +43,7 @@ export default function Profile() {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const { data, error } = await loginUserInfo(user_id);
+        const { data, error } = await loginUserInfo(storeUserData.user_id);
 
         if (error) throw error;
 
@@ -66,8 +66,8 @@ export default function Profile() {
       }
     };
 
-    if (user_id) fetchUserData();
-  }, [user_id, toast]);
+    if (storeUserData.user_id) fetchUserData();
+  }, [storeUserData.user_id, toast]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -127,8 +127,19 @@ export default function Profile() {
   const saveChanges = async () => {
     if (!userData) return;
 
+    // 닉네임 Validation 추가
+    if (!formData.nickname.trim()) {
+      toast('닉네임은 비워둘 수 없습니다.', 'error');
+      return;
+    }
+
     try {
       await updateUserProfile(userData.user_id, formData);
+
+      useUserDataStore.getState().setUserData({
+        ...storeUserData,
+        nickname: formData.nickname,
+      });
 
       toast('프로필이 성공적으로 저장되었습니다.', 'success');
 
