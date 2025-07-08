@@ -10,7 +10,11 @@ import { getQuestionsByCategoryAndTopic } from '../api/questionAPI';
 import { useToast } from '../hooks/useToast';
 import debounce from 'lodash.debounce';
 import { useUserDataStore } from '../store/userData';
-import { deleteBookMark, insertBookMark } from '../api/bookMarkAPI';
+import {
+  deleteBookMark,
+  insertBookMark,
+  Bookmarked as checkBookmarked,
+} from '../api/bookMarkAPI';
 
 function isCategoryKey(value: unknown): value is CategoryKey {
   return (
@@ -152,10 +156,22 @@ export default function InterviewPage() {
     debouncedFetch();
   };
 
-  // 질문이 바뀌면 즐겨찾기도 바꾸기!
   useEffect(() => {
-    setIsBookMarked(false);
-  }, [question]);
+    if (!user_id || !question.questionId) {
+      setIsBookMarked(false);
+      return;
+    }
+
+    (async () => {
+      try {
+        const bookmarked = await checkBookmarked(user_id, question.questionId);
+        setIsBookMarked(bookmarked);
+      } catch (err) {
+        console.error(err);
+        toast('북마크 여부를 확인하지 못했어요.', 'error');
+      }
+    })();
+  }, [user_id, question.questionId, toast]);
 
   // 즐겨찾기 디바운싱
   const deebounceBookMark = useMemo(
@@ -170,13 +186,13 @@ export default function InterviewPage() {
           try {
             if (nextBookmarked) {
               await insertBookMark(userId, questionId);
-              toast('북마크 등록 완료!', 'success');
+              toast('즐겨찾기 등록 완료!', 'success');
             } else {
               await deleteBookMark(userId, questionId);
-              toast('북마크 삭제 완료!', 'success');
+              toast('즐겨찾기 삭제 완료!', 'success');
             }
           } catch (err: any) {
-            console.error('[북마크 처리 중 에러] : ', err);
+            console.error('북마크 처리 중 에러 : ', err);
             onError();
           }
         },
@@ -209,11 +225,13 @@ export default function InterviewPage() {
         {/* 인터뷰 질문 컴포넌트 */}
         <div>
           <InterviewQuestion
+            questionId={question.questionId}
             category={question.category}
             topic={question.topic}
             question={question.question}
             isBookmarked={isBookMarked}
             onToggleBookmark={handleBookMark}
+            canBookmark={showFeedback}
           />
         </div>
         {/* 답변 컴포넌트 */}

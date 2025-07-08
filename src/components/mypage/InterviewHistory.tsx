@@ -164,7 +164,7 @@ export default function InterviewHistory() {
                       className={`inline-flex justify-center items-center text-center h-7 min-w-28 py-4 rounded-lg  ${CATEGORY_STYLES[question.category]?.bg} ${CATEGORY_STYLES[question.category]?.text}`}
                     >
                       {question.category === 'front-end'
-                        ? '프론트엔드'
+                        ? 'Front-end'
                         : question.category.toUpperCase()}
                     </span>
 

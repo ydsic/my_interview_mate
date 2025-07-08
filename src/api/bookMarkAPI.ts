@@ -87,3 +87,20 @@ export async function selectFeedbackData(questionId: number, answerId: string) {
 
   return feedbackData[0];
 }
+
+// 즐겨찾기 되어있는지 확인
+
+export async function Bookmarked(userId: string, questionId: number) {
+  const { data, error } = await supabase
+    .from('bookmark')
+    .select('question_id')
+    .eq('user_id', userId)
+    .eq('question_id', questionId)
+    .maybeSingle();
+
+  if (error) {
+    throw new Error(`북마크 여부 조회 오류: ${error.message}`);
+  }
+
+  return !!data;
+}

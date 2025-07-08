@@ -1,14 +1,19 @@
 import { useNavigate, useParams } from 'react-router-dom';
+import { debounce } from 'lodash';
 import { H2_content_title } from '../components/common/HTagStyle';
 import Feedback from '../components/interviewViewpage/Feedback';
 import { supabase } from '../supabaseClient';
 import InterviewQuestion from '../components/interviewpage/InterviewQuestion';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import AnswerInput from '../components/interviewpage/AnswerInput';
+import { useToast } from '../hooks/useToast';
 
 import type { QuestionData } from '../types/interview';
 import type { CategoryKey } from '../types/interview';
 import { selectFeedbackData } from '../api/bookMarkAPI';
+
+import { useUserDataStore } from '../store/userData';
+import { insertBookMark, deleteBookMark, Bookmarked } from '../api/bookMarkAPI';
 
 type AnswerWithQuestion = {
   content: string;
@@ -47,6 +52,58 @@ export default function InterviewViewPage() {
 
   const [feedbackData, setFeedbackData] = useState<FeedbackData | null>(null);
 
+  const userId = useUserDataStore((s) => s.userData.user_id);
+  const toast = useToast();
+  const [isBookmarked, setIsBookmarked] = useState(false);
+
+  //북마크
+  useEffect(() => {
+    if (!data?.question.questionId || !userId) return;
+    (async () => {
+      try {
+        const result = await Bookmarked(userId, data.question.questionId);
+        setIsBookmarked(result);
+      } catch (err) {
+        console.error('북마크 여부 조회 에러 : ', err);
+        toast('북마크 여부를 확인하지 못했어요.', 'error');
+      }
+    })();
+  }, [data?.question.questionId, userId, toast]);
+
+  // 북마크
+  const Bookmark = async () => {
+    if (!userId || !data) return;
+
+    try {
+      if (isBookmarked) {
+        const confirmed = window.confirm(
+          '즐겨찾기에서 이 질문을 즐겨찾기에서 삭제하시겠습니까??',
+        );
+        if (!confirmed) return;
+
+        await deleteBookMark(userId, data.question.questionId);
+        toast('즐겨찾기에서 삭제했어요!', 'success');
+      } else {
+        await insertBookMark(userId, data.question.questionId);
+        toast('즐겨찾기 등록 완료!', 'success');
+      }
+      setIsBookmarked((prev) => !prev);
+    } catch (e) {
+      console.error('북마크 토글 실패:', e);
+      toast('북마크 작업에 실패했어요.', 'error');
+    }
+  };
+
+  const toggleBookmark = useMemo(
+    () =>
+      debounce(Bookmark, 200, {
+        leading: true,
+        trailing: false,
+      }),
+    [isBookmarked, data?.question.questionId, userId, toast],
+  );
+
+  // 질문 답변 데이터 가져오기
   useEffect(() => {
     if (!answerId) return;
 
@@ -101,13 +158,13 @@ export default function InterviewViewPage() {
   }, [data, answerId]);
 
   if (loading) return <div className="py-20 text-center">로딩 중...</div>;
-
   if (error || !data)
     return (
       <div className="py-20 text-center text-red-600 font-semibold">
         {error ?? '데이터 없음'}
       </div>
     );
+
   return (
     <div className="px-6 space-y-6">
       {/* ← 돌아가기 */}
@@ -120,11 +177,12 @@ export default function InterviewViewPage() {
 
       {/* 질문 영역 */}
       <InterviewQuestion
+        questionId={data.question.questionId}
         category={data.question.category}
         topic={data.question.topic}
         question={data.question.question}
-        isBookmarked={false}
-        onToggleBookmark={() => {}}
+        isBookmarked={isBookmarked}
+        onToggleBookmark={toggleBookmark}
       />
 
       {/* 답변 영역 */}
