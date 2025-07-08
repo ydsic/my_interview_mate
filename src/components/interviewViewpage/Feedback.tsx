@@ -2,11 +2,12 @@ import { H3_sub_detail } from '../common/HTagStyle';
 import MyProgressBar from '../interviewpage/feedback/ProgressBar';
 import Improvements from '../interviewpage/feedback/Improvements';
 import ScoreItem from './ScoreItem';
+import { useMemo } from 'react';
 
-type FeedbackDataType = {
+type FeedbackDataPropsType = {
   average: number;
   summary: string;
-  feedback: string[];
+  feedback: string;
   logic_score: number;
   clarity_score: number;
   technical_score: number;
@@ -14,31 +15,31 @@ type FeedbackDataType = {
   structure_score: number;
 };
 
-const feedbackData: FeedbackDataType = {
-  average: 63,
-  feedback: [
-    'merge와 rebase의 실제 동작 방식과 차이점을 더 구체적으로 설명해 보세요.',
-    '용어의 의미를 명확하게 풀어서 설명하는 것이 좋습니다.',
-    '예시나 실제 사용 사례를 덧붙이면 심층성이 향상됩니다.',
-  ],
-  summary:
-    '간단하게 핵심을 언급했으나, 구체적 설명이 부족합니다. 용어의 의미가 모호하게 전달됩니다. 실제 동작과 차이점을 예시와 함께 설명하면 좋습니다.',
-  logic_score: 65,
-  clarity_score: 70,
-  technical_score: 60,
-  depth_score: 65,
-  structure_score: 55,
-};
+export default function Feedback({
+  feedbackData,
+}: {
+  feedbackData: FeedbackDataPropsType;
+}) {
+  const scoreItems = [
+    { label: '논리적 일관성', value: feedbackData.logic_score },
+    { label: '명료성', value: feedbackData.clarity_score },
+    { label: '기술적 정확성', value: feedbackData.technical_score },
+    { label: '심층성', value: feedbackData.depth_score },
+    { label: '구조화', value: feedbackData.structure_score },
+  ];
 
-const scoreItems = [
-  { label: '논리적 일관성', value: feedbackData.logic_score },
-  { label: '명료성', value: feedbackData.clarity_score },
-  { label: '기술적 정확성', value: feedbackData.technical_score },
-  { label: '심층성', value: feedbackData.depth_score },
-  { label: '구조화', value: feedbackData.structure_score },
-];
+  const parsedFeedback = useMemo(() => {
+    try {
+      return JSON.parse(feedbackData.feedback);
+    } catch {
+      try {
+        return JSON.parse(JSON.parse(feedbackData.feedback));
+      } catch {
+        return ['피드백 데이터를 불러오는 데 실패했어요.'];
+      }
+    }
+  }, [feedbackData.feedback]);
 
-export default function Feedback() {
   return (
     <div className="flex flex-col items-baseline w-full gap-5">
       <H3_sub_detail> AI 피드백 </H3_sub_detail>
@@ -65,7 +66,7 @@ export default function Feedback() {
       </div>
 
       <div className="w-full text-left">
-        <Improvements data={feedbackData.feedback} />
+        <Improvements data={parsedFeedback} />
       </div>
     </div>
   );
