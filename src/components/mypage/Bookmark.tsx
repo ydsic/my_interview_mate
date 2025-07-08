@@ -103,7 +103,7 @@ export default function Bookmark() {
   };
 
   return (
-    <div className="flex flex-col gap-7 mb-5 justify-between bg-white p-[30px] h-[750px] rounded-4xl shadow-md relative">
+    <div className="flex flex-col gap-7 mb-5 justify-between bg-white p-[30px] h-[750px] rounded-3xl shadow-md relative">
       <H3_sub_detail>즐겨찾기 질문</H3_sub_detail>
       <ul className="flex-1">
         {bookMarkList.length === 0 ? (
@@ -144,7 +144,7 @@ export default function Bookmark() {
                         className={`inline-flex justify-center items-center h-7 min-w-28 py-4 rounded-lg text-center ${bg} ${text}`}
                       >
                         {bookmark.question_category === 'front-end'
-                          ? '프론트엔드'
+                          ? 'Front-end'
                           : bookmark.question_category.toUpperCase()}
                       </span>
 
