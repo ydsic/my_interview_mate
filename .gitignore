@@ -13,11 +13,7 @@ dist-ssr
 
 
 *.local
-.env.local
-
-
 supabase/
-
 
 .vscode/*
 .gemini/*
