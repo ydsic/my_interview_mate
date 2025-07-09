@@ -116,6 +116,7 @@ export default function AnswerInput({
         setAnswer(
           (prev) => prev + (prev && !prev.endsWith(' ') ? ' ' : '') + text,
         );
+        setIsDirty(true);
         toast('음성 인식 완료!', 'success');
       },
       onError: (error: string) => {
@@ -155,8 +156,10 @@ export default function AnswerInput({
   }, [toast]);
 
   // 마이크 토글
+  const micLocked = (disabled && editMode) || isProcessing || loading;
+
   const handleMicClick = () => {
-    if (!voiceRecording || disabled || isProcessing) return;
+    if (!voiceRecording || micLocked) return;
 
     if (isRecording) {
       voiceRecording.stopRecording();
@@ -280,15 +283,16 @@ export default function AnswerInput({
           onChange={handleAnswerChange}
           readOnly={isReviewMode && !editMode}
         />
+        {/* 마이크버튼 */}
         <button
           type="button"
           onClick={handleMicClick}
+          disabled={micLocked}
           className={`
-            absolute bottom-3 right-3 p-1 rounded-full transition
+            absolute bottom-3 right-3 p-1 rounded-full transition cursor-pointer
             ${isRecording ? 'bg-red-500' : 'bg-white hover:bg-gray-200'}
-            ${disabled || isProcessing ? 'cursor-not-allowed' : ''}
+            ${micLocked ? 'cursor-not-allowed' : ''}
           `}
-          disabled={disabled || isProcessing}
         >
           <img src={micIcon} alt="마이크 아이콘" className="w-8 h-8" />
         </button>
@@ -344,13 +348,7 @@ export default function AnswerInput({
                 className="text-white"
                 size="lg"
               />
-              {loading
-                ? '피드백 생성 중...'
-                : !hasFeedback
-                  ? '피드백 받기'
-                  : isDirty
-                    ? '피드백 다시 받기'
-                    : '피드백 받기'}
+              {loading ? '피드백 생성 중...' : '피드백 받기'}
             </SubmitButton>
 
             {/* 추가 질문 버튼 */}
