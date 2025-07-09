@@ -1,22 +1,20 @@
+interface User {
+  user_id: string;
+  email: string;
+  nickname: string;
+  created_at: string;
+}
+
+type setViewType = {
+  setView: (view: 'main' | 'user' | 'question') => void;
+};
+
 import { useState, useEffect } from 'react';
 import { fetchUsers, updateUser, deleteUser } from '../../api/adminPageApi';
 import { H4_placeholder } from '../common/HTagStyle';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCaretLeft, faUser } from '@fortawesome/free-solid-svg-icons';
 import Button from '../common/Button';
-
-// Define the type for a user object based on the database schema
-interface User {
-  user_id: string;
-  email: string;
-  nickname: string;
-  created_at: string;
-  // Add other user properties as needed
-}
-
-type setViewType = {
-  setView: (view: 'main' | 'user' | 'question') => void;
-};
 
 export default function UserList({ setView }: setViewType) {
   const [users, setUsers] = useState<User[]>([]);
@@ -61,7 +59,6 @@ export default function UserList({ setView }: setViewType) {
       if (error) {
         throw new Error('사용자 정보 수정에 실패했습니다.');
       }
-      // Refresh user list
       const { data } = await fetchUsers();
       setUsers(data || []);
       setSelectedUser((prev) =>
@@ -87,7 +84,6 @@ export default function UserList({ setView }: setViewType) {
       if (error) {
         throw new Error('사용자 삭제에 실패했습니다.');
       }
-      // Refresh user list
       setUsers(users.filter((u) => u.user_id !== selectedUser.user_id));
       setSelectedUser(null);
       alert('사용자가 삭제되었습니다.');
@@ -157,7 +153,7 @@ export default function UserList({ setView }: setViewType) {
               >
                 사용자 정보
               </button>
-              <button
+              {/* <button
                 className={`py-3 px-6 font-medium transition-all duration-200 border-b-2 ${
                   activeTab === 'tab2'
                     ? 'border-[#427CF5] text-slate-800'
@@ -176,7 +172,7 @@ export default function UserList({ setView }: setViewType) {
                 onClick={() => setActiveTab('tab3')}
               >
                 탭 3
-              </button>
+              </button> */}
             </div>
 
             <div className="mt-4">

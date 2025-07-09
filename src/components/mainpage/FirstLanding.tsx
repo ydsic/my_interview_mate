@@ -1,7 +1,6 @@
 import LiquidGlass from 'liquid-glass-react';
 import bg from '../../assets/login_bg.mp4';
 import { useRef } from 'react';
-import { H3_sub_detail } from '../common/HTagStyle';
 
 type Props = {
   setFirstLandingPage: (show: boolean) => void;

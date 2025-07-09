@@ -19,7 +19,6 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCaretLeft } from '@fortawesome/free-solid-svg-icons';
 import { H4_placeholder } from '../common/HTagStyle';
-import ToastItem from '../common/ToastMessage';
 import { useToast } from '../../hooks/useToast';
 
 export default function QuestionList({ setView }: setViewType) {
