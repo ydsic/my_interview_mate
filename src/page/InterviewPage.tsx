@@ -50,21 +50,14 @@ export default function InterviewPage() {
   );
 
   /* 즐겨찾기(bookmark) 등록 부분 */
+
   // 유저 아이디 불러오기
   const user_id = useUserDataStore((state) => state.userData.user_id);
   const [isBookMarked, setIsBookMarked] = useState<boolean>(false);
 
-  // 추가 질문 랜덤 함수
-  function getRandomItems<T>(array: T[], count: number): T[] {
-    const shuffled = [...array].sort(() => 0.5 - Math.random());
-    return shuffled.slice(0, count);
-  }
-
   // 질문 불러오기 get요청
   const fetchQuestion = useCallback(async () => {
-    // API 요청 확인용
-    console.log('rawCategory:', rawCategory, 'topicParam:', topicParam);
-
+    // 유효성 체크
     if (!isCategoryKey(rawCategory) || !topicParam) {
       setQuestion({
         questionId: 0,
@@ -75,51 +68,73 @@ export default function InterviewPage() {
       setFollowUpQuestions([]);
       return;
     }
-
     try {
       const data = await getQuestionsByCategoryAndTopic(
-        rawCategory,
-        topicParam,
+        rawCategory!,
+        topicParam!,
+        4,
       );
       // API 요청 확인용
+      console.log('rawCategory:', rawCategory, 'topicParam:', topicParam);
       console.log('불러온 질문 수:', data.length);
       console.log('data 내용:', data);
 
       if (!data.length) throw new Error('질문 없음');
 
-      const idx = Math.floor(Math.random() * data.length);
-      const pick = data[idx];
+      const [main, ...others] = data;
 
+      // try {
+      //   const data = await getQuestionsByCategoryAndTopic(
+      //     rawCategory,
+      //     topicParam,
+      //   );
+      //   // API 요청 확인용
+      //   console.log('불러온 질문 수:', data.length);
+      //   console.log('data 내용:', data);
+
+      //   if (!data.length) throw new Error('질문 없음');
+
+      //   const idx = Math.floor(Math.random() * data.length);
+      //   const pick = data[idx];
+
+      // 메인 질문 세팅
       setQuestion({
-        questionId: pick.question_id,
-        category: rawCategory as CategoryKey,
-        topic: pick.topic,
-        question: pick.content,
+        questionId: main.question_id,
+        category: main.category as CategoryKey,
+        topic: main.topic,
+        question: main.content,
       });
 
       // 추가 질문 나머지 질문 목록에서 랜덤으로 3개 뽑기
-      const otherQuestion = data
-        .filter((_, i) => i !== idx)
-        .map((q) => ({
+
+      // const otherQuestion = data
+      //   .filter((_, i) => i !== idx)
+      //   .map((q) => ({
+      //     questionId: q.question_id,
+      //     category: rawCategory as CategoryKey,
+      //     topic: q.topic,
+      //     question: q.content,
+      //   }));
+
+      // 추가 질문 세팅
+      setFollowUpQuestions(
+        others.map((q) => ({
           questionId: q.question_id,
-          category: rawCategory as CategoryKey,
+          category: q.category as CategoryKey,
           topic: q.topic,
           question: q.content,
-        }));
+        })),
+      );
 
-      setFollowUpQuestions(getRandomItems(otherQuestion, 3));
-
-      if (isFirstLoad.current) {
-        isFirstLoad.current = false;
-      } else {
-        toast('새로운 질문이 도착했어요!', 'success');
-      }
+      // 토스트 메시지
+      if (isFirstLoad.current) isFirstLoad.current = false;
+      else toast('새로운 질문이 도착했어요!', 'success');
     } catch (e) {
       console.error(e);
       setQuestion({
         questionId: 0,
         category: rawCategory as CategoryKey,
-        topic: topicParam || '',
+        topic: topicParam,
         question: '질문을 불러오는 데 실패했습니다.',
       });
       setFollowUpQuestions([]);
