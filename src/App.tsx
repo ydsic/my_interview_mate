@@ -39,7 +39,7 @@ export default function App() {
                 </CheckAdminUuid>
               }
             />
-            <Route path="/*" element={<NotFound />} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </DefaultLayout>
       </BrowserRouter>
