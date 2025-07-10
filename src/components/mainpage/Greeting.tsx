@@ -4,7 +4,7 @@ import { H1_big_title } from '../common/HTagStyle';
 
 export default function Greeting() {
   return (
-    <div className="inset-16 absolute left-0 h-full w-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50">
+    <div className="absolute left-0 h-full w-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50">
       <div className="text-center space-y-3">
         <H1_big_title>AI와 함께하는</H1_big_title>
 

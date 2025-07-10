@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Route, Routes, Outlet } from 'react-router-dom';
 import MainPage from './page/MainPage';
 import StyleTest from './page/StyleTest';
 import LoginPage from './page/LoginPage';
@@ -13,15 +13,30 @@ import CheckAdminUuid from './components/mainpage/CheckAdminUuid';
 import NotFound from './page/NotFound';
 import InterviewViewPage from './page/InterviewViewPage';
 
+function LayoutWrapper() {
+  return (
+    <DefaultLayout>
+      <Outlet />
+    </DefaultLayout>
+  );
+}
+
 export default function App() {
   return (
     <>
       <ToastProvider />
       <BrowserRouter>
         <Nav />
-        <DefaultLayout>
-          <Routes>
-            <Route path="/" element={<MainPage />} />
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <DefaultLayout noPadding>
+                <MainPage />
+              </DefaultLayout>
+            }
+          />
+          <Route element={<LayoutWrapper />}>
             <Route path="/styleTest" element={<StyleTest />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/mypage" element={<MyPage />} />
@@ -39,9 +54,9 @@ export default function App() {
                 </CheckAdminUuid>
               }
             />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </DefaultLayout>
+          </Route>
+          <Route path="*" element={<NotFound />} />
+        </Routes>
       </BrowserRouter>
     </>
   );
