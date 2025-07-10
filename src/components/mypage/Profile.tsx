@@ -11,6 +11,7 @@ import {
 import { loginUserInfo } from '../../api/userInfo';
 import { useToast } from '../../hooks/useToast';
 import InputOrText from './InputOrText';
+import { H3_sub_detail } from '../common/HTagStyle';
 
 type UserData = {
   user_id: string;
@@ -39,6 +40,7 @@ export default function Profile() {
 
   const [previewImg, setPreviewImg] = useState<string>(defaultProfileImg);
   const [isEditing, setIsEditing] = useState(false); // '수정하기' - 편집 상태 확인
+  const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -79,16 +81,7 @@ export default function Profile() {
     if (!file || !userData) return;
 
     setPreviewImg(URL.createObjectURL(file));
-
-    try {
-      const publicUrl = await uploadUserImageOnly(file, userData.user_id);
-      setFormData((prev) => ({
-        ...prev,
-        profile_img: publicUrl,
-      }));
-    } catch (err: any) {
-      console.log('이미지 업로드 실패 : ', err);
-    }
+    setSelectedImageFile(file);
   };
 
   const resetForm = async () => {
@@ -111,6 +104,7 @@ export default function Profile() {
     });
 
     setPreviewImg(userData.profile_img || defaultProfileImg);
+    setSelectedImageFile(null);
   };
 
   // 수정 모드
@@ -134,7 +128,14 @@ export default function Profile() {
     }
 
     try {
-      await updateUserProfile(userData.user_id, formData);
+      const profile_img = selectedImageFile
+        ? await uploadUserImageOnly(selectedImageFile, userData.user_id)
+        : userData.profile_img;
+
+      await updateUserProfile(userData.user_id, {
+        ...formData,
+        profile_img,
+      });
 
       useUserDataStore.getState().setUserData({
         ...storeUserData,
@@ -159,7 +160,7 @@ export default function Profile() {
       onSubmit={handleSubmit}
       className="flex flex-col gap-10 mb-5 bg-white p-[30px] rounded-4xl shadow-md relative"
     >
-      <p className="font-semibold">프로필 정보</p>
+      <H3_sub_detail className="font-semibold">프로필 정보</H3_sub_detail>
 
       <div className="flex items-center gap-5.5 h-20 relative">
         <div className="relative">

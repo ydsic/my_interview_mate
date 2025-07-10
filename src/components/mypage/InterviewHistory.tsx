@@ -15,7 +15,7 @@ import {
 } from '../../api/historyAPI';
 import type { InterviewHistoryItem as RawItem } from '../../api/historyAPI';
 import { useToast } from '../../hooks/useToast';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 const CATEGORY_STYLES: Record<
   string,
@@ -46,7 +46,8 @@ export default function InterviewHistory() {
   const [error, setError] = useState<string | null>(null);
   const toast = useToast();
   //페이지 네이션
-  const [page, setPage] = useState(1);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const pageParam = Number(searchParams.get('page')) || 1;
   const [total, setTotal] = useState<number>(0);
   const PAGE_SIZE = 4;
   const navigate = useNavigate();
@@ -58,7 +59,7 @@ export default function InterviewHistory() {
       try {
         const { data, total } = await getInterviewHistory(
           user_id,
-          page,
+          pageParam,
           PAGE_SIZE,
         );
         const normalized = data.map((item) => ({
@@ -80,7 +81,7 @@ export default function InterviewHistory() {
     }
 
     fetchHistory();
-  }, [user_id, page]);
+  }, [user_id, pageParam]);
 
   // 수정버튼 토글
   const toggleEditMode = () => {
@@ -96,6 +97,12 @@ export default function InterviewHistory() {
     } catch {
       toast('기록 삭제에 실패했습니다.', 'error');
     }
+  };
+
+  const handlePageChange = (page: number) => {
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set('page', String(page));
+    setSearchParams(newParams);
   };
 
   return (
@@ -214,8 +221,8 @@ export default function InterviewHistory() {
           {/* 페이지네이션 */}
           <div className="flex justify-center w-full gap-2">
             <button
-              onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-              disabled={page === 1}
+              onClick={() => handlePageChange(Math.max(pageParam - 1, 1))}
+              disabled={pageParam === 1}
               className="px-4 py-2 rounded bg-gray-40 text-black disabled:opacity-50 cursor-pointer"
             >
               이전
@@ -223,12 +230,12 @@ export default function InterviewHistory() {
 
             {Array.from({ length: Math.ceil(total / PAGE_SIZE) }, (_, idx) => {
               const pageNumber = idx + 1;
-              const isCurrent = pageNumber === page;
+              const isCurrent = pageNumber === pageParam;
 
               return (
                 <button
                   key={pageNumber}
-                  onClick={() => setPage(pageNumber)}
+                  onClick={() => handlePageChange(pageNumber)}
                   disabled={isCurrent}
                   className={`w-6 text-center text-base font-semibold cursor-pointer ${
                     isCurrent ? 'text-black' : 'text-gray-300'
@@ -241,10 +248,11 @@ export default function InterviewHistory() {
 
             <button
               onClick={() => {
-                const lastPage = Math.ceil(total / PAGE_SIZE);
-                setPage((prev) => Math.min(prev + 1, lastPage));
+                handlePageChange(
+                  Math.min(pageParam + 1, Math.ceil(total / PAGE_SIZE)),
+                );
               }}
-              disabled={page >= Math.ceil(total / PAGE_SIZE)}
+              disabled={pageParam >= Math.ceil(total / PAGE_SIZE)}
               className="px-4 py-2 rounded bg-gray-40 text-black disabled:opacity-50 cursor-pointer"
             >
               다음
