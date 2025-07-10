@@ -1,6 +1,10 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { debounce } from 'lodash';
-import { H2_content_title } from '../components/common/HTagStyle';
+import {
+  H2_content_title,
+  H3_sub_detail,
+  H4_placeholder,
+} from '../components/common/HTagStyle';
 import Feedback from '../components/interviewViewpage/Feedback';
 import { supabase } from '../supabaseClient';
 import InterviewQuestion from '../components/interviewpage/InterviewQuestion';
@@ -56,7 +60,9 @@ export default function InterviewViewPage() {
   const toast = useToast();
   const [isBookmarked, setIsBookmarked] = useState(false);
 
-  //북마크
+  const [feedbackLoaded, setFeedbackLoaded] = useState(false);
+
+  // 북마크
   useEffect(() => {
     if (!data?.question.questionId || !userId) return;
     (async () => {
@@ -70,7 +76,6 @@ export default function InterviewViewPage() {
     })();
   }, [data?.question.questionId, userId, toast]);
 
-  // 북마크
   const Bookmark = async () => {
     if (!userId || !data) return;
 
@@ -103,7 +108,7 @@ export default function InterviewViewPage() {
     [isBookmarked, data?.question.questionId, userId, toast],
   );
 
-  // 질문 답변 데이터 가져오기
+  // 질문 데이터 가져오기
   useEffect(() => {
     if (!answerId) return;
 
@@ -138,25 +143,29 @@ export default function InterviewViewPage() {
     })();
   }, [answerId]);
 
-  // 피드백 데이터 가져오기
+  // 피드백 데이터 가져오기 및 예외처리
   const fetchFeedbackData = async () => {
     try {
       const feedback = await selectFeedbackData(
         data!.question.questionId,
         answerId!,
       );
-      console.log('[다시보기 페이지] 피드백 데이터 : ', feedback);
+      console.log('다시보기 페이지 피드백 데이터 : ', feedback);
       setFeedbackData(feedback);
     } catch (err) {
       console.error('피드백 조회 에러:', err);
+    } finally {
+      setFeedbackLoaded(true);
     }
   };
 
+  // 답변 데이터 예외처리
   useEffect(() => {
     if (data?.question.questionId == null || answerId == null) return;
     fetchFeedbackData();
   }, [data, answerId]);
 
+  // 로딩 에러
   if (loading) return <div className="py-20 text-center">로딩 중...</div>;
   if (error || !data)
     return (
@@ -198,7 +207,24 @@ export default function InterviewViewPage() {
       />
       {/* 피드백 영역 */}
       <div className="p-5 rounded-xl text-gray-800 border border-gray-200 text-center bg-white">
-        {feedbackData && <Feedback feedbackData={feedbackData} />}
+        {!feedbackLoaded ? (
+          <div className="text-sm text-gray-500">
+            피드백을 불러오는 중입니다...
+          </div>
+        ) : feedbackData ? (
+          <Feedback feedbackData={feedbackData} />
+        ) : (
+          /* 예외(결과 없음) */
+          <div className="p-10 rounded-xl border border-red-200 bg-red-50 text-red-500">
+            <H2_content_title>아직 저장된 피드백이 없습니다.</H2_content_title>
+
+            <div className="mt-5">
+              <H4_placeholder>
+                답변을 제출하고 피드백을 받아보세요
+              </H4_placeholder>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
