@@ -11,6 +11,7 @@ import {
 import { loginUserInfo } from '../../api/userInfo';
 import { useToast } from '../../hooks/useToast';
 import InputOrText from './InputOrText';
+import { H3_sub_detail } from '../common/HTagStyle';
 
 type UserData = {
   user_id: string;
@@ -159,7 +160,7 @@ export default function Profile() {
       onSubmit={handleSubmit}
       className="flex flex-col gap-10 mb-5 bg-white p-[30px] rounded-4xl shadow-md relative"
     >
-      <p className="font-semibold">프로필 정보</p>
+      <H3_sub_detail className="font-semibold">프로필 정보</H3_sub_detail>
 
       <div className="flex items-center gap-5.5 h-20 relative">
         <div className="relative">
