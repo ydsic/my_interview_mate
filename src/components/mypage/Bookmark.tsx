@@ -58,13 +58,9 @@ export default function Bookmark() {
   const toast = useToast();
   const navigation = useNavigate();
 
-  const fetchBookMarks = async () => {
+  const fetchBookMarks = async (page: number) => {
     try {
-      const { data, total } = await selectBookMarks(
-        user_id,
-        pageParam,
-        PAGE_SIZE,
-      );
+      const { data, total } = await selectBookMarks(user_id, page, PAGE_SIZE);
       // console.log('[북마크 데이터] : ', data);
       setBookMarkList(data);
       setTotal(total);
@@ -74,7 +70,7 @@ export default function Bookmark() {
   };
 
   useEffect(() => {
-    fetchBookMarks();
+    fetchBookMarks(pageParam);
   }, [user_id, pageParam]);
 
   const handleBookMark = useMemo(
@@ -88,14 +84,14 @@ export default function Bookmark() {
         try {
           await deleteBookMark(user_id, questionId);
           toast('즐겨찾기에서 삭제했어요!', 'success');
-          await fetchBookMarks();
+          await fetchBookMarks(pageParam);
         } catch (err: unknown) {
           const error = err as Error;
           console.error('[북마크 삭제 에러] : ', error);
           toast('북마크 삭제에 실패했어요.', 'error');
         }
       }, 500),
-    [user_id],
+    [user_id, pageParam],
   );
 
   const handleButtonClick = async (questionId: number) => {
