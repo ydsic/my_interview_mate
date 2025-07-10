@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Dashboard from '../components/mypage/Dashboard';
 import Bookmark from '../components/mypage/Bookmark';
 import Profile from '../components/mypage/Profile';
@@ -26,9 +26,18 @@ export default function MyPage() {
     | 'profile'
     | null;
 
-  const defaultTab: 'dashboard' | 'interview' | 'favorites' | 'profile' =
-    tabParam || 'dashboard';
-  const [activeTab, setActiveTab] = useState(defaultTab);
+  const [activeTab, setActiveTab] = useState<
+    'dashboard' | 'interview' | 'favorites' | 'profile'
+  >('dashboard');
+
+  // tab 기본값 dashboard로 설정
+  useEffect(() => {
+    if (tabParam) {
+      setActiveTab(tabParam);
+    } else {
+      setSearchParams({ tab: 'dashboard' });
+    }
+  }, [tabParam, setSearchParams]);
 
   const handleTabClick = (
     tab: 'dashboard' | 'interview' | 'favorites' | 'profile',
