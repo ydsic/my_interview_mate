@@ -2,32 +2,22 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { debounce } from 'lodash';
 import {
   H2_content_title,
-  H3_sub_detail,
   H4_placeholder,
 } from '../components/common/HTagStyle';
 import Feedback from '../components/interviewViewpage/Feedback';
-import { supabase } from '../supabaseClient';
+
 import InterviewQuestion from '../components/interviewpage/InterviewQuestion';
 import { useState, useEffect, useMemo } from 'react';
 import AnswerInput from '../components/interviewpage/AnswerInput';
 import { useToast } from '../hooks/useToast';
 
 import type { QuestionData } from '../types/interview';
-import type { CategoryKey } from '../types/interview';
+
 import { selectFeedbackData } from '../api/bookMarkAPI';
+import { getAnswerWithQuestion } from '../api/answerAPI';
 
 import { useUserDataStore } from '../store/userData';
 import { insertBookMark, deleteBookMark, Bookmarked } from '../api/bookMarkAPI';
-
-type AnswerWithQuestion = {
-  content: string;
-  questions: {
-    question_id: number;
-    content: string;
-    category: CategoryKey;
-    topic: string;
-  };
-};
 
 type FeedbackData = {
   average: number;
@@ -108,32 +98,15 @@ export default function InterviewViewPage() {
     [isBookmarked, data?.question.questionId, userId, toast],
   );
 
-  // 질문 데이터 가져오기
+  // 질문/답변 데이터 가져오기
   useEffect(() => {
+    setFeedbackLoaded(false);
     if (!answerId) return;
 
     (async () => {
       try {
-        const { data, error } = await supabase
-          .from('answers')
-          .select(
-            `content,
-             questions!answers_question_id_fkey(question_id, content, category, topic)`,
-          )
-          .eq('answer_id', answerId)
-          .single<AnswerWithQuestion>();
-
-        if (error) throw error;
-
-        setData({
-          answer: data.content,
-          question: {
-            questionId: data.questions.question_id,
-            category: data.questions.category,
-            topic: data.questions.topic,
-            question: data.questions.content,
-          },
-        });
+        const viewData = await getAnswerWithQuestion(answerId);
+        setData(viewData);
       } catch (e) {
         console.error(e);
         setError('질문/답변을 불러오지 못했습니다.');
@@ -143,7 +116,7 @@ export default function InterviewViewPage() {
     })();
   }, [answerId]);
 
-  // 피드백 데이터 가져오기 및 예외처리
+  // 피드백 데이터 가져오기
   const fetchFeedbackData = async () => {
     try {
       const feedback = await selectFeedbackData(
@@ -153,7 +126,7 @@ export default function InterviewViewPage() {
       console.log('다시보기 페이지 피드백 데이터 : ', feedback);
       setFeedbackData(feedback);
     } catch (err) {
-      console.error('피드백 조회 에러:', err);
+      console.error('피드백 조회 에러:', err); // 예외 ui노출
     } finally {
       setFeedbackLoaded(true);
     }
