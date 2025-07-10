@@ -15,7 +15,7 @@ import {
 } from '../../api/bookMarkAPI';
 import { useToast } from '../../hooks/useToast';
 import { debounce } from 'lodash';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 const CATEGORY_STYLES: Record<
   string,
@@ -49,7 +49,8 @@ interface BookmarkedQuesetions {
 export default function Bookmark() {
   const [bookMarkList, setBookMarkList] = useState<BookmarkedQuesetions[]>([]);
   // 페이지네이션
-  const [page, setPage] = useState<number>(1);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const pageParam = Number(searchParams.get('page')) || 1;
   const [total, setTotal] = useState<number>(0);
   const PAGE_SIZE = 4;
 
@@ -59,8 +60,12 @@ export default function Bookmark() {
 
   const fetchBookMarks = async () => {
     try {
-      const { data, total } = await selectBookMarks(user_id, page, PAGE_SIZE);
-      console.log('[북마크 데이터] : ', data);
+      const { data, total } = await selectBookMarks(
+        user_id,
+        pageParam,
+        PAGE_SIZE,
+      );
+      // console.log('[북마크 데이터] : ', data);
       setBookMarkList(data);
       setTotal(total);
     } catch (e) {
@@ -70,7 +75,7 @@ export default function Bookmark() {
 
   useEffect(() => {
     fetchBookMarks();
-  }, [user_id, page]);
+  }, [user_id, pageParam]);
 
   const handleBookMark = useMemo(
     () =>
@@ -84,8 +89,9 @@ export default function Bookmark() {
           await deleteBookMark(user_id, questionId);
           toast('즐겨찾기에서 삭제했어요!', 'success');
           await fetchBookMarks();
-        } catch (err: any) {
-          console.error('[북마크 삭제 에러] : ', err);
+        } catch (err: unknown) {
+          const error = err as Error;
+          console.error('[북마크 삭제 에러] : ', error);
           toast('북마크 삭제에 실패했어요.', 'error');
         }
       }, 500),
@@ -97,9 +103,16 @@ export default function Bookmark() {
       const answer_id = await selectBookmarkedAnswer(user_id, questionId);
       // console.log('answer_id : ', answer_id);
       navigation(`/interview-view/${answer_id}`);
-    } catch (err: any) {
-      console.error('오류 : ', err);
+    } catch (err: unknown) {
+      const error = err as Error;
+      console.error('오류 : ', error);
     }
+  };
+
+  const handlePageChange = (page: number) => {
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set('page', String(page));
+    setSearchParams(newParams);
   };
 
   return (
@@ -173,8 +186,8 @@ export default function Bookmark() {
       </ul>
       <div className="flex justify-center items-center gap-4">
         <button
-          onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-          disabled={page === 1}
+          onClick={() => handlePageChange(Math.max(pageParam - 1, 1))}
+          disabled={pageParam === 1}
           className="px-4 py-2 rounded bg-gray-40 text-black disabled:opacity-50 cursor-pointer"
         >
           이전
@@ -182,12 +195,12 @@ export default function Bookmark() {
 
         {Array.from({ length: Math.ceil(total / PAGE_SIZE) }, (_, idx) => {
           const pageNumber = idx + 1;
-          const isCurrent = pageNumber === page;
+          const isCurrent = pageNumber === pageParam;
 
           return (
             <button
               key={pageNumber}
-              onClick={() => setPage(pageNumber)}
+              onClick={() => handlePageChange(pageNumber)}
               disabled={isCurrent}
               className={`w-6 text-center text-base font-semibold cursor-pointer ${
                 isCurrent ? 'text-black' : 'text-gray-300'
@@ -200,10 +213,11 @@ export default function Bookmark() {
 
         <button
           onClick={() => {
-            const lastPage = Math.ceil(total / PAGE_SIZE);
-            setPage((prev) => Math.min(prev + 1, lastPage));
+            handlePageChange(
+              Math.min(pageParam + 1, Math.ceil(total / PAGE_SIZE)),
+            );
           }}
-          disabled={page >= Math.ceil(total / PAGE_SIZE)}
+          disabled={pageParam >= Math.ceil(total / PAGE_SIZE)}
           className="px-4 py-2 rounded bg-gray-40 text-black disabled:opacity-50 cursor-pointer"
         >
           다음
