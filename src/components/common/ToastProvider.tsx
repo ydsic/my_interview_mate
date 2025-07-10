@@ -16,7 +16,10 @@ export default function ToastProvider() {
   }, [toasts, removeToast]);
 
   return createPortal(
-    <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-[9999] space-y-2">
+    <div
+      className="fixed bottom-20 left-1/2 -translate-x-1/2 z-[9999]
+               flex flex-col items-center gap-4 px-4"
+    >
       <AnimatePresence>
         {toasts.map((t) => (
           <ToastMessage key={t.id} {...t} />
