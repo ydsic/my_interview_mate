@@ -115,7 +115,7 @@ export default function InterviewHistory() {
   };
 
   return (
-    <section className="max-w-7xl mx-auto rounded-3xl bg-white p-6 shadow-md flex flex-col justify-start min-h-[730px]">
+    <section className="max-w-7xl mx-auto rounded-3xl bg-white p-6 shadow-md flex flex-col gap-7 mb-5 justify-start min-h-[750px]">
       {/* 제목 */}
       <H3_sub_detail>최근 면접 기록</H3_sub_detail>
 
@@ -127,9 +127,13 @@ export default function InterviewHistory() {
           {error}
         </div>
       ) : items.length === 0 ? (
-        <div className="py-10 text-center text-gray-85">
+        <div className="py-20 text-center text-gray-70">
           {/* 면접 질문이 없을 때 */}
-          <H2_content_title>면접 기록이 없습니다</H2_content_title>
+          <H2_content_title>아직 인터뷰 기록이 없어요!</H2_content_title>
+          <br />
+          <span className="font-semibold mt-2">
+            나만의 인터뷰 실력을 보여주세요
+          </span>
         </div>
       ) : (
         <motion.div
