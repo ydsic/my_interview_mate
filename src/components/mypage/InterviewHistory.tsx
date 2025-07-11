@@ -51,6 +51,7 @@ export default function InterviewHistory() {
   const [total, setTotal] = useState<number>(0);
   const PAGE_SIZE = 4;
   const navigate = useNavigate();
+  const [direction, setDirection] = useState(0);
 
   useEffect(() => {
     if (!user_id) return;
@@ -100,13 +101,14 @@ export default function InterviewHistory() {
   };
 
   const handlePageChange = (page: number) => {
+    setDirection(page > pageParam ? 1 : -1);
     const newParams = new URLSearchParams(searchParams);
     newParams.set('page', String(page));
     setSearchParams(newParams);
   };
 
   return (
-    <section className="max-w-7xl mx-auto rounded-3xl bg-white p-6 shadow-md">
+    <section className="max-w-7xl mx-auto rounded-3xl bg-white p-6 shadow-md flex flex-col justify-between min-h-[720px]">
       {/* 제목 */}
       <H3_sub_detail>최근 면접 기록</H3_sub_detail>
 
@@ -123,90 +125,103 @@ export default function InterviewHistory() {
           <H2_content_title>면접 기록이 없습니다</H2_content_title>
         </div>
       ) : (
-        /* 리스트 */
-        <ul className="relative space-y-3 pt-6 pb-13">
-          <AnimatePresence>
-            {items.map(({ answer_id, created_at, question, feedback }) => (
-              <motion.li
-                key={answer_id}
-                layout
-                initial={false}
-                animate={{
-                  x: editMode ? 10 : 0,
-                  width: editMode ? '98%' : '100%',
-                }}
-                exit={{
-                  opacity: 0,
-                  x: -20,
-                  height: 0,
-                  marginTop: 0,
-                  marginBottom: 0,
-                  paddingTop: 0,
-                  paddingBottom: 0,
-                }}
-                transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-                style={{ transformOrigin: 'right center' }}
-                className={`flex items-center justify-between rounded-md bg-gray-50 shadow-sm px-4 py-5 mb-5 ${editMode ? 'ml-auto' : 'w-full'}`}
-              >
-                {/* 삭제버튼 */}
-                {editMode && (
-                  <button
-                    type="button"
-                    onClick={() => handleDelete(answer_id)}
-                    aria-label="delete history"
-                    className="items-center justify-center flex border rounded-3xl h-7 w-7 absolute -left-10 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 transition-colors cursor-pointer"
-                  >
-                    <FontAwesomeIcon
-                      icon={faXmark}
-                      className="items-center justify-center flex"
-                    />
-                  </button>
-                )}
-
-                {/* 면접 질문 / 카테고리 */}
-                <div className="mt-1 flex flex-col gap-4 max-w-[65%]">
-                  <H3_sub_detail>{question.content}</H3_sub_detail>
-                  <div className="flex items-center gap-2 text-base font-semibold">
-                    <span
-                      className={`inline-flex justify-center items-center text-center h-7 min-w-28 py-4 rounded-lg  ${CATEGORY_STYLES[question.category]?.bg} ${CATEGORY_STYLES[question.category]?.text}`}
+        <motion.div
+          layout
+          transition={{ duration: 0.5, ease: 'easeInOut' }}
+          className="flex-grow"
+        >
+          {/* 리스트 */}
+          <AnimatePresence mode="wait">
+            <motion.ul
+              key={pageParam}
+              initial={{ opacity: 0, x: direction > 0 ? 100 : -50 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: direction > 0 ? -100 : 50 }}
+              transition={{ duration: 0.4, ease: 'easeInOut' }}
+              className="relative space-y-3 pt-6 pb-13 "
+            >
+              {items.map(({ answer_id, created_at, question, feedback }) => (
+                <motion.li
+                  key={answer_id}
+                  layout
+                  initial={false}
+                  animate={{
+                    x: editMode ? 10 : 0,
+                    width: editMode ? '98%' : '100%',
+                  }}
+                  exit={{
+                    opacity: 0,
+                    x: -20,
+                    height: 0,
+                    marginTop: 0,
+                    marginBottom: 0,
+                    paddingTop: 0,
+                    paddingBottom: 0,
+                  }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+                  style={{ transformOrigin: 'right center' }}
+                  className={`flex items-center justify-between rounded-md bg-gray-50 shadow-sm px-4 py-5 mb-5 ${editMode ? 'ml-auto' : 'w-full'}`}
+                >
+                  {/* 삭제버튼 */}
+                  {editMode && (
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(answer_id)}
+                      aria-label="delete history"
+                      className="items-center justify-center flex border rounded-3xl h-7 w-7 absolute -left-10 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 transition-colors cursor-pointer"
                     >
-                      {question.category === 'front-end'
-                        ? 'Front-end'
-                        : question.category.toUpperCase()}
-                    </span>
+                      <FontAwesomeIcon
+                        icon={faXmark}
+                        className="items-center justify-center flex"
+                      />
+                    </button>
+                  )}
 
-                    <H4_placeholder className="ml-2 text-gray-70 font-extralight">
-                      {new Date(created_at).toLocaleDateString()}
-                    </H4_placeholder>
+                  {/* 면접 질문 / 카테고리 */}
+                  <div className="mt-1 flex flex-col gap-4 max-w-[65%]">
+                    <H3_sub_detail>{question.content}</H3_sub_detail>
+                    <div className="flex items-center gap-2 text-base font-semibold">
+                      <span
+                        className={`inline-flex justify-center items-center text-center h-7 min-w-28 py-4 rounded-lg  ${CATEGORY_STYLES[question.category]?.bg} ${CATEGORY_STYLES[question.category]?.text}`}
+                      >
+                        {question.category === 'front-end'
+                          ? 'Front-end'
+                          : question.category.toUpperCase()}
+                      </span>
+
+                      <H4_placeholder className="ml-2 text-gray-70 font-extralight">
+                        {new Date(created_at).toLocaleDateString()}
+                      </H4_placeholder>
+                    </div>
                   </div>
-                </div>
 
-                {/* 오른쪽: 점수 & 다시보기 */}
-                <div className="flex items-center gap-3 shrink-0">
-                  <H2_content_title>
-                    {feedback?.average ?? '-'}점
-                  </H2_content_title>
-                  <WhiteButton
-                    onClick={() =>
-                      navigate(
-                        editMode
-                          ? `/interview-view/${answer_id}?mode=edit`
-                          : `/interview-view/${answer_id}`,
-                        {
-                          state: {
-                            answerId: answer_id,
+                  {/* 오른쪽: 점수 & 다시보기 */}
+                  <div className="flex items-center gap-3 shrink-0">
+                    <H2_content_title>
+                      {feedback?.average ?? '-'}점
+                    </H2_content_title>
+                    <WhiteButton
+                      onClick={() =>
+                        navigate(
+                          editMode
+                            ? `/interview-view/${answer_id}?mode=edit`
+                            : `/interview-view/${answer_id}`,
+                          {
+                            state: {
+                              answerId: answer_id,
+                            },
                           },
-                        },
-                      )
-                    }
-                  >
-                    {editMode ? '수정하기' : '다시보기'}
-                  </WhiteButton>
-                </div>
-              </motion.li>
-            ))}
+                        )
+                      }
+                    >
+                      {editMode ? '수정하기' : '다시보기'}
+                    </WhiteButton>
+                  </div>
+                </motion.li>
+              ))}
+            </motion.ul>
           </AnimatePresence>
-        </ul>
+        </motion.div>
       )}
       {/* 하단 버튼 */}
       {items.length > 0 && (
