@@ -29,13 +29,13 @@ export default function LoginPage() {
 
     try {
       // Supabase Auth로 로그인
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { error } = await supabase.auth.signInWithPassword({
         email,
         password: userPassword,
       });
 
       if (error) {
-        alert(error.message || '이메일 또는 비밀번호가 올바르지 않습니다.');
+        alert('이메일 또는 비밀번호가 올바르지 않습니다.');
         return;
       }
 
@@ -57,9 +57,10 @@ export default function LoginPage() {
       setTimeout(() => {
         navigate('/');
       }, 0);
-    } catch (err: any) {
-      alert(err.message || '알 수 없는 오류가 발생했습니다.');
-      console.log('로그인 에러 : ', err);
+    } catch (err: unknown) {
+      const error = err as Error;
+      alert(error.message || '알 수 없는 오류가 발생했습니다.');
+      console.log('로그인 에러 : ', error);
     }
   };
 
