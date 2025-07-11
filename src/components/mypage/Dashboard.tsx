@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from 'react';
 import { useUserDataStore } from '../../store/userData';
 import DoughnutChart from '../chart/DoughnutChart';
@@ -6,6 +5,12 @@ import LineChart from '../chart/LineChart';
 import RadarChart from '../chart/RadarChart';
 import { H2_content_title } from '../common/HTagStyle';
 import { getScoreTrend, getUserDashboard } from '../../api/userInfo';
+import { useToast } from '../../hooks/useToast';
+
+type ScoreTrendItems = {
+  date: string;
+  avg_score: number;
+};
 
 export default function Dashboard() {
   const { user_id, nickname } = useUserDataStore((state) => state.userData);
@@ -17,6 +22,8 @@ export default function Dashboard() {
   const [lineData, setLineData] = useState<number[]>([]);
   const [RadarData, setRadarData] = useState<number[]>([]);
 
+  const toast = useToast();
+
   useEffect(() => {
     const fetchDashboard = async () => {
       try {
@@ -25,6 +32,7 @@ export default function Dashboard() {
           await getUserDashboard(user_id);
         if (dashboardError) {
           console.error('[대시보드] 에러 발생:', dashboardError.message);
+          toast('대시보드 데이터를 불러오지 못했어요!', 'error');
         } else if (dashboard) {
           setAvgScore(dashboard.avg_score || 0);
           setSolvedCount(dashboard.total_question || 0);
@@ -44,20 +52,25 @@ export default function Dashboard() {
         if (trendError) {
           console.error('[score_trend_view] 에러 : ', trendError.message);
         } else if (trendData) {
-          const days = trendData.map((item: any) => item.date.slice(5)); // MM-DD 형식
-          const scores = trendData.map((item: any) => item.avg_score);
+          const scoreTrendData = trendData as ScoreTrendItems[];
+
+          const days = scoreTrendData.map((item) => item.date.slice(5));
+          const scores = scoreTrendData.map((item) => item.avg_score);
+
           setLineDays(days);
           setLineData(scores);
         }
-      } catch (err: any) {
+      } catch (error: unknown) {
+        const err = error as Error;
         console.log(err);
+        toast('점수 변화 데이터를 불러오지 못했어요!', 'error');
       }
     };
 
     if (user_id) {
       fetchDashboard();
     }
-  }, [user_id]);
+  }, [user_id, toast]);
 
   return (
     <div className="flex flex-col items-center gap-6 mb-5">
