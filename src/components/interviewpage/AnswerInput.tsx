@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheck } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faX } from '@fortawesome/free-solid-svg-icons';
 import addQuestionIcon from '../../assets/ic-add-question.svg';
 import micIcon from '../../assets/micIcon.png';
 import { SubmitButton } from '../common/Button';
@@ -366,6 +366,26 @@ export default function AnswerInput({
                   className="w-4 h-4"
                 />
                 {isFollowUpOpen ? '추가 질문 닫기' : '추가 질문하기'}
+              </button>
+            )}
+
+            {editMode && (
+              <button
+                onClick={() => {
+                  setEditMode(false);
+                  setAnswer(initialAnswer);
+                }}
+                className="
+            flex items-center gap-2 border border-gray-200 rounded-xl px-3 py-1 transition
+            hover:bg-gray-40 cursor-pointer
+          "
+              >
+                <FontAwesomeIcon
+                  icon={faX}
+                  className="text-gray-100"
+                  size="sm"
+                />
+                수정 취소하기
               </button>
             )}
           </>
