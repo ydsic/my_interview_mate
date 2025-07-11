@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from 'react';
 import { useUserDataStore } from '../../store/userData';
 import Button from '../common/Button';
@@ -28,8 +27,6 @@ export default function Profile() {
   const toast = useToast();
   const storeUserData = useUserDataStore((state) => state.userData);
 
-  // 받아오는 데이터는 userData
-  // 보낼거는 formData
   const [userData, setUserData] = useState<UserData | null>(null);
   const [formData, setFormData] = useState<FormData>({
     nickname: '',
@@ -62,12 +59,12 @@ export default function Profile() {
 
           setPreviewImg(user.profile_img || defaultProfileImg);
         }
-      } catch (err: any) {
+      } catch (error: unknown) {
+        const err = error as Error;
         console.log('유저 정보 불러오기 실패 : ', err);
         toast('유저 정보를 불러오는 데 실패 했습니다.', 'error');
       }
     };
-
     if (storeUserData.user_id) fetchUserData();
   }, [storeUserData.user_id, toast]);
 
@@ -107,11 +104,6 @@ export default function Profile() {
     setSelectedImageFile(null);
   };
 
-  // 수정 모드
-  const startEditing = () => {
-    setIsEditing(true);
-  };
-
   // 수정 모드 해제
   const endEditing = () => {
     resetForm();
@@ -145,7 +137,7 @@ export default function Profile() {
       toast('프로필이 성공적으로 저장되었습니다.', 'success');
 
       setIsEditing(false);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.log('프로필 저장 실패 : ', err);
     }
   };
@@ -166,9 +158,7 @@ export default function Profile() {
         <div className="relative">
           <img
             className="h-20 w-20 rounded-full object-cover"
-            src={
-              previewImg && previewImg !== '' ? previewImg : defaultProfileImg
-            }
+            src={previewImg || defaultProfileImg}
             alt="프로필 사진"
           />
           {isEditing && (
@@ -236,7 +226,7 @@ export default function Profile() {
           </>
         ) : (
           <>
-            <Button onClick={startEditing}> 프로필 수정 </Button>
+            <Button onClick={() => setIsEditing(true)}> 프로필 수정 </Button>
           </>
         )}
       </div>
