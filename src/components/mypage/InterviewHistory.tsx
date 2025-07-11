@@ -43,9 +43,11 @@ export default function InterviewHistory() {
   const [items, setItems] = useState<RawItem[]>([]);
   const [editMode, setEditMode] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [isFetching, setIsFetching] = useState(false);
+  const [prevItems, setPrevItems] = useState<RawItem[]>([]);
   const [error, setError] = useState<string | null>(null);
   const toast = useToast();
-  //페이지 네이션
+  // 페이지 네이션
   const [searchParams, setSearchParams] = useSearchParams();
   const pageParam = Number(searchParams.get('page')) || 1;
   const [total, setTotal] = useState<number>(0);
@@ -57,6 +59,9 @@ export default function InterviewHistory() {
     if (!user_id) return;
 
     async function fetchHistory() {
+      if (!loading) {
+        setIsFetching(true);
+      }
       try {
         const { data, total } = await getInterviewHistory(
           user_id,
@@ -78,6 +83,8 @@ export default function InterviewHistory() {
         setError('면접 기록을 불러오는 중 오류가 발생했습니다.');
       } finally {
         setLoading(false);
+        setIsFetching(false);
+        setPrevItems(items);
       }
     }
 
@@ -89,7 +96,7 @@ export default function InterviewHistory() {
     setEditMode((prev) => !prev);
   };
 
-  // 삭제 로직,
+  // 삭제 로직
   const handleDelete = async (id: number) => {
     try {
       await deleteInterviewHistory(id);
@@ -108,7 +115,7 @@ export default function InterviewHistory() {
   };
 
   return (
-    <section className="max-w-7xl mx-auto rounded-3xl bg-white p-6 shadow-md flex flex-col justify-between min-h-[720px]">
+    <section className="max-w-7xl mx-auto rounded-3xl bg-white p-6 shadow-md flex flex-col justify-start min-h-[730px]">
       {/* 제목 */}
       <H3_sub_detail>최근 면접 기록</H3_sub_detail>
 
@@ -131,103 +138,94 @@ export default function InterviewHistory() {
           className="flex-grow"
         >
           {/* 리스트 */}
-          <AnimatePresence mode="wait">
-            <motion.ul
-              key={pageParam}
-              initial={{ opacity: 0, x: direction > 0 ? 100 : -50 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: direction > 0 ? -100 : 50 }}
-              transition={{ duration: 0.4, ease: 'easeInOut' }}
-              className="relative space-y-3 pt-6 pb-13 "
-            >
-              {items.map(({ answer_id, created_at, question, feedback }) => (
-                <motion.li
-                  key={answer_id}
-                  layout
-                  initial={false}
-                  animate={{
-                    x: editMode ? 10 : 0,
-                    width: editMode ? '98%' : '100%',
-                  }}
-                  exit={{
-                    opacity: 0,
-                    x: -20,
-                    height: 0,
-                    marginTop: 0,
-                    marginBottom: 0,
-                    paddingTop: 0,
-                    paddingBottom: 0,
-                  }}
-                  transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-                  style={{ transformOrigin: 'right center' }}
-                  className={`flex items-center justify-between rounded-md bg-gray-50 shadow-sm px-4 py-5 mb-5 ${editMode ? 'ml-auto' : 'w-full'}`}
-                >
-                  {/* 삭제버튼 */}
-                  {editMode && (
-                    <button
-                      type="button"
-                      onClick={() => handleDelete(answer_id)}
-                      aria-label="delete history"
-                      className="items-center justify-center flex border rounded-3xl h-7 w-7 absolute -left-10 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 transition-colors cursor-pointer"
-                    >
-                      <FontAwesomeIcon
-                        icon={faXmark}
-                        className="items-center justify-center flex"
-                      />
-                    </button>
-                  )}
-
-                  {/* 면접 질문 / 카테고리 */}
-                  <div className="mt-1 flex flex-col gap-4 max-w-[65%]">
-                    <H3_sub_detail>{question.content}</H3_sub_detail>
-                    <div className="flex items-center gap-2 text-base font-semibold">
-                      <span
-                        className={`inline-flex justify-center items-center text-center h-7 min-w-28 py-4 rounded-lg  ${CATEGORY_STYLES[question.category]?.bg} ${CATEGORY_STYLES[question.category]?.text}`}
+          <motion.ul layout className="relative space-y-3 pt-6 pb-13 flex-grow">
+            <AnimatePresence mode="popLayout" initial={false}>
+              {' '}
+              {(isFetching ? prevItems : items).map(
+                ({ answer_id, created_at, question, feedback }) => (
+                  <motion.li
+                    key={answer_id}
+                    layout
+                    initial={{ opacity: 0, x: direction > 0 ? 40 : -40 }}
+                    animate={{
+                      opacity: 1,
+                      x: editMode ? 10 : 0,
+                      width: editMode ? '98%' : '100%',
+                    }}
+                    exit={{ opacity: 0, x: direction > 0 ? -40 : 40 }}
+                    transition={{ duration: 0.35 }}
+                    style={{ transformOrigin: 'right center' }}
+                    className={`flex items-center justify-between rounded-md bg-gray-50 shadow-sm px-4 py-5 mb-5 ${
+                      editMode ? 'ml-auto' : 'w-full'
+                    }`}
+                  >
+                    {/* 삭제버튼 */}
+                    {editMode && (
+                      <button
+                        type="button"
+                        onClick={() => handleDelete(answer_id)}
+                        aria-label="delete history"
+                        className="items-center justify-center flex border rounded-3xl h-7 w-7 absolute -left-10 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 transition-colors cursor-pointer"
                       >
-                        {question.category === 'front-end'
-                          ? 'Front-end'
-                          : question.category.toUpperCase()}
-                      </span>
+                        <FontAwesomeIcon icon={faXmark} />
+                      </button>
+                    )}
 
-                      <H4_placeholder className="ml-2 text-gray-70 font-extralight">
-                        {new Date(created_at).toLocaleDateString()}
-                      </H4_placeholder>
+                    {/* 면접 질문 / 카테고리 */}
+                    <div className="mt-1 flex flex-col gap-4 max-w-[65%]">
+                      <H3_sub_detail>{question.content}</H3_sub_detail>
+                      <div className="flex items-center gap-2 text-base font-semibold">
+                        <span
+                          className={`inline-flex justify-center items-center text-center h-7 min-w-28 py-4 rounded-lg ${
+                            CATEGORY_STYLES[question.category]?.bg
+                          } ${CATEGORY_STYLES[question.category]?.text}`}
+                        >
+                          {question.category === 'front-end'
+                            ? 'Front-end'
+                            : question.category.toUpperCase()}
+                        </span>
+
+                        <H4_placeholder className="ml-2 text-gray-70 font-extralight">
+                          {new Date(created_at).toLocaleDateString()}
+                        </H4_placeholder>
+                      </div>
                     </div>
-                  </div>
 
-                  {/* 오른쪽: 점수 & 다시보기 */}
-                  <div className="flex items-center gap-3 shrink-0">
-                    <H2_content_title>
-                      {feedback?.average ?? '-'}점
-                    </H2_content_title>
-                    <WhiteButton
-                      onClick={() =>
-                        navigate(
-                          editMode
-                            ? `/interview-view/${answer_id}?mode=edit`
-                            : `/interview-view/${answer_id}`,
-                          {
-                            state: {
-                              answerId: answer_id,
+                    {/* 오른쪽: 점수 & 다시보기 */}
+                    <div className="flex items-center gap-3 shrink-0">
+                      <H2_content_title>
+                        {feedback?.average ?? '-'} 점
+                      </H2_content_title>
+                      <WhiteButton
+                        onClick={() =>
+                          navigate(
+                            editMode
+                              ? `/interview-view/${answer_id}?mode=edit`
+                              : `/interview-view/${answer_id}`,
+                            {
+                              state: {
+                                answerId: answer_id,
+                              },
                             },
-                          },
-                        )
-                      }
-                    >
-                      {editMode ? '수정하기' : '다시보기'}
-                    </WhiteButton>
-                  </div>
-                </motion.li>
-              ))}
-            </motion.ul>
-          </AnimatePresence>
+                          )
+                        }
+                      >
+                        {editMode ? '수정하기' : '다시보기'}
+                      </WhiteButton>
+                    </div>
+                  </motion.li>
+                ),
+              )}
+            </AnimatePresence>
+          </motion.ul>
         </motion.div>
       )}
+
       {/* 하단 버튼 */}
       {items.length > 0 && (
         <div className="relative">
           {/* 수정버튼 */}
-          <div className="absolute  right-0 top-0">
+          <div className="absolute right-0 top-0">
             <Button onClick={toggleEditMode}>
               {editMode ? '히스토리 내역 수정' : '히스토리 수정'}
             </Button>
@@ -262,11 +260,11 @@ export default function InterviewHistory() {
             })}
 
             <button
-              onClick={() => {
+              onClick={() =>
                 handlePageChange(
                   Math.min(pageParam + 1, Math.ceil(total / PAGE_SIZE)),
-                );
-              }}
+                )
+              }
               disabled={pageParam >= Math.ceil(total / PAGE_SIZE)}
               className="px-4 py-2 rounded bg-gray-40 text-black disabled:opacity-50 cursor-pointer"
             >

@@ -167,7 +167,7 @@ export default function Bookmark() {
                 {/* 오른쪽: 점수 & 다시보기 */}
                 <div className="flex items-center gap-5 shrink-0">
                   <H2_content_title>
-                    {bookmark.average_score}점
+                    {bookmark.average_score ?? '-'} 점
                   </H2_content_title>
                   <WhiteButton
                     onClick={() => handleButtonClick(bookmark.question_id)}
