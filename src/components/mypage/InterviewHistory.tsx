@@ -55,40 +55,37 @@ export default function InterviewHistory() {
   const navigate = useNavigate();
   const [direction, setDirection] = useState(0);
 
-  useEffect(() => {
+  const fetchHistory = async (page: number) => {
     if (!user_id) return;
-
-    async function fetchHistory() {
-      if (!loading) {
-        setIsFetching(true);
-      }
-      try {
-        const { data, total } = await getInterviewHistory(
-          user_id,
-          pageParam,
-          PAGE_SIZE,
-        );
-        const normalized = data.map((item) => ({
-          ...item,
-          question: Array.isArray(item.question)
-            ? item.question[0]
-            : item.question,
-          feedback: Array.isArray(item.feedback)
-            ? item.feedback[0]
-            : item.feedback,
-        }));
-        setItems(normalized);
-        setTotal(total);
-      } catch {
-        setError('면접 기록을 불러오는 중 오류가 발생했습니다.');
-      } finally {
-        setLoading(false);
-        setIsFetching(false);
-        setPrevItems(items);
-      }
+    setIsFetching(true);
+    try {
+      const { data, total } = await getInterviewHistory(
+        user_id,
+        page,
+        PAGE_SIZE,
+      );
+      const normalized = data.map((item) => ({
+        ...item,
+        question: Array.isArray(item.question)
+          ? item.question[0]
+          : item.question,
+        feedback: Array.isArray(item.feedback)
+          ? item.feedback[0]
+          : item.feedback,
+      }));
+      setItems(normalized);
+      setPrevItems(normalized);
+      setTotal(total);
+    } catch {
+      setError('면접 기록을 불러오는 중 오류가 발생했습니다.');
+    } finally {
+      setLoading(false);
+      setIsFetching(false);
     }
+  };
 
-    fetchHistory();
+  useEffect(() => {
+    fetchHistory(pageParam);
   }, [user_id, pageParam]);
 
   // 수정버튼 토글
@@ -102,6 +99,7 @@ export default function InterviewHistory() {
       await deleteInterviewHistory(id);
       setItems((prev) => prev.filter((item) => item.answer_id !== id));
       toast('면접 기록을 삭제했어요.', 'success');
+      fetchHistory(pageParam);
     } catch {
       toast('기록 삭제에 실패했습니다.', 'error');
     }
