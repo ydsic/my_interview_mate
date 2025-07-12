@@ -96,15 +96,17 @@ export default function InterviewHistory() {
   };
 
   // 삭제 로직
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (answerId: number, questionId: number) => {
     modal({
       title: '면접 기록 삭제',
-      description: '정말 삭제할까요?\n삭제 시 즐겨찾기도 함께 삭제됩니다.',
+      description: '정말 삭제할까요?\n삭제시 즐겨찾기도 함께 삭제됩니다.',
       confirmText: '삭제',
       onConfirm: async () => {
         try {
-          await deleteInterviewHistory(id);
-          setItems((prev) => prev.filter((item) => item.answer_id !== id));
+          await deleteInterviewHistory(answerId, questionId, user_id);
+          setItems((prev) =>
+            prev.filter((item) => item.answer_id !== answerId),
+          );
           toast('면접 기록을 삭제했어요.', 'success');
           fetchHistory(pageParam);
         } catch {
@@ -154,7 +156,13 @@ export default function InterviewHistory() {
             <AnimatePresence mode="popLayout" initial={false}>
               {' '}
               {(isFetching ? prevItems : items).map(
-                ({ answer_id, created_at, question, feedback }) => (
+                ({
+                  answer_id,
+                  question_id,
+                  created_at,
+                  question,
+                  feedback,
+                }) => (
                   <motion.li
                     key={answer_id}
                     layout
@@ -175,7 +183,7 @@ export default function InterviewHistory() {
                     {editMode && (
                       <button
                         type="button"
-                        onClick={() => handleDelete(answer_id)}
+                        onClick={() => handleDelete(answer_id, question_id)}
                         aria-label="delete history"
                         className="items-center justify-center flex border rounded-3xl h-7 w-7 absolute -left-10 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 transition-colors cursor-pointer"
                       >
