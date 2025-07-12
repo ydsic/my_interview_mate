@@ -66,10 +66,7 @@ export default function UserMain() {
         <div className="flex justify-center w-full ">
           <div className="grid grid-cols-3 gap-10 text-center w-full ">
             {topics.map((topic) => (
-              <div
-                key={topic.category}
-                className="flex flex-col gap-5 cursor-pointer"
-              >
+              <div key={topic.category} className="flex flex-col gap-5">
                 <div>
                   <p className={`font-semibold text-lg ${topic.colorClass}`}>
                     {topic.category}
