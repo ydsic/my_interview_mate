@@ -83,20 +83,6 @@ export default function InterviewPage() {
 
       const [main, ...others] = data;
 
-      // try {
-      //   const data = await getQuestionsByCategoryAndTopic(
-      //     rawCategory,
-      //     topicParam,
-      //   );
-      //   // API 요청 확인용
-      //   console.log('불러온 질문 수:', data.length);
-      //   console.log('data 내용:', data);
-
-      //   if (!data.length) throw new Error('질문 없음');
-
-      //   const idx = Math.floor(Math.random() * data.length);
-      //   const pick = data[idx];
-
       // 메인 질문 세팅
       setQuestion({
         questionId: main.question_id,
@@ -104,17 +90,6 @@ export default function InterviewPage() {
         topic: main.topic,
         question: main.content,
       });
-
-      // 추가 질문 나머지 질문 목록에서 랜덤으로 3개 뽑기
-
-      // const otherQuestion = data
-      //   .filter((_, i) => i !== idx)
-      //   .map((q) => ({
-      //     questionId: q.question_id,
-      //     category: rawCategory as CategoryKey,
-      //     topic: q.topic,
-      //     question: q.content,
-      //   }));
 
       // 추가 질문 세팅
       setFollowUpQuestions(
