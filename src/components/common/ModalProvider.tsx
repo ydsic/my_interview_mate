@@ -16,11 +16,15 @@ export default function ModalProvider() {
         key={modal.id}
         className="fixed inset-0 z-[9998] bg-black/40 flex items-center justify-center"
       >
-        <motion.div className="w-[90%] max-w-md bg-white rounded-2xl shadow-xl p-6">
-          <H2_content_title>{modal.title}</H2_content_title>
-          {modal.description && (
-            <H4_placeholder>{modal.description}</H4_placeholder>
-          )}
+        <motion.div className="flex-col justify-center items-center w-[90%] max-w-md bg-white rounded-2xl shadow-xl p-6">
+          <div className="mb-5 text-center">
+            <H2_content_title>{modal.title}</H2_content_title>
+            {modal.description && (
+              <H4_placeholder className="pt-5">
+                {modal.description}
+              </H4_placeholder>
+            )}
+          </div>
 
           <div className="flex justify-center gap-4">
             <WhiteButton
@@ -28,6 +32,7 @@ export default function ModalProvider() {
                 modal.onCancel?.();
                 close();
               }}
+              className="px-10 py-3 h-auto"
             >
               {modal.cancelText}
             </WhiteButton>
@@ -36,6 +41,7 @@ export default function ModalProvider() {
                 modal.onConfirm?.();
                 close();
               }}
+              className=""
             >
               {modal.confirmText}
             </Button>
