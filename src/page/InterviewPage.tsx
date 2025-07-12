@@ -193,6 +193,10 @@ export default function InterviewPage() {
 
   // 즐겨찾기 등록 토글
   const handleBookMark = () => {
+    if (!showFeedback) {
+      toast('질문에 대한 답변을 제출해 주세요.', 'info');
+      return;
+    }
     const next = !isBookMarked;
     const questionId = question.questionId;
 
