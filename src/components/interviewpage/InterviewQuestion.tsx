@@ -77,8 +77,7 @@ export default function InterviewQuestion({
 
         {/* 즐겨찾기 아이콘 */}
         <button
-          onClick={canBookmark ? onToggleBookmark : undefined}
-          disabled={!canBookmark}
+          onClick={onToggleBookmark}
           className={`
             text-[24px] transition
             ${canBookmark ? 'cursor-pointer' : 'cursor-not-allowed opacity-40'}
