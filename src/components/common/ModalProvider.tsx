@@ -20,7 +20,7 @@ export default function ModalProvider() {
           <div className="mb-5 text-center">
             <H2_content_title>{modal.title}</H2_content_title>
             {modal.description && (
-              <H4_placeholder className="pt-5">
+              <H4_placeholder className="pt-5 whitespace-pre-line">
                 {modal.description}
               </H4_placeholder>
             )}

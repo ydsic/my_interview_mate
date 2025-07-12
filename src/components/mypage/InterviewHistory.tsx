@@ -16,6 +16,7 @@ import {
 import type { InterviewHistoryItem as RawItem } from '../../api/historyAPI';
 import { useToast } from '../../hooks/useToast';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useModal } from '../../hooks/useModal';
 
 const CATEGORY_STYLES: Record<
   string,
@@ -47,6 +48,7 @@ export default function InterviewHistory() {
   const [prevItems, setPrevItems] = useState<RawItem[]>([]);
   const [error, setError] = useState<string | null>(null);
   const toast = useToast();
+  const modal = useModal();
   // 페이지 네이션
   const [searchParams, setSearchParams] = useSearchParams();
   const pageParam = Number(searchParams.get('page')) || 1;
@@ -95,14 +97,22 @@ export default function InterviewHistory() {
 
   // 삭제 로직
   const handleDelete = async (id: number) => {
-    try {
-      await deleteInterviewHistory(id);
-      setItems((prev) => prev.filter((item) => item.answer_id !== id));
-      toast('면접 기록을 삭제했어요.', 'success');
-      fetchHistory(pageParam);
-    } catch {
-      toast('기록 삭제에 실패했습니다.', 'error');
-    }
+    modal({
+      title: '면접 기록 삭제',
+      description: '정말 삭제할까요?\n삭제 시 즐겨찾기도 함께 삭제됩니다.',
+      confirmText: '삭제',
+      onConfirm: async () => {
+        try {
+          await deleteInterviewHistory(id);
+          setItems((prev) => prev.filter((item) => item.answer_id !== id));
+          toast('면접 기록을 삭제했어요.', 'success');
+          fetchHistory(pageParam);
+        } catch {
+          toast('기록 삭제에 실패했습니다.', 'error');
+        }
+      },
+      onCancel: () => {},
+    });
   };
 
   const handlePageChange = (page: number) => {
