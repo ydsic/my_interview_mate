@@ -12,6 +12,7 @@ import AdminPage from './page/AdminPage';
 import CheckAdminUuid from './components/mainpage/CheckAdminUuid';
 import NotFound from './page/NotFound';
 import InterviewViewPage from './page/InterviewViewPage';
+import ModalProvider from './components/common/ModalProvider';
 
 function LayoutWrapper() {
   return (
@@ -24,6 +25,7 @@ function LayoutWrapper() {
 export default function App() {
   return (
     <>
+      <ModalProvider />
       <ToastProvider />
       <BrowserRouter>
         <Nav />

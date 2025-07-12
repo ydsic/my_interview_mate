@@ -17,6 +17,7 @@ import { useToast } from '../../hooks/useToast';
 import { debounce } from 'lodash';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useModal } from '../../hooks/useModal';
 
 const CATEGORY_STYLES: Record<
   string,
@@ -52,6 +53,9 @@ export default function Bookmark() {
   const toast = useToast();
   const navigate = useNavigate();
 
+  // 모달
+  const modal = useModal();
+
   const fetchBookMarks = async (page: number) => {
     try {
       const { data, total } = await selectBookMarks(user_id, page, PAGE_SIZE);
@@ -70,21 +74,24 @@ export default function Bookmark() {
   const handleBookMark = useMemo(
     () =>
       debounce(async (questionId: number) => {
-        const confirmed = window.confirm(
-          '이 질문을 즐겨찾기에서 삭제하시겠습니까?',
-        );
-        if (!confirmed) return;
-
-        try {
-          await deleteBookMark(user_id, questionId);
-          toast('즐겨찾기에서 삭제했어요!', 'success');
-          fetchBookMarks(pageParam);
-        } catch (err: unknown) {
-          console.error('[북마크 삭제 에러] : ', err);
-          toast('북마크 삭제에 실패했어요.', 'error');
-        }
+        modal({
+          title: '즐겨찾기 삭제',
+          description: '이 질문을 즐겨찾기에서 삭제하시겠습니까?',
+          confirmText: '삭제',
+          onConfirm: async () => {
+            try {
+              await deleteBookMark(user_id, questionId);
+              toast('즐겨찾기에서 삭제했어요!', 'success');
+              fetchBookMarks(pageParam);
+            } catch (err: unknown) {
+              console.error('[북마크 삭제 에러] : ', err);
+              toast('즐겨찾기 삭제에 실패했어요.', 'error');
+            }
+          },
+          onCancel: () => {},
+        });
       }, 500),
-    [user_id, pageParam],
+    [user_id, pageParam, modal, toast],
   );
 
   const handleButtonClick = async (questionId: number) => {
