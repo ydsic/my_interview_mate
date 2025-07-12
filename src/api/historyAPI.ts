@@ -2,6 +2,7 @@ import { supabase } from '../supabaseClient';
 
 export interface InterviewHistoryItem {
   answer_id: number;
+  question_id: number;
   created_at: string;
   updated_at: string;
   question: { content: string; category: string };
@@ -22,6 +23,7 @@ export async function getInterviewHistory(
     .select(
       `
       answer_id,
+      question_id,
       created_at,
       updated_at,                            
       questions!answers_question_id_fkey (content, category),
@@ -48,6 +50,7 @@ export async function getInterviewHistory(
 
     return {
       answer_id: item.answer_id,
+      question_id: item.question_id,
       created_at: item.created_at,
       updated_at: item.updated_at,
       question: q ?? { content: '알 수 없음', category: '' },
@@ -61,8 +64,12 @@ export async function getInterviewHistory(
   };
 }
 
-// 면접 기록 삭제 api
-export async function deleteInterviewHistory(answerId: number) {
+// 면접 기록 삭제 + 북마크도 같이 삭제됨 api
+export async function deleteInterviewHistory(
+  answerId: number,
+  questionId: number,
+  uwerId: string,
+) {
   //feedback에서 먼저 삭제
   const { error: fbErr } = await supabase
     .from('feedback')
@@ -83,5 +90,15 @@ export async function deleteInterviewHistory(answerId: number) {
   if (ansErr) {
     console.error('답변 삭제 실패:', ansErr);
     throw ansErr;
+  }
+
+  // bookmark 삭제
+  const { error: bmErr } = await supabase
+    .from('bookmark')
+    .delete()
+    .eq('question_id', questionId);
+  if (bmErr) {
+    console.error('즐겨찾기 삭제 실패');
+    throw bmErr;
   }
 }
