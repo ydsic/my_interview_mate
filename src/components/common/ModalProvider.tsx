@@ -23,8 +23,22 @@ export default function ModalProvider() {
           )}
 
           <div className="flex justify-center gap-4">
-            <WhiteButton>{modal.cancelText}</WhiteButton>
-            <Button>{modal.confirmText}</Button>
+            <WhiteButton
+              onClick={() => {
+                modal.onCancel?.();
+                close();
+              }}
+            >
+              {modal.cancelText}
+            </WhiteButton>
+            <Button
+              onClick={() => {
+                modal.onConfirm?.();
+                close();
+              }}
+            >
+              {modal.confirmText}
+            </Button>
           </div>
         </motion.div>
       </motion.div>
