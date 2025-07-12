@@ -31,6 +31,7 @@ export const saveAnswer = async (
           user_id,
           question_id,
           content,
+          updated_at: new Date(),
         },
       ],
       {
