@@ -20,6 +20,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCaretLeft } from '@fortawesome/free-solid-svg-icons';
 import { H4_placeholder } from '../common/HTagStyle';
 import { useToast } from '../../hooks/useToast';
+import { useModal } from '../../hooks/useModal';
 
 export default function QuestionList({ setView }: setViewType) {
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -31,6 +32,7 @@ export default function QuestionList({ setView }: setViewType) {
   const [editContent, setEditContent] = useState('');
 
   const toast = useToast();
+  const modal = useModal();
 
   const categoryTopicMap: Record<string, string[]> = {
     'front-end': ['react', 'javascript', 'nextjs'],
@@ -107,14 +109,34 @@ export default function QuestionList({ setView }: setViewType) {
   };
 
   const handleDelete = async (question_id: number) => {
-    if (!window.confirm('정말 삭제하시겠습니까?')) return;
-    const res = await deleteQuestion(question_id);
-    if (res.error) {
-      alert('질문 삭제 실패: ' + res.error.message);
-      return;
-    }
-    fetchQuestions().then((res) => {
-      if (res.data) setQuestions(res.data);
+    modal({
+      title: '질문 삭제하기',
+      description: '정말 삭제하시겠습니까?',
+      confirmText: '삭제',
+      onConfirm: async () => {
+        try {
+          if (!question_id) throw new Error('question_id 가 비었습니다.');
+          const { error } = await deleteQuestion(question_id);
+          if (error) throw error;
+
+          toast('질문이 삭제되었습니다.', 'success');
+
+          const { data } = await fetchQuestions();
+          if (data) setQuestions(data);
+          close();
+        } catch (err: any) {
+          if (err.code == '23503') {
+            toast(
+              '해당 질문에 대한 답변으로 인해 삭제가 불가능합니다.\n질문 삭제 이전에 관련 답변을 먼저 삭제해 주세요.',
+              'error',
+            );
+          } else {
+            toast(err.message ?? '질문 삭제에 실패했습니다.', 'error');
+          }
+          console.error(err);
+        }
+      },
+      onCancel: () => {},
     });
   };
 

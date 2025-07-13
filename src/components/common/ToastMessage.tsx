@@ -48,7 +48,9 @@ export default function ToastMessage({ id, message, type = 'info' }: Toast) {
       </span>
 
       {/* 메시지 */}
-      <p className="flex-1 text-center text-lg text-gray-100">{message}</p>
+      <p className="p-2 flex-1 text-center text-lg text-gray-100 whitespace-pre-line">
+        {message}
+      </p>
     </motion.div>
   );
 }

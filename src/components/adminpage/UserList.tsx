@@ -15,6 +15,8 @@ import { H4_placeholder } from '../common/HTagStyle';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCaretLeft, faUser } from '@fortawesome/free-solid-svg-icons';
 import Button from '../common/Button';
+import { useModal } from '../../hooks/useModal';
+import { useToast } from '../../hooks/useToast';
 
 export default function UserList({ setView }: setViewType) {
   const [users, setUsers] = useState<User[]>([]);
@@ -24,6 +26,12 @@ export default function UserList({ setView }: setViewType) {
   const [error, setError] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editedNickname, setEditedNickname] = useState('');
+
+  // 모달 추가
+  const modal = useModal();
+
+  // 토스트 메시지 추가
+  const toast = useToast();
 
   useEffect(() => {
     const loadUsers = async () => {
@@ -59,37 +67,41 @@ export default function UserList({ setView }: setViewType) {
       if (error) {
         throw new Error('사용자 정보 수정에 실패했습니다.');
       }
+
       const { data } = await fetchUsers();
       setUsers(data || []);
       setSelectedUser((prev) =>
         prev ? { ...prev, nickname: editedNickname } : null,
       );
       setIsEditing(false);
-      alert('사용자 정보가 수정되었습니다.');
+      toast('사용자 정보가 수정되었습니다.', 'success');
     } catch (err: any) {
       alert(err.message);
     }
   };
 
   const handleDeleteUser = async () => {
-    if (
-      !selectedUser ||
-      !window.confirm(
-        `${selectedUser.nickname} 사용자를 정말 삭제하시겠습니까?`,
-      )
-    )
-      return;
-    try {
-      const { error } = await deleteUser(selectedUser.user_id);
-      if (error) {
-        throw new Error('사용자 삭제에 실패했습니다.');
-      }
-      setUsers(users.filter((u) => u.user_id !== selectedUser.user_id));
-      setSelectedUser(null);
-      alert('사용자가 삭제되었습니다.');
-    } catch (err: any) {
-      alert(err.message);
-    }
+    if (!selectedUser) return;
+    modal({
+      title: '사용자 삭제',
+      description: `${selectedUser.nickname} 사용자를 정말 삭제하시겠습니까?`,
+      confirmText: '삭제',
+      onConfirm: async () => {
+        try {
+          const { error } = await deleteUser(selectedUser.user_id);
+          if (error) {
+            throw new Error('사용자 삭제에 실패했습니다.');
+          }
+
+          setUsers(users.filter((u) => u.user_id !== selectedUser.user_id));
+          setSelectedUser(null);
+          toast('사용자가 삭제되었습니다.', 'success');
+        } catch (err: any) {
+          alert(err.message);
+        }
+      },
+      onCancel: () => {},
+    });
   };
 
   if (isLoading) {
@@ -154,6 +166,7 @@ export default function UserList({ setView }: setViewType) {
                 사용자 정보
               </button>
               {/* <button
+
                 className={`py-3 px-6 font-medium transition-all duration-200 border-b-2 ${
                   activeTab === 'tab2'
                     ? 'border-[#427CF5] text-slate-800'
