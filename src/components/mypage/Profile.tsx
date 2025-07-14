@@ -11,6 +11,7 @@ import { loginUserInfo } from '../../api/userInfo';
 import { useToast } from '../../hooks/useToast';
 import InputOrText from './InputOrText';
 import { H3_sub_detail } from '../common/HTagStyle';
+import { useModal } from '../../hooks/useModal';
 
 type UserData = {
   user_id: string;
@@ -38,6 +39,7 @@ export default function Profile() {
   const [previewImg, setPreviewImg] = useState<string>(defaultProfileImg);
   const [isEditing, setIsEditing] = useState(false); // '수정하기' - 편집 상태 확인
   const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
+  const modal = useModal();
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -105,10 +107,10 @@ export default function Profile() {
   };
 
   // 수정 모드 해제
-  const endEditing = () => {
-    resetForm();
-    setIsEditing(false);
-  };
+  // const endEditing = () => {
+  //   resetForm();
+  //   setIsEditing(false);
+  // };
 
   const saveChanges = async () => {
     if (!userData) return;
@@ -145,6 +147,30 @@ export default function Profile() {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     saveChanges();
+  };
+  // 모달 적용
+  const handleEditClick = () => {
+    modal({
+      title: '프로필 수정',
+      description: '프로필을 저장하시겠습니까?',
+      confirmText: '저장',
+      cancelText: '닫기',
+      onConfirm: () => saveChanges(),
+    });
+  };
+
+  const handelCancelEdit = () => {
+    modal({
+      title: '수정 취소',
+      description:
+        '저장하지 않은 변경 사항이 모두 사라집니다.\n 계속하시겠습니까?',
+      confirmText: '네',
+      cancelText: '아니요',
+      onConfirm: () => {
+        resetForm();
+        setIsEditing(false);
+      },
+    });
   };
 
   return (
@@ -217,12 +243,16 @@ export default function Profile() {
         {isEditing ? (
           <>
             <button
+              type="button"
               className="px-10 py-3 bg-gray-25 text-gray-70 font-semibold rounded-xl cursor-pointer hover:bg-gray-40"
-              onClick={endEditing}
+              onClick={handelCancelEdit}
             >
               되돌리기
             </button>
-            <Button type="submit"> 저장하기</Button>
+            <Button type="button" onClick={handleEditClick}>
+              {' '}
+              저장하기
+            </Button>
           </>
         ) : (
           <>
