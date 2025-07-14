@@ -106,12 +106,6 @@ export default function Profile() {
     setSelectedImageFile(null);
   };
 
-  // 수정 모드 해제
-  // const endEditing = () => {
-  //   resetForm();
-  //   setIsEditing(false);
-  // };
-
   const saveChanges = async () => {
     if (!userData) return;
 
@@ -130,6 +124,16 @@ export default function Profile() {
         ...formData,
         profile_img,
       });
+
+      // 프로필 수정하고, 새로고침 없이 되돌리기 했을 때 이전 데이터 나오길래 수정
+      const newUser = {
+        ...userData,
+        ...formData,
+        profile_img,
+      };
+      setUserData(newUser);
+      setFormData(newUser);
+      setPreviewImg(profile_img || defaultProfileImg);
 
       useUserDataStore.getState().setUserData({
         ...storeUserData,
