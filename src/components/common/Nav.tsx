@@ -2,6 +2,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useLoggedInStore, useUserDataStore } from '../../store/userData';
 import logoutIcon from '../../assets/logout.svg';
 import { supabase } from '../../supabaseClient';
+import { useToast } from '../../hooks/useToast';
 
 export default function Nav() {
   const isLoggedIn = useLoggedInStore((state) => state.isLoggedIn);
@@ -9,12 +10,14 @@ export default function Nav() {
   const navigate = useNavigate();
   const admin = useUserDataStore((state) => state.userData.admin);
   const clearUserData = useUserDataStore((state) => state.clearUserData);
+  const toast = useToast();
 
   const handleLogout = async () => {
     await supabase.auth.signOut(); // 로그아웃 시 인증 토큰 삭제
     setIsLoggedIn(false);
     clearUserData();
     navigate('/');
+    toast('로그아웃이 되었습니다!', 'success');
   };
 
   return (
