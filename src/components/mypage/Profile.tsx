@@ -40,10 +40,12 @@ export default function Profile() {
   const [isEditing, setIsEditing] = useState(false); // '수정하기' - 편집 상태 확인
   const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
   const modal = useModal();
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
+        setIsLoading(true);
         const { data, error } = await loginUserInfo(storeUserData.user_id);
 
         if (error) throw error;
@@ -65,10 +67,40 @@ export default function Profile() {
         const err = error as Error;
         console.log('유저 정보 불러오기 실패 : ', err);
         toast('유저 정보를 불러오는 데 실패 했습니다.', 'error');
+      } finally {
+        setIsLoading(false);
       }
     };
     if (storeUserData.user_id) fetchUserData();
   }, [storeUserData.user_id, toast]);
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col gap-10 mb-5 bg-white p-[24px] rounded-4xl shadow-md animate-pulse">
+        <H3_sub_detail className="font-semibold">프로필 정보</H3_sub_detail>
+        <div className="flex items-center gap-5.5 h-20">
+          <div className="h-20 w-20 rounded-full bg-gray-25" />
+          <div className="flex flex-col grow justify-between h-full py-0.5 gap-2">
+            <div className="h-[36px] w-1/3 bg-gray-25 rounded-2xl" />
+            <div className="h-4 w-2/5 bg-gray-25 rounded-2xl" />
+          </div>
+        </div>
+        <div className="flex flex-col gap-5">
+          <div className="flex w-full gap-8 px-2 items-center">
+            <p className="flex-shrink-0"> 희망 직무</p>
+            <div className="h-12 flex-1 bg-gray-25 rounded-2xl" />
+          </div>
+          <div className="flex w-full gap-8 px-2 items-center">
+            <p className="flex-shrink-0"> 면접 목표</p>{' '}
+            <div className="h-12 flex-1 bg-gray-25 rounded-2xl" />
+          </div>
+        </div>
+        <div className="flex justify-end mt-auto gap-5">
+          <Button> 프로필 수정 </Button>
+        </div>
+      </div>
+    );
+  }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -180,7 +212,7 @@ export default function Profile() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex flex-col gap-10 mb-5 bg-white p-[30px] rounded-4xl shadow-md relative"
+      className="flex flex-col gap-10 mb-5 bg-white p-[24px] rounded-4xl shadow-md relative"
     >
       <H3_sub_detail className="font-semibold">프로필 정보</H3_sub_detail>
 
