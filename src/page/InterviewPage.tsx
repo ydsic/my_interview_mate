@@ -35,6 +35,7 @@ export default function InterviewPage() {
   const [answer, setAnswer] = useState('');
   const toast = useToast();
   const isFirstLoad = useRef(true);
+
   const [question, setQuestion] = useState<QuestionData>({
     questionId: 0,
     category: initialCategory,
@@ -42,109 +43,78 @@ export default function InterviewPage() {
     question: '질문을 불러오는 중입니다...',
   });
 
-  // 중복 질문 방지, 사용된 질문 id 저장
-  const [usedQuestionIds, setUsedQuestionIds] = useState<number[]>([]);
-  const [readyToFetch, setReadyToFetch] = useState(false);
-
-  // 추가 질문하기 토글
-  const [showFollowUp, setShowFollowUp] = useState(false);
-  const toggleFollowUp = () => setShowFollowUp((prev) => !prev);
-  // 추가 질문 useSate
+  const usedIdsRef = useRef<number[]>([]);
   const [followUpQuestions, setFollowUpQuestions] = useState<QuestionData[]>(
     [],
   );
+  const addUsed = (ids: number[]) => {
+    usedIdsRef.current = [...usedIdsRef.current, ...ids];
+  };
 
-  /* 즐겨찾기(bookmark) 등록 부분 */
+  // 추가 질문하기 토글
+  const [showFollowUp, setShowFollowUp] = useState(false);
+  const toggleFollowUp = async () => {
+    if (!showFollowUp && followUpQuestions.length === 0) {
+      await fetchFollowUps();
+    }
+    setShowFollowUp((value) => !value);
+  };
+  // 추가 질문 useSate
+
+  /*---- 즐겨찾기(bookmark) 등록 부분 ----*/
 
   // 유저 아이디 불러오기
   const user_id = useUserDataStore((state) => state.userData.user_id);
   const [isBookMarked, setIsBookMarked] = useState<boolean>(false);
 
   // 질문 불러오기 get요청
-  const fetchQuestion = useCallback(async () => {
-    // 유효성 체크
-    if (!isCategoryKey(rawCategory) || !topicParam) {
-      setQuestion({
-        questionId: 0,
-        category: rawCategory as CategoryKey,
-        topic: topicParam || '',
-        question: '잘못된 접근입니다.',
-      });
-      setFollowUpQuestions([]);
+
+  const fetchMain = async () => {
+    const [main] = await getQuestionsByCategoryAndTopic(
+      rawCategory!,
+      topicParam!,
+      1,
+      usedIdsRef.current,
+    );
+
+    if (!main) {
+      toast('더 이상 질문이 없습니다.', 'info');
       return;
     }
-    try {
-      const data = await getQuestionsByCategoryAndTopic(
-        rawCategory!,
-        topicParam!,
-        4,
-      );
+    console.log('가져온 질문:', main);
 
-      const newQuestions = data.filter(
-        (q) => !usedQuestionIds.includes(q.question_id),
-      );
-      // API 요청 확인용
-      console.log('rawCategory:', rawCategory, 'topicParam:', topicParam);
-      console.log('불러온 질문 수:', data.length);
-      console.log('data 내용:', data);
+    setQuestion({
+      questionId: main.question_id,
+      category: main.category,
+      topic: main.topic,
+      question: main.content,
+    });
 
-      if (newQuestions.length === 0) {
-        toast('해당 카테고리의 질문을 모두 사용했습니다.', 'info');
-        return;
-      } else if (!data.length) throw new Error('질문 없음');
+    usedIdsRef.current.push(main.question_id);
 
-      const [main, ...others] = newQuestions;
-
-      // 메인 질문 세팅
-      setQuestion({
-        questionId: main.question_id,
-        category: main.category as CategoryKey,
-        topic: main.topic,
-        question: main.content,
-      });
-
-      // 추가 질문 세팅
-      setFollowUpQuestions(
-        others.map((q) => ({
-          questionId: q.question_id,
-          category: q.category as CategoryKey,
-          topic: q.topic,
-          question: q.content,
-        })),
-      );
-
-      setUsedQuestionIds((prev) => [
-        ...prev,
-        main.question_id,
-        ...others.map((q) => q.question_id),
-      ]);
-
-      // 토스트 메시지
-      if (isFirstLoad.current) isFirstLoad.current = false;
-      else toast('새로운 질문이 도착했어요!', 'success');
-    } catch (e) {
-      console.error(e);
-      setQuestion({
-        questionId: 0,
-        category: rawCategory as CategoryKey,
-        topic: topicParam,
-        question: '질문을 불러오는 데 실패했습니다.',
-      });
-      setFollowUpQuestions([]);
-      toast('질문 로딩에 실패했어요...', 'error');
+    if (!isFirstLoad.current) {
+      toast('새로운 질문이 도착했어요!', 'success');
+    } else {
+      isFirstLoad.current = false;
     }
-  }, [rawCategory, topicParam, toast, usedQuestionIds]);
+  };
+  async function fetchFollowUps() {
+    const data = await getQuestionsByCategoryAndTopic(
+      rawCategory!,
+      topicParam!,
+      3,
+      usedIdsRef.current,
+    );
 
-  const debouncedFetch = useMemo(
-    () => debounce(fetchQuestion, 1000, { leading: true, trailing: false }),
-    [fetchQuestion],
-  );
+    console.log('추가질문:', data);
+    const filtered = data.filter((q) => q.question_id !== question.questionId);
 
-  useEffect(() => {
-    return () => {
-      debouncedFetch.cancel();
-    };
-  }, [debouncedFetch]);
+    setFollowUpQuestions(
+      filtered.map((q: any) => ({ ...q, question: q.content })),
+    );
+    filtered.forEach((q) => usedIdsRef.current.push(q.question_id));
+    toast('추가 질문을 불러왔어요!', 'success');
+  }
 
   const handleFeedback = async (answerText: string, feedback: string) => {
     setAnswer(answerText);
@@ -152,12 +122,13 @@ export default function InterviewPage() {
     setShowFeedback(true);
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     setShowFeedback(false);
     setAnswer('');
     setFeedbackContent('');
     setShowFollowUp(false);
-    debouncedFetch();
+    setFollowUpQuestions([]);
+    await fetchMain();
   };
 
   useEffect(() => {
@@ -224,17 +195,10 @@ export default function InterviewPage() {
   };
 
   useEffect(() => {
-    setUsedQuestionIds([]);
-    setReadyToFetch(true);
+    usedIdsRef.current = [];
+    setFollowUpQuestions([]);
+    fetchMain();
   }, [rawCategory, topicParam]);
-
-  // 중복 질문 상태 초기화
-  useEffect(() => {
-    if (readyToFetch) {
-      fetchQuestion();
-      setReadyToFetch(false);
-    }
-  }, [readyToFetch, fetchQuestion]);
 
   return (
     <div className="h-full flex flex-row justify-center items-start gap-6 w-full px-8">
@@ -282,6 +246,7 @@ export default function InterviewPage() {
                 setAnswer('');
                 setFeedbackContent('');
                 setShowFeedback(false);
+                setFollowUpQuestions([]);
                 setShowFollowUp(false);
               }}
               onClose={() => setShowFollowUp(false)}
