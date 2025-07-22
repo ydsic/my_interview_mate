@@ -357,7 +357,7 @@ export default function AnswerInput({
                 onClick={onFollowUpToggle}
                 className="
             flex items-center gap-2 border border-gray-200 rounded-xl px-3 py-1 transition
-            hover:bg-gray-40 cursor-pointer
+            hover:bg-gray-40 cursor-pointer justify-center w-38
           "
               >
                 <img
