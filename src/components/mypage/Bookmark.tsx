@@ -53,17 +53,22 @@ export default function Bookmark() {
   const toast = useToast();
   const navigate = useNavigate();
 
+  const [isLoading, setIsLoading] = useState(false);
+
   // 모달
   const modal = useModal();
 
   const fetchBookMarks = async (page: number) => {
     try {
+      setIsLoading(true);
       const { data, total } = await selectBookMarks(user_id, page, PAGE_SIZE);
       // console.log(`[북마크 데이터] : `, )
       setBookMarkList(data);
       setTotal(total);
     } catch (e) {
       console.error(e);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -114,7 +119,14 @@ export default function Bookmark() {
     <section className="max-w-7xl mx-auto rounded-3xl bg-white p-6 shadow-md flex flex-col justify-start gap-7 mb-5 min-h-[750px]">
       <H3_sub_detail>즐겨찾기 질문</H3_sub_detail>
 
-      {bookMarkList.length === 0 ? (
+      {isLoading && (
+        <div className="flex flex-col flex-1 justify-center items-center text-gray-85 gap-5">
+          <div className="w-10 h-10 border-[5px] border-gray-70 border-t-transparent rounded-full animate-spin mb-4" />
+          <p> 로딩중 ... </p>
+        </div>
+      )}
+
+      {!isLoading && bookMarkList.length === 0 && (
         <div className="py-20 text-center text-gray-70">
           <H2_content_title>아직 즐겨찾기한 질문이 없어요!</H2_content_title>
           <br />
@@ -122,7 +134,9 @@ export default function Bookmark() {
             관심 있는 질문을 북마크해보세요 ⭐️
           </span>
         </div>
-      ) : (
+      )}
+
+      {!isLoading && bookMarkList.length > 0 && (
         <>
           <motion.div
             layout
