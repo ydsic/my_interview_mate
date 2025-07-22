@@ -22,6 +22,14 @@ function isCategoryKey(value: unknown): value is CategoryKey {
   );
 }
 
+function toQuestionData(raw: any): QuestionData {
+  return {
+    questionId: raw.question_id,
+    category: raw.category,
+    topic: raw.topic,
+    question: raw.content,
+  };
+}
 export default function InterviewPage() {
   const { category: rawCategory } = useParams<{ category: string }>();
   const [searchParams] = useSearchParams();
@@ -35,102 +43,88 @@ export default function InterviewPage() {
   const [answer, setAnswer] = useState('');
   const toast = useToast();
   const isFirstLoad = useRef(true);
+
   const [question, setQuestion] = useState<QuestionData>({
     questionId: 0,
     category: initialCategory,
     topic: topicParam || '',
     question: '질문을 불러오는 중입니다...',
   });
-  // 추가 질문하기 토글
-  const [showFollowUp, setShowFollowUp] = useState(false);
-  const toggleFollowUp = () => setShowFollowUp((prev) => !prev);
-  // 추가 질문 useSate
+
+  // 중복 제거 로직
+  const noMoreRef = useRef(false);
+  const mainUsedIdsRef = useRef<number[]>([]);
+  const followUpUsedIdsRef = useRef<number[]>([]);
+
   const [followUpQuestions, setFollowUpQuestions] = useState<QuestionData[]>(
     [],
   );
 
-  /* 즐겨찾기(bookmark) 등록 부분 */
+  // 추가 질문하기 토글
+  const [showFollowUp, setShowFollowUp] = useState(false);
+  const toggleFollowUp = async () => {
+    if (!showFollowUp && followUpQuestions.length === 0) {
+      await fetchFollowUps();
+    }
+    setShowFollowUp((value) => !value);
+  };
+  // 추가 질문 useSate
+
+  /*---- 즐겨찾기(bookmark) 등록 부분 ----*/
 
   // 유저 아이디 불러오기
   const user_id = useUserDataStore((state) => state.userData.user_id);
   const [isBookMarked, setIsBookMarked] = useState<boolean>(false);
 
   // 질문 불러오기 get요청
-  const fetchQuestion = useCallback(async () => {
-    // 유효성 체크
-    if (!isCategoryKey(rawCategory) || !topicParam) {
-      setQuestion({
-        questionId: 0,
-        category: rawCategory as CategoryKey,
-        topic: topicParam || '',
-        question: '잘못된 접근입니다.',
-      });
-      setFollowUpQuestions([]);
+
+  const fetchMain = async () => {
+    const [main] = await getQuestionsByCategoryAndTopic(
+      rawCategory!,
+      topicParam!,
+      1,
+      mainUsedIdsRef.current,
+    );
+
+    if (!main) {
+      noMoreRef.current = true;
+      toast('더 이상 질문이 없습니다.', 'info');
       return;
     }
-    try {
-      const data = await getQuestionsByCategoryAndTopic(
-        rawCategory!,
-        topicParam!,
-        4,
-      );
-      // API 요청 확인용
-      console.log('rawCategory:', rawCategory, 'topicParam:', topicParam);
-      console.log('불러온 질문 수:', data.length);
-      console.log('data 내용:', data);
+    console.log('가져온 질문:', main);
 
-      if (!data.length) throw new Error('질문 없음');
+    setQuestion(toQuestionData(main));
 
-      const [main, ...others] = data;
+    mainUsedIdsRef.current.push(main.question_id);
 
-      // 메인 질문 세팅
-      setQuestion({
-        questionId: main.question_id,
-        category: main.category as CategoryKey,
-        topic: main.topic,
-        question: main.content,
-      });
-
-      // 추가 질문 세팅
-      setFollowUpQuestions(
-        others.map((q) => ({
-          questionId: q.question_id,
-          category: q.category as CategoryKey,
-          topic: q.topic,
-          question: q.content,
-        })),
-      );
-
-      // 토스트 메시지
-      if (isFirstLoad.current) isFirstLoad.current = false;
-      else toast('새로운 질문이 도착했어요!', 'success');
-    } catch (e) {
-      console.error(e);
-      setQuestion({
-        questionId: 0,
-        category: rawCategory as CategoryKey,
-        topic: topicParam,
-        question: '질문을 불러오는 데 실패했습니다.',
-      });
-      setFollowUpQuestions([]);
-      toast('질문 로딩에 실패했어요...', 'error');
+    if (!isFirstLoad.current) {
+      toast('새로운 질문이 도착했어요!', 'success');
+    } else {
+      isFirstLoad.current = false;
     }
-  }, [rawCategory, topicParam, toast]);
+  };
+  async function fetchFollowUps() {
+    const data = await getQuestionsByCategoryAndTopic(
+      rawCategory!,
+      topicParam!,
+      3,
+      mainUsedIdsRef.current,
+    );
 
-  const debouncedFetch = useMemo(
-    () => debounce(fetchQuestion, 1000, { leading: true, trailing: false }),
-    [fetchQuestion],
-  );
+    console.log('추가질문:', data);
 
-  useEffect(() => {
-    return () => {
-      debouncedFetch.cancel();
-    };
-  }, [debouncedFetch]);
+    const filtered = data.filter((q) => q.question_id !== question.questionId);
 
-  useEffect(() => {
-    fetchQuestion();
-  }, [fetchQuestion]);
+    if (filtered.length === 0) {
+      toast('더 이상 추가 질문이 없습니다.', 'info');
+      return;
+    }
+
+    setFollowUpQuestions(filtered.map(toQuestionData));
+
+    followUpUsedIdsRef.current.push(...filtered.map((q) => q.question_id));
+    toast('추가 질문을 불러왔어요!', 'success');
+  }
 
   const handleFeedback = async (answerText: string, feedback: string) => {
     setAnswer(answerText);
@@ -138,13 +132,33 @@ export default function InterviewPage() {
     setShowFeedback(true);
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     setShowFeedback(false);
     setAnswer('');
     setFeedbackContent('');
     setShowFollowUp(false);
-    debouncedFetch();
+    setFollowUpQuestions([]);
+    if (noMoreRef.current) {
+      toast('더 이상 질문이 없습니다.', 'info');
+      return;
+    }
+    await fetchMain();
   };
+
+  // 다음 질문 디바운싱
+  const handleNextDebounced = useMemo(
+    () =>
+      debounce(() => {
+        handleNext();
+      }, 500),
+    [question.questionId],
+  );
+
+  // 추가 질문 디바운싱
+  const debounceToggleFollowUp = useMemo(
+    () => debounce(toggleFollowUp, 500),
+    [showFollowUp, followUpQuestions.length],
+  );
 
   useEffect(() => {
     if (!user_id || !question.questionId) {
@@ -164,7 +178,7 @@ export default function InterviewPage() {
   }, [user_id, question.questionId, toast]);
 
   // 즐겨찾기 디바운싱
-  const deebounceBookMark = useMemo(
+  const debounceBookMark = useMemo(
     () =>
       debounce(
         async (
@@ -203,11 +217,17 @@ export default function InterviewPage() {
     console.log('[북마크 질문 id] : ', questionId);
 
     setIsBookMarked(next);
-    deebounceBookMark(user_id, questionId, next, () => {
+    debounceBookMark(user_id, questionId, next, () => {
       setIsBookMarked(!next);
       toast('북마크 등록에 실패했습니다.', 'error');
     });
   };
+
+  useEffect(() => {
+    mainUsedIdsRef.current = [];
+    setFollowUpQuestions([]);
+    fetchMain();
+  }, [rawCategory, topicParam]);
 
   return (
     <div className="h-full flex flex-row justify-center items-start gap-6 w-full px-8">
@@ -236,7 +256,7 @@ export default function InterviewPage() {
             onFeedback={handleFeedback}
             disabled={showFeedback}
             isFollowUpOpen={showFollowUp}
-            onFollowUpToggle={toggleFollowUp}
+            onFollowUpToggle={debounceToggleFollowUp}
           />
         </div>
 
@@ -255,6 +275,7 @@ export default function InterviewPage() {
                 setAnswer('');
                 setFeedbackContent('');
                 setShowFeedback(false);
+                setFollowUpQuestions([]);
                 setShowFollowUp(false);
               }}
               onClose={() => setShowFollowUp(false)}
@@ -262,7 +283,7 @@ export default function InterviewPage() {
           )}
         </div>
         <div className="flex justify-center items-center">
-          <Button className="w-55 h-15 mt-8" onClick={handleNext}>
+          <Button className="w-55 h-15 mt-8" onClick={handleNextDebounced}>
             다음 질문
           </Button>
         </div>

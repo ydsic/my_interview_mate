@@ -31,20 +31,28 @@ export default function FolloUpQuestion({
           </H4_placeholder>
         </div>
       </div>
-      {questions.map((q, idx) => (
-        <button
-          key={idx}
-          onClick={() => onSelect(q)}
-          className="w-full text-left my-2 p-2 rounded-lg bg-orange-10 hover:bg-git-bg-tag border border-gray-300 transition cursor-pointer"
-        >
-          <div className="inline-block w-fit border border-gray-300 rounded-full px-3 m-1 text-gray-100">
-            질문 {idx + 1}
-          </div>
-          <H4_placeholder className="text-gray-100 text-sm font-light px-2 py-1">
-            {q.question}
+      {questions.length === 0 ? (
+        <div className="flex justify-center items-center min-h-[120px] m-10 py-10 border border-gray-200 rounded-2xl">
+          <H4_placeholder className="text-center text-g">
+            추가 질문이 없습니다.
           </H4_placeholder>
-        </button>
-      ))}
+        </div>
+      ) : (
+        questions.map((q, idx) => (
+          <button
+            key={idx}
+            onClick={() => onSelect(q)}
+            className="w-full text-left my-2 p-2 rounded-lg bg-orange-10 hover:bg-git-bg-tag border border-gray-300 transition cursor-pointer"
+          >
+            <div className="inline-block w-fit border border-gray-300 rounded-full px-3 m-1 text-gray-100">
+              질문 {idx + 1}
+            </div>
+            <H4_placeholder className="text-gray-100 text-sm font-light px-2 py-1">
+              {q.question}
+            </H4_placeholder>
+          </button>
+        ))
+      )}
     </div>
   );
 }
