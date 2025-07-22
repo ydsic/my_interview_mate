@@ -131,7 +131,10 @@ export default function InterviewHistory() {
 
       {/* 면접 기록 불러오기 */}
       {loading ? (
-        <div className="py-10 text-center text-gray-85">로딩 중...</div>
+        <div className="flex flex-col flex-1 justify-center items-center text-gray-85 gap-5">
+          <div className="w-10 h-10 border-[5px] border-gray-70 border-t-transparent rounded-full animate-spin mb-4" />
+          <p> 로딩중 ... </p>
+        </div>
       ) : error ? (
         <div className="m-10 p-5 rounded-xl border border-red-200 bg-red-50 text-red-600 text-center font-semibold">
           {error}
