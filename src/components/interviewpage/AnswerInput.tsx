@@ -365,7 +365,7 @@ export default function AnswerInput({
                   alt="추가 질문하기 아이콘"
                   className="w-4 h-4"
                 />
-                {isFollowUpOpen ? '추가 질문 닫기' : '추가 질문하기'}
+                {isFollowUpOpen ? '추가 질문 닫기' : '추가 질문 보기'}
               </button>
             )}
 
