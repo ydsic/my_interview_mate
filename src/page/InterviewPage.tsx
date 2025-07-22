@@ -115,6 +115,11 @@ export default function InterviewPage() {
 
     const filtered = data.filter((q) => q.question_id !== question.questionId);
 
+    if (filtered.length === 0) {
+      toast('더 이상 추가 질문이 없습니다.', 'info');
+      return;
+    }
+
     setFollowUpQuestions(filtered.map(toQuestionData));
 
     followUpUsedIdsRef.current.push(...filtered.map((q) => q.question_id));
@@ -139,6 +144,21 @@ export default function InterviewPage() {
     }
     await fetchMain();
   };
+
+  // 다음 질문 디바운싱
+  const handleNextDebounced = useMemo(
+    () =>
+      debounce(() => {
+        handleNext();
+      }, 500),
+    [question.questionId],
+  );
+
+  // 추가 질문 디바운싱
+  const debounceToggleFollowUp = useMemo(
+    () => debounce(toggleFollowUp, 500),
+    [showFollowUp, followUpQuestions.length],
+  );
 
   useEffect(() => {
     if (!user_id || !question.questionId) {
@@ -236,7 +256,7 @@ export default function InterviewPage() {
             onFeedback={handleFeedback}
             disabled={showFeedback}
             isFollowUpOpen={showFollowUp}
-            onFollowUpToggle={toggleFollowUp}
+            onFollowUpToggle={debounceToggleFollowUp}
           />
         </div>
 
@@ -263,7 +283,7 @@ export default function InterviewPage() {
           )}
         </div>
         <div className="flex justify-center items-center">
-          <Button className="w-55 h-15 mt-8" onClick={handleNext}>
+          <Button className="w-55 h-15 mt-8" onClick={handleNextDebounced}>
             다음 질문
           </Button>
         </div>
