@@ -105,7 +105,10 @@ export default function LoginPage() {
                   </H4_placeholder>
                 </div>
 
-                <SubmitButton className="w-full py-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-lg hover:from-blue-600 hover:to-purple-600 transition-all duration-200 shadow-md">
+                <SubmitButton
+                  className="w-full py-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-lg hover:from-blue-600 hover:to-purple-600 transition-all duration-200 shadow-md"
+                  isDisabled={email === '' || userPassword === ''}
+                >
                   로그인
                 </SubmitButton>
               </form>
