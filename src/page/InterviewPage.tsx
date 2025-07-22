@@ -41,6 +41,11 @@ export default function InterviewPage() {
     topic: topicParam || '',
     question: '질문을 불러오는 중입니다...',
   });
+
+  // 중복 질문 방지, 사용된 질문 id 저장
+  const [usedQuestionIds, setUsedQuestionIds] = useState<number[]>([]);
+  const [readyToFetch, setReadyToFetch] = useState(false);
+
   // 추가 질문하기 토글
   const [showFollowUp, setShowFollowUp] = useState(false);
   const toggleFollowUp = () => setShowFollowUp((prev) => !prev);
@@ -74,14 +79,21 @@ export default function InterviewPage() {
         topicParam!,
         4,
       );
+
+      const newQuestions = data.filter(
+        (q) => !usedQuestionIds.includes(q.question_id),
+      );
       // API 요청 확인용
       console.log('rawCategory:', rawCategory, 'topicParam:', topicParam);
       console.log('불러온 질문 수:', data.length);
       console.log('data 내용:', data);
 
-      if (!data.length) throw new Error('질문 없음');
+      if (newQuestions.length === 0) {
+        toast('해당 카테고리의 질문을 모두 사용했습니다.', 'info');
+        return;
+      } else if (!data.length) throw new Error('질문 없음');
 
-      const [main, ...others] = data;
+      const [main, ...others] = newQuestions;
 
       // 메인 질문 세팅
       setQuestion({
@@ -101,6 +113,12 @@ export default function InterviewPage() {
         })),
       );
 
+      setUsedQuestionIds((prev) => [
+        ...prev,
+        main.question_id,
+        ...others.map((q) => q.question_id),
+      ]);
+
       // 토스트 메시지
       if (isFirstLoad.current) isFirstLoad.current = false;
       else toast('새로운 질문이 도착했어요!', 'success');
@@ -115,7 +133,7 @@ export default function InterviewPage() {
       setFollowUpQuestions([]);
       toast('질문 로딩에 실패했어요...', 'error');
     }
-  }, [rawCategory, topicParam, toast]);
+  }, [rawCategory, topicParam, toast, usedQuestionIds]);
 
   const debouncedFetch = useMemo(
     () => debounce(fetchQuestion, 1000, { leading: true, trailing: false }),
@@ -127,10 +145,6 @@ export default function InterviewPage() {
       debouncedFetch.cancel();
     };
   }, [debouncedFetch]);
-
-  useEffect(() => {
-    fetchQuestion();
-  }, [fetchQuestion]);
 
   const handleFeedback = async (answerText: string, feedback: string) => {
     setAnswer(answerText);
@@ -164,7 +178,7 @@ export default function InterviewPage() {
   }, [user_id, question.questionId, toast]);
 
   // 즐겨찾기 디바운싱
-  const deebounceBookMark = useMemo(
+  const debounceBookMark = useMemo(
     () =>
       debounce(
         async (
@@ -203,11 +217,24 @@ export default function InterviewPage() {
     console.log('[북마크 질문 id] : ', questionId);
 
     setIsBookMarked(next);
-    deebounceBookMark(user_id, questionId, next, () => {
+    debounceBookMark(user_id, questionId, next, () => {
       setIsBookMarked(!next);
       toast('북마크 등록에 실패했습니다.', 'error');
     });
   };
+
+  useEffect(() => {
+    setUsedQuestionIds([]);
+    setReadyToFetch(true);
+  }, [rawCategory, topicParam]);
+
+  // 중복 질문 상태 초기화
+  useEffect(() => {
+    if (readyToFetch) {
+      fetchQuestion();
+      setReadyToFetch(false);
+    }
+  }, [readyToFetch, fetchQuestion]);
 
   return (
     <div className="h-full flex flex-row justify-center items-start gap-6 w-full px-8">
