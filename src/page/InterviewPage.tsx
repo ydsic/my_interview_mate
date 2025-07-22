@@ -22,6 +22,14 @@ function isCategoryKey(value: unknown): value is CategoryKey {
   );
 }
 
+function toQuestionData(raw: any): QuestionData {
+  return {
+    questionId: raw.question_id,
+    category: raw.category,
+    topic: raw.topic,
+    question: raw.content,
+  };
+}
 export default function InterviewPage() {
   const { category: rawCategory } = useParams<{ category: string }>();
   const [searchParams] = useSearchParams();
@@ -43,13 +51,14 @@ export default function InterviewPage() {
     question: '질문을 불러오는 중입니다...',
   });
 
-  const usedIdsRef = useRef<number[]>([]);
+  // 중복 제거 로직
+  const noMoreRef = useRef(false);
+  const mainUsedIdsRef = useRef<number[]>([]);
+  const followUpUsedIdsRef = useRef<number[]>([]);
+
   const [followUpQuestions, setFollowUpQuestions] = useState<QuestionData[]>(
     [],
   );
-  const addUsed = (ids: number[]) => {
-    usedIdsRef.current = [...usedIdsRef.current, ...ids];
-  };
 
   // 추가 질문하기 토글
   const [showFollowUp, setShowFollowUp] = useState(false);
@@ -74,23 +83,19 @@ export default function InterviewPage() {
       rawCategory!,
       topicParam!,
       1,
-      usedIdsRef.current,
+      mainUsedIdsRef.current,
     );
 
     if (!main) {
+      noMoreRef.current = true;
       toast('더 이상 질문이 없습니다.', 'info');
       return;
     }
     console.log('가져온 질문:', main);
 
-    setQuestion({
-      questionId: main.question_id,
-      category: main.category,
-      topic: main.topic,
-      question: main.content,
-    });
+    setQuestion(toQuestionData(main));
 
-    usedIdsRef.current.push(main.question_id);
+    mainUsedIdsRef.current.push(main.question_id);
 
     if (!isFirstLoad.current) {
       toast('새로운 질문이 도착했어요!', 'success');
@@ -103,16 +108,16 @@ export default function InterviewPage() {
       rawCategory!,
       topicParam!,
       3,
-      usedIdsRef.current,
+      mainUsedIdsRef.current,
     );
 
     console.log('추가질문:', data);
+
     const filtered = data.filter((q) => q.question_id !== question.questionId);
 
-    setFollowUpQuestions(
-      filtered.map((q: any) => ({ ...q, question: q.content })),
-    );
-    filtered.forEach((q) => usedIdsRef.current.push(q.question_id));
+    setFollowUpQuestions(filtered.map(toQuestionData));
+
+    followUpUsedIdsRef.current.push(...filtered.map((q) => q.question_id));
     toast('추가 질문을 불러왔어요!', 'success');
   }
 
@@ -128,6 +133,10 @@ export default function InterviewPage() {
     setFeedbackContent('');
     setShowFollowUp(false);
     setFollowUpQuestions([]);
+    if (noMoreRef.current) {
+      toast('더 이상 질문이 없습니다.', 'info');
+      return;
+    }
     await fetchMain();
   };
 
@@ -195,7 +204,7 @@ export default function InterviewPage() {
   };
 
   useEffect(() => {
-    usedIdsRef.current = [];
+    mainUsedIdsRef.current = [];
     setFollowUpQuestions([]);
     fetchMain();
   }, [rawCategory, topicParam]);
