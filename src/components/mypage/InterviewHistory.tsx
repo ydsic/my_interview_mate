@@ -250,7 +250,7 @@ export default function InterviewHistory() {
           {/* 수정버튼 */}
           <div className="absolute right-0 top-0">
             <Button onClick={toggleEditMode}>
-              {editMode ? '히스토리 내역 수정' : '히스토리 수정'}
+              {editMode ? '수정 내용 저장하기' : '히스토리 수정'}
             </Button>
           </div>
 
