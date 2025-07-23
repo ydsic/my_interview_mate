@@ -175,7 +175,7 @@ export default function AnswerInput({
 
   const handleFeedback = useCallback(async () => {
     // 동일 답변 방지
-    if (answer == editAnswer) {
+    if (answer == initialAnswer) {
       toast('기존 답변과 동일해요. 내용을 수정해 주세요.', 'info');
       return;
     }
