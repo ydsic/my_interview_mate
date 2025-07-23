@@ -75,7 +75,7 @@ export default function LoginPage() {
             <div className="bg-white rounded-2xl border-2 border-gray-300 p-8 shadow-sm">
               <h1 className="text-2xl font-bold text-center mb-8">로그인</h1>
 
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form onSubmit={handleSubmit} className="space-y-6" noValidate>
                 <div>
                   <label className="flex font-medium text-gray-700 mb-2">
                     이메일
