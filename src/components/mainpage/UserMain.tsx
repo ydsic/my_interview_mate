@@ -86,7 +86,7 @@ export default function UserMain() {
                       key={index}
                       onClick={() => handleSelect(topic, item)}
                       className={clsx(
-                        'flex flex-col justify-between p-4 gap-3 rounded-2xl shadow-sm/20 cursor-pointer transition',
+                        'flex flex-col justify-between p-4 gap-3 rounded-2xl shadow-sm/20 cursor-pointer transition hover:scale-105 hover:bg-gray-50 hover:border-gray-300',
                         isSelected
                           ? ['ring-2', styles.ring, styles.bg]
                           : 'bg-white',
