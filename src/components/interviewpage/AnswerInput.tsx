@@ -42,17 +42,16 @@ export default function AnswerInput({
   isReviewMode,
   afterFeedbackSaved,
 }: AnswerInputProps) {
-  const [answer, setAnswer] = useState(initialAnswer ?? '');
+  const [answer, setAnswer] = useState(initialAnswer);
+  const [editAnswer, setEditAnswer] = useState(initialAnswer);
 
   const [loading, setLoading] = useState(false);
-
   const [hasFeedback, setHasFeedback] = useState(false);
-
   const [isDirty, setIsDirty] = useState(false);
-
   const [isRecording, setIsRecording] = useState(false);
-
   const [isProcessing, setIsProcessing] = useState(false);
+
+  const [editMode, setEditMode] = useState(false);
 
   const toast = useToast();
   const isEmpty = answer.trim() === '';
@@ -70,8 +69,6 @@ export default function AnswerInput({
 
   // AbortController 적용
   const controllerRef = useRef<AbortController | null>(null);
-
-  const [editMode, setEditMode] = useState(false);
 
   // VoiceRecording 세팅
   useEffect(() => {
@@ -177,6 +174,7 @@ export default function AnswerInput({
   };
 
   const handleFeedback = useCallback(async () => {
+    // 동일 답변 방지
     if (answer == initialAnswer) {
       toast('기존 답변과 동일해요. 내용을 수정해 주세요.', 'info');
       return;
@@ -193,7 +191,6 @@ export default function AnswerInput({
     }
     controllerRef.current?.abort();
     controllerRef.current = new AbortController();
-
     setLoading(true);
 
     try {
@@ -241,10 +238,10 @@ export default function AnswerInput({
       }
 
       setRadarData(scores);
-      toast('피드백을 가져왔어요!', 'success');
+      setEditAnswer(answer);
       setHasFeedback(true);
-
       setIsDirty(false);
+      toast('피드백을 가져왔어요!', 'success');
     } catch (err: unknown) {
       if (err instanceof DOMException && err.name === 'AbortError') {
         console.log('피드백 요청 취소됨');
@@ -266,14 +263,23 @@ export default function AnswerInput({
   // 새로운 질문에 대한 답변을 위한 입력 초기화.
   useEffect(() => {
     setAnswer(initialAnswer);
+    setEditAnswer(initialAnswer);
     setIsDirty(false);
     setHasFeedback(false);
     setIsRecording(false);
     setIsProcessing(false);
     setRecordingTime(60);
-
     controllerRef.current?.abort();
   }, [question, initialAnswer]);
+
+  const isBtnDisabled =
+    isEmpty ||
+    loading ||
+    isRecording ||
+    isProcessing ||
+    (hasFeedback && !isDirty) ||
+    answer === initialAnswer;
+
   return (
     <div className="p-5 rounded-xl border border-gray-300 bg-white shadow-sm space-y-4 mt-3 relative">
       {/* 로딩 모달 */}
@@ -346,14 +352,7 @@ flex items-center gap-2 border border-gray-200 rounded-xl px-3 py-2 transition
             <SubmitButton
               onClick={debounceRequest}
               className="flex items-center gap-2 pl-3 pr-4"
-              isDisabled={
-                isEmpty ||
-                loading ||
-                isRecording ||
-                isProcessing ||
-                (hasFeedback && !isDirty) ||
-                answer === initialAnswer
-              }
+              isDisabled={isBtnDisabled}
             >
               <FontAwesomeIcon
                 icon={faCheck}
@@ -385,7 +384,7 @@ flex items-center gap-2 border border-gray-200 rounded-xl px-3 py-2 transition
               <button
                 onClick={() => {
                   setEditMode(false);
-                  setAnswer(initialAnswer);
+                  setAnswer(editAnswer);
                 }}
                 className="
             flex items-center gap-2 border border-gray-200 rounded-xl px-3 py-1 transition
