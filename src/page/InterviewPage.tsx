@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
+
 import Button from '../components/common/Button';
 import AnswerInput from '../components/interviewpage/AnswerInput';
 import InterviewQuestion from '../components/interviewpage/InterviewQuestion';
@@ -75,6 +76,9 @@ export default function InterviewPage() {
   // 유저 아이디 불러오기
   const user_id = useUserDataStore((state) => state.userData.user_id);
   const [isBookMarked, setIsBookMarked] = useState<boolean>(false);
+
+  // 디바운스시, 버튼 비활성화
+  const [nextDisabled, setNextDisabled] = useState(false);
 
   // 질문 불러오기 get요청
 
@@ -153,6 +157,12 @@ export default function InterviewPage() {
       }, 500),
     [question.questionId],
   );
+
+  const onNextClick = () => {
+    setNextDisabled(true);
+    handleNextDebounced();
+    setTimeout(() => setNextDisabled(false), 500);
+  };
 
   // 추가 질문 디바운싱
   const debounceToggleFollowUp = useMemo(
@@ -283,7 +293,11 @@ export default function InterviewPage() {
           )}
         </div>
         <div className="flex justify-center items-center">
-          <Button className="w-55 h-15 mt-8" onClick={handleNextDebounced}>
+          <Button
+            className={`w-55 h-15 mt-8 ${nextDisabled ? 'opacity-50' : ''}`}
+            onClick={onNextClick}
+            disabled={nextDisabled}
+          >
             다음 질문
           </Button>
         </div>
