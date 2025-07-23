@@ -177,6 +177,11 @@ export default function AnswerInput({
   };
 
   const handleFeedback = useCallback(async () => {
+    if (hasFeedback && !isDirty) {
+      toast('이미 제출한 답변이에요. 내용을 수정해 주세요.', 'info');
+      return;
+    }
+
     if (!answer.trim()) {
       toast('먼저 질문에 대한 답변을 해주세요.', 'info');
       return;
@@ -245,7 +250,7 @@ export default function AnswerInput({
     } finally {
       setLoading(false);
     }
-  }, [answer, question, questionId, toast, onFeedback]);
+  }, [answer, question, questionId, toast, onFeedback, isDirty]);
 
   // 디바운스 처리,
   const debounceRequest = useMemo(
@@ -257,6 +262,7 @@ export default function AnswerInput({
   useEffect(() => {
     setAnswer(initialAnswer);
     setIsDirty(false);
+    setHasFeedback(false);
     setIsRecording(false);
     setIsProcessing(false);
     setRecordingTime(60);
