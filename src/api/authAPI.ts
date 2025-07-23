@@ -27,7 +27,7 @@ export async function signUpUser({
     if (authError.message.includes('Invalid email')) {
       throw new Error('올바른 이메일 주소를 입력해주세요.');
     }
-    if (authError.message.includes('email address is invalid')) {
+    if (authError.message.includes('is invalid')) {
       throw new Error('올바른 이메일 주소를 입력해주세요.');
     }
     throw authError;
