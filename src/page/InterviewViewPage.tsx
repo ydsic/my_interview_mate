@@ -151,7 +151,7 @@ export default function InterviewViewPage() {
     <div className="px-6 space-y-6">
       {/* ← 돌아가기 */}
       <button
-        className="flex items-center mb-2 text-sm font-semibold cursor-pointer mb-5"
+        className="flex items-center text-sm font-semibold cursor-pointer mb-5"
         onClick={() => navigate(-1)}
       >
         <H2_content_title>← 돌아가기</H2_content_title>

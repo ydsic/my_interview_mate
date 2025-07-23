@@ -177,6 +177,11 @@ export default function AnswerInput({
   };
 
   const handleFeedback = useCallback(async () => {
+    if (answer == initialAnswer) {
+      toast('기존 답변과 동일해요. 내용을 수정해 주세요.', 'info');
+      return;
+    }
+
     if (hasFeedback && !isDirty) {
       toast('이미 제출한 답변이에요. 내용을 수정해 주세요.', 'info');
       return;
@@ -324,14 +329,14 @@ export default function AnswerInput({
             <button
               onClick={() => setEditMode(true)}
               className="
-            flex items-center gap-2 border border-gray-200 rounded-xl px-3 py-1 transition
+flex items-center gap-2 border border-gray-200 rounded-xl px-3 py-2 transition
             hover:bg-gray-40 cursor-pointer
           "
             >
               <img
                 src={addQuestionIcon}
-                alt="다시 질문하기 아이콘"
-                className="w-4 h-4"
+                alt="답변 수정하기 아이콘"
+                className="w-5 h-5"
               />
               {'답변 수정하기'}
             </button>
@@ -346,7 +351,8 @@ export default function AnswerInput({
                 loading ||
                 isRecording ||
                 isProcessing ||
-                (hasFeedback && !isDirty)
+                (hasFeedback && !isDirty) ||
+                answer === initialAnswer
               }
             >
               <FontAwesomeIcon
