@@ -115,6 +115,17 @@ export default function Profile() {
     setSelectedImageFile(file);
   };
 
+  const handleImageDelete = () => {
+    setPreviewImg(defaultProfileImg);
+
+    setFormData((prev) => ({
+      ...prev,
+      profile_img: '',
+    }));
+
+    setSelectedImageFile(null);
+  };
+
   const resetForm = async () => {
     if (!userData) return;
 
@@ -150,7 +161,9 @@ export default function Profile() {
     try {
       const profile_img = selectedImageFile
         ? await uploadUserImageOnly(selectedImageFile, userData.user_id)
-        : userData.profile_img;
+        : formData.profile_img === ''
+          ? ''
+          : userData.profile_img;
 
       await updateUserProfile(userData.user_id, {
         ...formData,
@@ -224,15 +237,28 @@ export default function Profile() {
             alt="프로필 사진"
           />
           {isEditing && (
-            <label className="absolute -bottom-2 left-1/2 -translate-x-1/2 text-xs w-full text-center bg-white border text-gray-500 rounded-full shadow-sm cursor-pointer">
-              사진 변경
-              <input
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={handleImageChange}
-              />
-            </label>
+            <>
+              <label
+                className="absolute -bottom-2 left-1/2 -translate-x-1/2 text-xs w-full text-center bg-white border text-gray-500 rounded-full shadow-sm cursor-pointer 
+              hover:bg-green-10 hover:text-green-500 hover:border-green-500"
+              >
+                사진 변경
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleImageChange}
+                />
+              </label>
+              <button
+                type="button"
+                onClick={handleImageDelete}
+                className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-xs w-full text-center bg-white border text-gray-500 rounded-full shadow-sm cursor-pointer
+               hover:bg-red-100 hover:text-red-500 hover:border-red-500"
+              >
+                사진 삭제
+              </button>
+            </>
           )}
         </div>
 
