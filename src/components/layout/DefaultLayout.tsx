@@ -10,7 +10,7 @@ export default function DefaultLayout({
   noPadding = false,
 }: DefaultLayoutProps) {
   return (
-    <div className="w-full flex justify-center min-h-[93vh] bg-gray-15">
+    <div className="pt-[7vh] w-full flex justify-center min-h-[100vh] bg-gray-15">
       <div
         className={`min-w-[1280px] max-w-7xl px-5 ${noPadding ? 'py-0' : 'py-10'}`}
       >
