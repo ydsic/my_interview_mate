@@ -142,6 +142,7 @@ export default function SignupPage() {
       <form
         onSubmit={handleSignup}
         className="space-y-6 w-1/2 bg-white p-8 rounded-2xl border-2 border-gray-300 shadow-sm"
+        noValidate
       >
         <div>
           <label className="flex font-medium text-gray-700 mb-2">
