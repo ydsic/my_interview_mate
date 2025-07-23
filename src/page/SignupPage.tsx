@@ -34,7 +34,7 @@ export default function SignupPage() {
     password: '',
     confirmPassword: '',
     nickname: '',
-    job: '',
+    job: 'frontend',
     goal: '',
   });
 
@@ -50,7 +50,9 @@ export default function SignupPage() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
     const { name, value } = e.target;
 
     setFormData((prev) => {
@@ -87,7 +89,7 @@ export default function SignupPage() {
       password: '',
       confirmPassword: '',
       nickname: '',
-      job: '',
+      job: 'frontend',
       goal: '',
     });
   };
@@ -208,14 +210,21 @@ export default function SignupPage() {
             희망 직무
           </label>
           <H4_placeholder>
-            <Input
-              type="text"
+            <select
+              className="flex w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               name="job"
               value={formData.job}
               onChange={handleChange}
-              placeholder="직업을 입력하세요"
-              error={formErrors.job}
-            />
+            >
+              <option value="frontend">프론트엔드</option>
+              <option value="backend">백엔드</option>
+              <option value="fullstack">풀스택</option>
+              <option value="devops">DevOps</option>
+              <option value="data">데이터 분석</option>
+              <option value="design">디자인</option>
+              <option value="qa">QA</option>
+              <option value="other">기타</option>
+            </select>
           </H4_placeholder>
         </div>
         <div>
