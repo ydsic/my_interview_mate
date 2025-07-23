@@ -9,6 +9,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import Input from '../components/common/Input';
 import { validateField } from '../utils/validation';
 import { signUpUser } from '../api/authAPI';
+import { useToast } from '../hooks/useToast';
 
 type FormDataType = {
   userId: string;
@@ -49,6 +50,7 @@ export default function SignupPage() {
 
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const toast = useToast();
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -99,13 +101,13 @@ export default function SignupPage() {
     if (loading) return;
 
     if (!formData.password || !formData.nickname || !formData.userId) {
-      alert('비밀번호, 닉네임, 이메일을 모두 입력하세요.');
+      toast('비밀번호, 닉네임, 이메일을 모두 입력하세요.', 'error');
       return;
     }
 
     const hasError = Object.values(formErrors).some((error) => error != null);
     if (hasError) {
-      alert('입력란을 다시 확인해주세요!');
+      toast('입력란을 다시 확인해주세요!', 'error');
       return;
     }
 
@@ -121,13 +123,15 @@ export default function SignupPage() {
         profile_img: '',
       });
 
-      alert('회원가입 성공!! 이메일 인증 후 로그인하세요.');
+      toast('회원가입 성공!! 이메일 인증 후 로그인하세요.', 'success');
+      resetFromData(); // 성공했을 때만 폼 데이터 초기화
       navigate('/login');
-    } catch (err: any) {
-      alert(err.message || '회원가입 중 오류가 발생했습니다.');
+    } catch (err: unknown) {
+      const errorMessage =
+        err instanceof Error ? err.message : '회원가입 중 오류가 발생했습니다.';
+      toast(errorMessage, 'error');
     } finally {
       setLoading(false);
-      resetFromData();
     }
   };
 
