@@ -24,6 +24,12 @@ export async function signUpUser({
     if (authError.message.includes('already registered')) {
       throw new Error('이미 가입된 이메일입니다.');
     }
+    if (authError.message.includes('Invalid email')) {
+      throw new Error('올바른 이메일 주소를 입력해주세요.');
+    }
+    if (authError.message.includes('email address is invalid')) {
+      throw new Error('올바른 이메일 주소를 입력해주세요.');
+    }
     throw authError;
   }
 
