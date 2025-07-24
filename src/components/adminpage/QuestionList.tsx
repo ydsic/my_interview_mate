@@ -61,21 +61,23 @@ export default function QuestionList({ setView }: setViewType) {
     }
 
     setAdding(true);
-    const res = await addQuestion({
-      category: selectedCategory,
-      topic: selectedTopic,
-      content: newContent.trim(),
-    });
-    setAdding(false);
-    if (res.error) {
-      toast('질문 추가 실패:' + res.error.message, 'error');
-      return;
-    }
+    try {
+      const res = await addQuestion({
+        category: selectedCategory,
+        topic: selectedTopic,
+        content: newContent.trim(),
+      });
+      if (res.error) throw res.error;
+      toast('질문이 성공적으로 추가되었습니다.', 'success');
 
-    fetchQuestions().then((res) => {
-      if (res.data) setQuestions(res.data);
-    });
-    setNewContent('');
+      const refreshed = await fetchQuestions();
+      setQuestions(refreshed.data ?? []);
+      setNewContent('');
+    } catch (err: any) {
+      toast('질문 추가 실패: ' + err.message, 'error');
+    } finally {
+      setAdding(false);
+    }
   };
 
   const handleEditClick = (q: Question) => {
