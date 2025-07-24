@@ -1,4 +1,4 @@
-import trumbs from '../../../assets/thumbs.png';
+import thumbsUp from '../../../assets/ic_thumbs-up.svg';
 
 type FeedbackCardProps = {
   feedbackData: {
@@ -14,7 +14,7 @@ export default function Answer({ feedbackData }: FeedbackCardProps) {
       <div className="bg-gray-50 border border-gray-200 rounded-xl px-6 py-5 mx-4">
         <div className="flex items-center mb-4">
           <div className="flex items-center justify-center w-10 h-10 bg-gray-200 rounded-lg mr-3">
-            <img src={trumbs} alt="thumbs up" className="w-6 h-6" />
+            <img src={thumbsUp} alt="thumbs up" className="w-6 h-6" />
           </div>
           <span className="font-bold text-lg text-gray-900">AI 모범 답안</span>
         </div>
