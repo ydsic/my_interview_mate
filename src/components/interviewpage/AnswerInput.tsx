@@ -70,6 +70,8 @@ export default function AnswerInput({
   // AbortController 적용
   const controllerRef = useRef<AbortController | null>(null);
 
+  const isReadOnly = isReviewMode && !editMode;
+
   // VoiceRecording 세팅
   useEffect(() => {
     const recording = new VoiceRecording({
@@ -153,10 +155,14 @@ export default function AnswerInput({
   }, [toast]);
 
   // 마이크 토글
-  const micLocked = (disabled && editMode) || isProcessing || loading;
+  const micLocked = isReadOnly || disabled || isProcessing || loading;
 
-  const handleMicClick = () => {
-    if (!voiceRecording || micLocked) return;
+  const handleMicClick = useCallback(() => {
+    if (micLocked) {
+      toast('[답변 수정하기] 버튼을 눌러 수정 모드로 전환해 주세요.', 'info');
+      return;
+    }
+    if (!voiceRecording) return;
 
     if (isRecording) {
       voiceRecording.stopRecording();
@@ -165,7 +171,7 @@ export default function AnswerInput({
     }
 
     setIsDirty(true);
-  };
+  }, [voiceRecording, micLocked, isRecording, toast]);
 
   // 답변 수정
   const handleAnswerChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -298,13 +304,12 @@ export default function AnswerInput({
           placeholder="답변을 작성하거나 음성으로 대답해주세요."
           value={answer}
           onChange={handleAnswerChange}
-          readOnly={isReviewMode && !editMode}
+          readOnly={isReadOnly}
         />
         {/* 마이크버튼 */}
         <button
           type="button"
           onClick={handleMicClick}
-          disabled={micLocked}
           className={`
             absolute bottom-3 right-3 p-1 rounded-full transition cursor-pointer
             ${isRecording ? 'bg-red-500' : 'bg-white hover:bg-gray-200'}
@@ -383,6 +388,15 @@ flex items-center gap-2 border border-gray-200 rounded-xl px-3 py-2 transition
             {editMode && (
               <button
                 onClick={() => {
+                  // 녹음 중이면 녹음 즉시 중단
+                  if (voiceRecordingRef.current?.recording) {
+                    voiceRecordingRef.current.stopRecording();
+                  }
+                  // 타이머도 초기화.
+                  if (timerRef.current) {
+                    clearInterval(timerRef.current);
+                    timerRef.current = null;
+                  }
                   setEditMode(false);
                   setAnswer(editAnswer);
                 }}
