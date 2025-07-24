@@ -74,34 +74,6 @@ export default function Profile() {
     if (storeUserData.user_id) fetchUserData();
   }, [storeUserData.user_id, toast]);
 
-  if (isLoading) {
-    return (
-      <div className="flex flex-col gap-10 mb-5 bg-white p-[24px] rounded-4xl shadow-md animate-pulse">
-        <H3_sub_detail className="font-semibold">프로필 정보</H3_sub_detail>
-        <div className="flex items-center gap-5.5 h-20">
-          <div className="h-20 w-20 rounded-full bg-gray-25" />
-          <div className="flex flex-col grow justify-between h-full py-0.5 gap-2">
-            <div className="h-[36px] w-1/3 bg-gray-25 rounded-2xl" />
-            <div className="h-4 w-2/5 bg-gray-25 rounded-2xl" />
-          </div>
-        </div>
-        <div className="flex flex-col gap-5">
-          <div className="flex w-full gap-8 px-2 items-center">
-            <p className="flex-shrink-0"> 희망 직무</p>
-            <div className="h-12 flex-1 bg-gray-25 rounded-2xl" />
-          </div>
-          <div className="flex w-full gap-8 px-2 items-center">
-            <p className="flex-shrink-0"> 면접 목표</p>{' '}
-            <div className="h-12 flex-1 bg-gray-25 rounded-2xl" />
-          </div>
-        </div>
-        <div className="flex justify-end mt-auto gap-5">
-          <Button> 프로필 수정 </Button>
-        </div>
-      </div>
-    );
-  }
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -225,103 +197,115 @@ export default function Profile() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex flex-col gap-10 mb-5 bg-white p-[24px] rounded-4xl shadow-md relative"
+      className="flex flex-col gap-10 mb-5 bg-white p-[24px] rounded-4xl shadow-md relative h-[450px]"
     >
       <H3_sub_detail className="font-semibold">프로필 정보</H3_sub_detail>
 
-      <div className="flex items-center gap-5.5 h-20 relative">
-        <div className="relative">
-          <img
-            className="h-20 w-20 rounded-full object-cover"
-            src={previewImg || defaultProfileImg}
-            alt="프로필 사진"
-          />
-          {isEditing && (
-            <>
-              <label
-                className="absolute -bottom-2 left-1/2 -translate-x-1/2 text-xs w-full text-center bg-white border text-gray-500 rounded-full shadow-sm cursor-pointer 
+      {isLoading ? (
+        <div className="flex flex-col flex-1  justify-center items-center text-gray-85 gap-5 ">
+          <div className="w-10 h-10 border-[5px] border-gray-70 border-t-transparent rounded-full animate-spin mb-4" />
+          <p> 로딩중 ... </p>
+        </div>
+      ) : (
+        <>
+          <div className="flex items-center gap-5.5 h-20 relative">
+            <div className="relative">
+              <img
+                className="h-20 w-20 rounded-full object-cover"
+                src={previewImg || defaultProfileImg}
+                alt="프로필 사진"
+              />
+              {isEditing && (
+                <>
+                  <label
+                    className="absolute -bottom-2 left-1/2 -translate-x-1/2 text-xs w-full text-center bg-white border text-gray-500 rounded-full shadow-sm cursor-pointer 
               hover:bg-green-10 hover:text-green-500 hover:border-green-500"
-              >
-                사진 변경
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handleImageChange}
-                />
-              </label>
-              <button
-                type="button"
-                onClick={handleImageDelete}
-                className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-xs w-full text-center bg-white border text-gray-500 rounded-full shadow-sm cursor-pointer
+                  >
+                    사진 변경
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleImageChange}
+                    />
+                  </label>
+                  <button
+                    type="button"
+                    onClick={handleImageDelete}
+                    className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-xs w-full text-center bg-white border text-gray-500 rounded-full shadow-sm cursor-pointer
                hover:bg-red-100 hover:text-red-500 hover:border-red-500"
-              >
-                사진 삭제
-              </button>
-            </>
-          )}
-        </div>
+                  >
+                    사진 삭제
+                  </button>
+                </>
+              )}
+            </div>
 
-        <div className="flex flex-col grow-1 justify-between h-full py-0.5">
-          <InputOrText
-            isEditing={isEditing}
-            name="nickname"
-            value={formData.nickname}
-            placeholder={userData?.nickname || ''}
-            maxLength={15}
-            onChange={handleInputChange}
-          />
-          <p className="text-sm text-gray-70">{userData?.user_id}</p>
-        </div>
-      </div>
+            <div className="flex flex-col grow-1 justify-between h-full py-0.5">
+              <InputOrText
+                isEditing={isEditing}
+                name="nickname"
+                value={formData.nickname}
+                placeholder={userData?.nickname || ''}
+                maxLength={15}
+                onChange={handleInputChange}
+              />
+              <p className="text-sm text-gray-70">{userData?.user_id}</p>
+            </div>
+          </div>
 
-      <div className="flex flex-col gap-5">
-        <div className="flex w-full gap-8 px-2 items-center">
-          <p className="flex-shrink-0"> 희망 직무</p>
-          <InputOrText
-            isEditing={isEditing}
-            name="job"
-            value={formData.job}
-            placeholder={userData?.job || '희망 직무를 작성해보세요.'}
-            maxLength={20}
-            onChange={handleInputChange}
-          />
-        </div>
+          <div className="flex flex-col gap-5">
+            <div className="flex w-full gap-8 px-2 items-center">
+              <p className="flex-shrink-0"> 희망 직무</p>
+              <InputOrText
+                isEditing={isEditing}
+                name="job"
+                value={formData.job}
+                placeholder={userData?.job || '희망 직무를 작성해보세요.'}
+                maxLength={20}
+                onChange={handleInputChange}
+              />
+            </div>
 
-        <div className="flex w-full gap-8 px-2 items-center">
-          <p className="flex-shrink-0"> 면접 목표</p>
-          <InputOrText
-            isEditing={isEditing}
-            name="goal"
-            value={formData?.goal}
-            placeholder={userData?.goal || '희망 목표를 작성해보세요.'}
-            maxLength={50}
-            onChange={handleInputChange}
-          />
-        </div>
-      </div>
+            <div className="flex w-full gap-8 px-2 items-center">
+              <p className="flex-shrink-0"> 면접 목표</p>
+              <InputOrText
+                isEditing={isEditing}
+                name="goal"
+                value={formData?.goal}
+                placeholder={userData?.goal || '희망 목표를 작성해보세요.'}
+                maxLength={50}
+                onChange={handleInputChange}
+              />
+            </div>
+          </div>
 
-      <div className="flex justify-end mt-auto gap-5">
-        {isEditing ? (
-          <>
-            <button
-              type="button"
-              className="px-10 py-3 bg-gray-25 text-gray-70 font-semibold rounded-xl cursor-pointer hover:bg-gray-40"
-              onClick={handelCancelEdit}
-            >
-              되돌리기
-            </button>
-            <Button type="button" onClick={handleEditClick}>
-              {' '}
-              저장하기
-            </Button>
-          </>
-        ) : (
-          <>
-            <Button onClick={() => setIsEditing(true)}> 프로필 수정 </Button>
-          </>
-        )}
-      </div>
+          <div className="flex justify-end mt-auto gap-5">
+            {isEditing ? (
+              <>
+                <button
+                  type="button"
+                  className="px-10 py-3 bg-gray-25 text-gray-70 font-semibold rounded-xl cursor-pointer hover:bg-gray-40"
+                  onClick={handelCancelEdit}
+                >
+                  되돌리기
+                </button>
+                <Button type="button" onClick={handleEditClick}>
+                  {' '}
+                  저장하기
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button onClick={() => setIsEditing(true)}>
+                  {' '}
+                  프로필 수정{' '}
+                </Button>
+              </>
+            )}
+          </div>
+        </>
+      )}
     </form>
   );
 }
