@@ -26,6 +26,7 @@ export default function UserList({ setView }: setViewType) {
   const [error, setError] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editedNickname, setEditedNickname] = useState('');
+  const [isNameError, setIsNameError] = useState(false);
 
   // 모달 추가
   const modal = useModal();
@@ -61,9 +62,15 @@ export default function UserList({ setView }: setViewType) {
   const handleUpdateUser = async () => {
     if (!selectedUser) return;
     try {
+      if (editedNickname.trim() === '') {
+        setIsNameError(true);
+        return;
+      }
+
       const { error } = await updateUser(selectedUser.user_id, {
         nickname: editedNickname,
       });
+
       if (error) {
         throw new Error('사용자 정보 수정에 실패했습니다.');
       }
@@ -102,6 +109,17 @@ export default function UserList({ setView }: setViewType) {
       },
       onCancel: () => {},
     });
+  };
+
+  const onChangeName = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setEditedNickname(value);
+
+    if (value.trim() === '') {
+      setIsNameError(true);
+    } else {
+      setIsNameError(false);
+    }
   };
 
   if (isLoading) {
@@ -203,17 +221,24 @@ export default function UserList({ setView }: setViewType) {
                         {selectedUser.email}
                       </span>
                     </div>
-                    <div className="flex items-center">
+                    <div className="flex items-start">
                       <span className="font-medium text-slate-700 w-20">
                         Nickname:
                       </span>
                       {isEditing ? (
-                        <input
-                          type="text"
-                          value={editedNickname}
-                          onChange={(e) => setEditedNickname(e.target.value)}
-                          className="ml-4 px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200"
-                        />
+                        <div className="flex flex-col ml-4">
+                          <input
+                            type="text"
+                            value={editedNickname}
+                            onChange={onChangeName}
+                            className="px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200"
+                          />
+                          {isNameError && (
+                            <p className="text-sm text-red-500 mt-1">
+                              * 이름은 공백으로 설정할 수 없습니다.
+                            </p>
+                          )}
+                        </div>
                       ) : (
                         <span className="text-slate-600 ml-4">
                           {selectedUser.nickname}
