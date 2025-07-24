@@ -18,6 +18,7 @@ import { getAnswerWithQuestion } from '../api/answerAPI';
 
 import { useUserDataStore } from '../store/userData';
 import { insertBookMark, deleteBookMark, Bookmarked } from '../api/bookMarkAPI';
+import { useModal } from '../hooks/useModal';
 
 type FeedbackData = {
   average: number;
@@ -38,6 +39,7 @@ interface ViewData {
 export default function InterviewViewPage() {
   const { answerId } = useParams<{ answerId: string }>();
   const navigate = useNavigate();
+  const modal = useModal();
 
   const [data, setData] = useState<ViewData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -71,21 +73,30 @@ export default function InterviewViewPage() {
 
     try {
       if (isBookmarked) {
-        const confirmed = window.confirm(
-          '즐겨찾기에서 이 질문을 즐겨찾기에서 삭제하시겠습니까??',
-        );
-        if (!confirmed) return;
-
-        await deleteBookMark(userId, data.question.questionId);
-        toast('즐겨찾기에서 삭제했어요!', 'success');
+        modal({
+          title: '즐겨찾기 삭제',
+          description: '이 질문을 즐겨찾기에서 삭제하시겠습니까?',
+          confirmText: '삭제',
+          onConfirm: async () => {
+            try {
+              await deleteBookMark(userId, data.question.questionId);
+              toast('즐겨찾기에서 삭제했어요!', 'success');
+              setIsBookmarked((prev) => !prev);
+            } catch (err: unknown) {
+              console.error('[북마크 삭제 에러] : ', err);
+              toast('즐겨찾기 삭제에 실패했어요.', 'error');
+            }
+          },
+          onCancel: () => {},
+        });
       } else {
         await insertBookMark(userId, data.question.questionId);
         toast('즐겨찾기 등록 완료!', 'success');
+        setIsBookmarked((prev) => !prev);
       }
-      setIsBookmarked((prev) => !prev);
     } catch (e) {
       console.error('북마크 토글 실패:', e);
-      toast('북마크 작업에 실패했어요.', 'error');
+      toast('즐겨찾기 작업에 실패했어요.', 'error');
     }
   };
 
