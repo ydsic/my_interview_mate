@@ -68,7 +68,7 @@ export default function QuestionList({ setView }: setViewType) {
         content: newContent.trim(),
       });
       if (res.error) throw res.error;
-      toast('질문이 성공적으로 차가되었습니다!', 'success');
+      toast('질문이 성공적으로 추가되었습니다.', 'success');
 
       const refreshed = await fetchQuestions();
       setQuestions(refreshed.data ?? []);
