@@ -1,4 +1,12 @@
-import { BrowserRouter, Route, Routes, Outlet } from 'react-router-dom';
+import {
+  BrowserRouter,
+  Route,
+  Routes,
+  Outlet,
+  useLocation,
+} from 'react-router-dom';
+import { initGA, logPageView } from './utils/analytics';
+
 import MainPage from './page/MainPage';
 import StyleTest from './page/StyleTest';
 import LoginPage from './page/LoginPage';
@@ -13,6 +21,9 @@ import CheckAdminUuid from './components/mainpage/CheckAdminUuid';
 import NotFound from './page/NotFound';
 import InterviewViewPage from './page/InterviewViewPage';
 import ModalProvider from './components/common/ModalProvider';
+import { useEffect } from 'react';
+
+const TRACKING_ID = 'G-';
 
 function LayoutWrapper() {
   return (
@@ -23,6 +34,15 @@ function LayoutWrapper() {
 }
 
 export default function App() {
+  const location = useLocation();
+
+  useEffect(() => {
+    initGA(TRACKING_ID);
+  }, []);
+
+  useEffect(() => {
+    logPageView(location.pathname);
+  }, [location]);
   return (
     <>
       <ModalProvider />
