@@ -21,7 +21,7 @@ export default function Nav() {
   };
 
   return (
-    <div className="fixed top-0 w-full h-[7vh] flex justify-around items-center bg-white ">
+    <div className="fixed top-0 w-full h-[7vh] flex justify-around items-center bg-white z-[10000] shadow-sm">
       <div className="w-full max-w-7xl mx-auto px-5 h-full flex justify-between items-center ">
         <Link to="/">
           <p className="text-xl font-bold">나만의 인터뷰 메이트</p>
