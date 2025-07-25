@@ -5,10 +5,6 @@ interface User {
   created_at: string;
 }
 
-type setViewType = {
-  setView: (view: 'main' | 'user' | 'question') => void;
-};
-
 import { useState, useEffect } from 'react';
 import { fetchUsers, updateUser, deleteUser } from '../../api/adminPageApi';
 import { H4_placeholder } from '../common/HTagStyle';
@@ -17,8 +13,9 @@ import { faCaretLeft, faUser } from '@fortawesome/free-solid-svg-icons';
 import Button from '../common/Button';
 import { useModal } from '../../hooks/useModal';
 import { useToast } from '../../hooks/useToast';
+import { Navigate, useNavigate } from 'react-router-dom';
 
-export default function UserList({ setView }: setViewType) {
+export default function UserList() {
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [activeTab, setActiveTab] = useState('info');
@@ -27,6 +24,8 @@ export default function UserList({ setView }: setViewType) {
   const [isEditing, setIsEditing] = useState(false);
   const [editedNickname, setEditedNickname] = useState('');
   const [isNameError, setIsNameError] = useState(false);
+
+  const navigate = useNavigate();
 
   // 모달 추가
   const modal = useModal();
@@ -147,7 +146,7 @@ export default function UserList({ setView }: setViewType) {
         <div className="p-6 border-b border-slate-100 flex items-center justify-between">
           <div
             className="flex items-center gap-2 cursor-pointer text-slate-500 hover:text-[#427CF5] transition-colors duration-200 w-fit"
-            onClick={() => setView('main')}
+            onClick={() => navigate('/admin')}
           >
             <FontAwesomeIcon icon={faCaretLeft} size={'lg'} />
             <H4_placeholder>뒤로가기</H4_placeholder>

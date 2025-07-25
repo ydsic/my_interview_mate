@@ -1,7 +1,3 @@
-type setViewType = {
-  setView: (view: 'main' | 'user' | 'question') => void;
-};
-
 interface Question {
   question_id: number;
   category: string;
@@ -21,8 +17,9 @@ import { faCaretLeft } from '@fortawesome/free-solid-svg-icons';
 import { H4_placeholder } from '../common/HTagStyle';
 import { useToast } from '../../hooks/useToast';
 import { useModal } from '../../hooks/useModal';
+import { useNavigate } from 'react-router-dom';
 
-export default function QuestionList({ setView }: setViewType) {
+export default function QuestionList() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [selectedTopic, setSelectedTopic] = useState<string>('');
@@ -30,6 +27,7 @@ export default function QuestionList({ setView }: setViewType) {
   const [adding, setAdding] = useState(false);
   const [editId, setEditId] = useState<number | null>(null);
   const [editContent, setEditContent] = useState('');
+  const navigate = useNavigate();
 
   const toast = useToast();
   const modal = useModal();
@@ -146,7 +144,7 @@ export default function QuestionList({ setView }: setViewType) {
     <div className="flex flex-col mx-auto mt-6 p-6 bg-white rounded-xl shadow-sm border border-slate-200">
       <div
         className="flex items-center gap-2 cursor-pointer mb-6 text-slate-500 hover:text-slate-700 transition-colors duration-200 w-fit"
-        onClick={() => setView('main')}
+        onClick={() => navigate('/admin')}
       >
         <FontAwesomeIcon icon={faCaretLeft} size={'lg'} />
         <H4_placeholder>뒤로가기</H4_placeholder>
