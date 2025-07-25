@@ -123,7 +123,14 @@ export default function UserList({ setView }: setViewType) {
   };
 
   if (isLoading) {
-    return <div className="p-6 text-slate-600">로딩 중...</div>;
+    return (
+      <div className="flex h-full bg-slate-50">
+        <div className=" flex flex-col flex-1 w-full bg-white border-r border-slate-200 shadow-sm justify-center items-center  gap-5">
+          <div className="w-10 h-10 border-[5px] border-gray-70 border-t-transparent rounded-full animate-spin mb-4" />
+          <p className="text-gray-85"> 로딩중 ... </p>
+        </div>
+      </div>
+    );
   }
 
   if (error) {
