@@ -40,7 +40,7 @@ export const initGA = (trackingId: string): void => {
 
 export const logPageView = (url: string): void => {
   if (window.gtag) {
-    window.gtag('config', 'G-TT0994D9NP', { page_path: url });
+    window.gtag('config', 'G-TJFKXS7LCF', { page_path: url });
   }
 };
 
