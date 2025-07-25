@@ -69,7 +69,7 @@ export default function App() {
               element={<InterviewViewPage />}
             />
             <Route
-              path="/admin"
+              path="/admin/*"
               element={
                 <CheckAdminUuid>
                   <AdminPage />
