@@ -23,7 +23,7 @@ import InterviewViewPage from './page/InterviewViewPage';
 import ModalProvider from './components/common/ModalProvider';
 import { useEffect } from 'react';
 
-const TRACKING_ID = 'G-';
+const TRACKING_ID = 'G-TJFKXS7LCF';
 
 function LayoutWrapper() {
   return (

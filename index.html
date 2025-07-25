@@ -14,7 +14,7 @@
     <!-- Content Security Policy: XSS 공격 방지를 위한 콘텐츠 보안 정책 -->
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; object-src 'none'; connect-src 'self' https://vlowdzoigoyaudsydqam.supabase.co https://vlowdzoigoyaudsydqam.functions.supabase.co https://api.openai.com https://api.elevenlabs.io/v1/speech-to-text; img-src 'self' data: blob: https://vlowdzoigoyaudsydqam.supabase.co;"
+      content="default-src 'self'; script-src 'self' 'unsafe-inline' https://pagead2.googlesyndication.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; object-src 'none'; connect-src 'self' https://vlowdzoigoyaudsydqam.supabase.co https://vlowdzoigoyaudsydqam.functions.supabase.co https://api.openai.com https://api.elevenlabs.io/v1/speech-to-text https://pagead2.googlesyndication.com; img-src 'self' data: blob: https://vlowdzoigoyaudsydqam.supabase.co https://pagead2.googlesyndication.com; frame-src https://googleads.g.doubleclick.net https://tpc.googlesyndication.com;"
     />
 
     <!-- ========== 검색엔진 최적화 (SEO) ========== -->
@@ -60,6 +60,14 @@
     <meta property="og:image" content="https://aimigo.kr/favicon.png" />
     <meta property="og:url" content="https://aimigo.kr" />
     <meta property="og:locale" content="ko_KR" />
+
+    <!-- ========== Google AdSense ========== -->
+    <!-- Google AdSense 광고 코드 -->
+    <script
+      async
+      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_PUBLISHER_ID"
+      crossorigin="anonymous"
+    ></script>
 
     <!-- ========== 스타일시트 ========== -->
     <link href="/src/index.css" rel="stylesheet" />
