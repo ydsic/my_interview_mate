@@ -34,52 +34,59 @@ function LayoutWrapper() {
 }
 
 export default function App() {
-  const location = useLocation();
-
   useEffect(() => {
     initGA(TRACKING_ID);
   }, []);
 
-  useEffect(() => {
-    logPageView(location.pathname);
-  }, [location]);
   return (
     <>
       <ModalProvider />
       <ToastProvider />
       <BrowserRouter>
-        <Nav />
-        <Routes>
+        <AppContent />
+      </BrowserRouter>
+    </>
+  );
+}
+
+function AppContent() {
+  const location = useLocation();
+  useEffect(() => {
+    logPageView(location.pathname);
+  }, [location]);
+  return (
+    <>
+      <Nav />
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <DefaultLayout noPadding>
+              <MainPage />
+            </DefaultLayout>
+          }
+        />
+        <Route element={<LayoutWrapper />}>
+          <Route path="/styleTest" element={<StyleTest />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/mypage" element={<MyPage />} />
+          <Route path="/signup" element={<SignupPage />} />
+          <Route path="/interview/:category" element={<InterviewPage />} />
           <Route
-            path="/"
+            path="/interview-view/:answerId"
+            element={<InterviewViewPage />}
+          />
+          <Route
+            path="/admin/*"
             element={
-              <DefaultLayout noPadding>
-                <MainPage />
-              </DefaultLayout>
+              <CheckAdminUuid>
+                <AdminPage />
+              </CheckAdminUuid>
             }
           />
-          <Route element={<LayoutWrapper />}>
-            <Route path="/styleTest" element={<StyleTest />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/mypage" element={<MyPage />} />
-            <Route path="/signup" element={<SignupPage />} />
-            <Route path="/interview/:category" element={<InterviewPage />} />
-            <Route
-              path="/interview-view/:answerId"
-              element={<InterviewViewPage />}
-            />
-            <Route
-              path="/admin/*"
-              element={
-                <CheckAdminUuid>
-                  <AdminPage />
-                </CheckAdminUuid>
-              }
-            />
-          </Route>
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
+        </Route>
+        <Route path="*" element={<NotFound />} />
+      </Routes>
     </>
   );
 }
