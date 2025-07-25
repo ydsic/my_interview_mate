@@ -54,7 +54,7 @@ export default function UserList({ setView }: setViewType) {
 
   const handleUserSelect = (user: User) => {
     setSelectedUser(user);
-    setEditedNickname(user.nickname);
+    setEditedNickname('');
     setIsEditing(false);
     setActiveTab('info');
   };
@@ -230,7 +230,9 @@ export default function UserList({ setView }: setViewType) {
                           <input
                             type="text"
                             value={editedNickname}
+                            placeholder={selectedUser.nickname}
                             onChange={onChangeName}
+                            maxLength={15}
                             className="px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-slate-500 transition-all duration-200"
                           />
                           {isNameError && (
@@ -258,7 +260,12 @@ export default function UserList({ setView }: setViewType) {
                     {isEditing ? (
                       <>
                         <Button onClick={handleUpdateUser}>저장</Button>
-                        <Button onClick={() => setIsEditing(false)}>
+                        <Button
+                          onClick={() => {
+                            setIsEditing(false);
+                            setEditedNickname('');
+                          }}
+                        >
                           취소
                         </Button>
                       </>
