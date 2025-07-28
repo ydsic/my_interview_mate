@@ -1,8 +1,10 @@
 import { supabase } from '../supabaseClient';
 
 // 유저 전체 조회
-export async function fetchUsers() {
-  return await supabase.functions.invoke('get-all-users');
+export async function fetchUsers(page: number = 1, perPage: number = 10) {
+  // console.log('페이지네이션 : ', page);
+  const functionName = `get-all-users?page=${page}&perPage=${perPage}`;
+  return await supabase.functions.invoke(functionName);
 }
 
 // 유저 정보 수정

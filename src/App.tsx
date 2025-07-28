@@ -51,11 +51,9 @@ export default function App() {
 
 function AppContent() {
   const location = useLocation();
-
   useEffect(() => {
     logPageView(location.pathname);
   }, [location]);
-
   return (
     <>
       <Nav />
@@ -79,7 +77,7 @@ function AppContent() {
             element={<InterviewViewPage />}
           />
           <Route
-            path="/admin"
+            path="/admin/*"
             element={
               <CheckAdminUuid>
                 <AdminPage />
