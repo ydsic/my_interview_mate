@@ -13,7 +13,7 @@ import { faCaretLeft, faUser } from '@fortawesome/free-solid-svg-icons';
 import Button from '../common/Button';
 import { useModal } from '../../hooks/useModal';
 import { useToast } from '../../hooks/useToast';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 export default function UserList() {
   const [users, setUsers] = useState<User[]>([]);
@@ -24,6 +24,8 @@ export default function UserList() {
   const [isEditing, setIsEditing] = useState(false);
   const [editedNickname, setEditedNickname] = useState('');
   const [isNameError, setIsNameError] = useState(false);
+  const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
 
   const navigate = useNavigate();
 
@@ -33,15 +35,25 @@ export default function UserList() {
   // 토스트 메시지 추가
   const toast = useToast();
 
+  // 페이지 네이션
+  const PAGE_SIZE = 10;
+  const PAGE_GROUP_SIZE = 5;
+  const totalPages = Math.ceil(total / PAGE_SIZE);
+  const currentGroup = Math.floor((page - 1) / PAGE_GROUP_SIZE);
+  const startPage = currentGroup * PAGE_GROUP_SIZE + 1;
+  const endPage = Math.min(startPage + PAGE_GROUP_SIZE - 1, totalPages);
+
   useEffect(() => {
     const loadUsers = async () => {
       try {
         setIsLoading(true);
-        const { data, error } = await fetchUsers();
+        const { data, error } = await fetchUsers(page);
+        console.log('[관리자 유저 목록] : ', data);
         if (error) {
           throw new Error('사용자 정보를 불러오는데 실패했습니다.');
         }
-        setUsers(data || []);
+        setUsers(data.users || []);
+        setTotal(data.total);
       } catch (err: any) {
         setError(err.message);
       } finally {
@@ -49,7 +61,7 @@ export default function UserList() {
       }
     };
     loadUsers();
-  }, []);
+  }, [page]);
 
   const handleUserSelect = (user: User) => {
     setSelectedUser(user);
@@ -121,9 +133,13 @@ export default function UserList() {
     }
   };
 
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+  };
+
   if (isLoading) {
     return (
-      <div className="flex h-full bg-slate-50">
+      <div className="flex h-[85vh] bg-slate-50">
         <div className=" flex flex-col flex-1 w-full bg-white border-r border-slate-200 shadow-sm justify-center items-center  gap-5">
           <div className="w-10 h-10 border-[5px] border-gray-70 border-t-transparent rounded-full animate-spin mb-4" />
           <p className="text-gray-85"> 로딩중 ... </p>
@@ -141,9 +157,9 @@ export default function UserList() {
   }
 
   return (
-    <div className="flex h-full bg-slate-50">
-      <div className="w-1/4 bg-white border-r border-slate-200 overflow-y-auto shadow-sm">
-        <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+    <div className="flex  h-[85vh] bg-slate-50">
+      <div className="w-1/4 flex flex-col bg-white border-r border-slate-200 overflow-y-auto shadow-sm">
+        <div className="sticky top-0 bg-white p-6 border-b border-slate-100 flex items-center justify-between">
           <div
             className="flex items-center gap-2 cursor-pointer text-slate-500 hover:text-[#427CF5] transition-colors duration-200 w-fit"
             onClick={() => navigate('/admin')}
@@ -151,28 +167,87 @@ export default function UserList() {
             <FontAwesomeIcon icon={faCaretLeft} size={'lg'} />
             <H4_placeholder>뒤로가기</H4_placeholder>
           </div>
-          <h2 className="text-xl font-semibold text-slate-800">사용자 목록</h2>
+          <H4_placeholder>사용자 목록 {`(총 ${total}명)`}</H4_placeholder>
         </div>
-        <ul className="p-2">
-          {users.map((user) => (
-            <li
-              key={user.user_id}
-              className={`p-4 m-2 cursor-pointer rounded-lg transition-all duration-100 hover:bg-slate-50 ${
-                selectedUser?.user_id === user.user_id
-                  ? 'bg-slate-100 border-l-4 border-[#427CF5] shadow-sm'
-                  : 'hover:shadow-sm'
-              }`}
-              onClick={() => handleUserSelect(user)}
+        <div className="flex flex-1 flex-col justify-between pb-5">
+          <ul className="p-2">
+            {users.map((user) => (
+              <li
+                key={user.user_id}
+                className={`p-4 m-2 cursor-pointer rounded-lg transition-all duration-100 hover:bg-slate-50 ${
+                  selectedUser?.user_id === user.user_id
+                    ? 'bg-slate-100 border-l-4 border-[#427CF5] shadow-sm'
+                    : 'hover:shadow-sm'
+                }`}
+                onClick={() => handleUserSelect(user)}
+              >
+                <div className="font-medium text-slate-800">
+                  {user.nickname || user.email}
+                </div>
+                {user.nickname && (
+                  <div className="text-sm text-slate-500 mt-1">
+                    {user.email}
+                  </div>
+                )}
+              </li>
+            ))}
+          </ul>
+          {/* 페이지네이션 */}
+          <div className="flex justify-center items-center gap-2 ">
+            <button
+              onClick={() => handlePageChange(1)}
+              disabled={page === 1}
+              className="px-2 py-1 text-sm rounded bg-gray-40 text-black disabled:opacity-50 cursor-pointer"
             >
-              <div className="font-medium text-slate-800">
-                {user.nickname || user.email}
-              </div>
-              {user.nickname && (
-                <div className="text-sm text-slate-500 mt-1">{user.email}</div>
-              )}
-            </li>
-          ))}
-        </ul>
+              &laquo;
+            </button>
+
+            <button
+              onClick={() => handlePageChange(Math.max(startPage - 1, 1))}
+              disabled={page <= PAGE_GROUP_SIZE}
+              className="px-2 py-1 text-sm rounded bg-gray-40 text-black disabled:opacity-50 cursor-pointer"
+            >
+              &lsaquo;
+            </button>
+
+            {/* 페이지 번호 */}
+            {Array.from({ length: endPage - startPage + 1 }, (_, idx) => {
+              const pageNumber = startPage + idx;
+              const isCurrent = pageNumber === page;
+              return (
+                <button
+                  key={pageNumber}
+                  onClick={() => handlePageChange(pageNumber)}
+                  className={`w-8 h-8 rounded text-sm font-medium cursor-pointer ${
+                    isCurrent
+                      ? 'bg-blue-500 text-white'
+                      : 'text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  {pageNumber}
+                </button>
+              );
+            })}
+
+            <button
+              onClick={() =>
+                handlePageChange(Math.min(endPage + 1, totalPages))
+              }
+              disabled={endPage >= totalPages}
+              className="px-2 py-1 text-sm rounded bg-gray-40 text-black disabled:opacity-50 cursor-pointer"
+            >
+              &rsaquo;
+            </button>
+
+            <button
+              onClick={() => handlePageChange(totalPages)}
+              disabled={page === totalPages}
+              className="px-2 py-1 text-sm rounded bg-gray-40 text-black disabled:opacity-50 cursor-pointer "
+            >
+              &raquo;
+            </button>
+          </div>
+        </div>
       </div>
 
       <div className="w-3/4 p-6 bg-white">
@@ -189,27 +264,6 @@ export default function UserList() {
               >
                 사용자 정보
               </button>
-              {/* <button
-
-                className={`py-3 px-6 font-medium transition-all duration-200 border-b-2 ${
-                  activeTab === 'tab2'
-                    ? 'border-[#427CF5] text-slate-800'
-                    : 'border-transparent text-slate-500 hover:text-slate-700'
-                }`}
-                onClick={() => setActiveTab('tab2')}
-              >
-                탭 2
-              </button>
-              <button
-                className={`py-3 px-6 font-medium transition-all duration-200 border-b-2 ${
-                  activeTab === 'tab3'
-                    ? 'border-[#427CF5] text-slate-800'
-                    : 'border-transparent text-slate-500 hover:text-slate-700'
-                }`}
-                onClick={() => setActiveTab('tab3')}
-              >
-                탭 3
-              </button> */}
             </div>
 
             <div className="mt-4">
