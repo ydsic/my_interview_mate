@@ -2,7 +2,6 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { corsHeaders } from '../_shared/cors.ts';
 
 Deno.serve(async (req) => {
-  // This is needed if you're planning to invoke your function from a browser.
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
   }
@@ -13,10 +12,18 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
     );
 
+    const url = new URL(req.url);
+    const page = parseInt(url.searchParams.get('page') || '1', 10);
+    const perPage = parseInt(url.searchParams.get('perPage') || '10', 10);
+
     const {
-      data: { users },
+      data: { users, total },
       error: usersError,
-    } = await supabaseAdmin.auth.admin.listUsers();
+    } = await supabaseAdmin.auth.admin.listUsers({
+      page: page,
+      perPage: perPage,
+    });
+
     if (usersError) throw usersError;
 
     const userIds = users.map((user) => user.id);
@@ -40,7 +47,7 @@ Deno.serve(async (req) => {
       };
     });
 
-    return new Response(JSON.stringify(combinedUsers), {
+    return new Response(JSON.stringify({ users: combinedUsers, total }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 200,
     });
