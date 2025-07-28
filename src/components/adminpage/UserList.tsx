@@ -14,8 +14,11 @@ import Button from '../common/Button';
 import { useModal } from '../../hooks/useModal';
 import { useToast } from '../../hooks/useToast';
 import { useNavigate } from 'react-router-dom';
+import { useUserDataStore } from '../../store/userData';
 
 export default function UserList() {
+  const storeUserData = useUserDataStore((state) => state.userData);
+
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [activeTab, setActiveTab] = useState('info');
@@ -86,13 +89,21 @@ export default function UserList() {
         throw new Error('사용자 정보 수정에 실패했습니다.');
       }
 
-      const { data } = await fetchUsers();
-      setUsers(data || []);
+      const { data } = await fetchUsers(page);
+      setUsers(data.users || []);
       setSelectedUser((prev) =>
         prev ? { ...prev, nickname: editedNickname } : null,
       );
       setIsEditing(false);
       toast('사용자 정보가 수정되었습니다.', 'success');
+
+      // 닉네임 수정한 사용자와 현재 로그인한 사용자가 일치하면 zustand 닉네임 값 변경
+      if (selectedUser.user_id === storeUserData.user_id) {
+        useUserDataStore.getState().setUserData({
+          ...storeUserData,
+          nickname: editedNickname,
+        });
+      }
     } catch (err: any) {
       alert(err.message);
     }
