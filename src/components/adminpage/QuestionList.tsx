@@ -5,12 +5,15 @@ interface Question {
   content: string;
 }
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
+import debounce from 'lodash/debounce';
 import {
   fetchQuestions,
   addQuestion,
   updateQuestion,
   deleteQuestion,
+  fetchCategories,
+  fetchTopics,
 } from '../../api/adminPageApi';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCaretLeft } from '@fortawesome/free-solid-svg-icons';
@@ -23,6 +26,8 @@ export default function QuestionList() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [selectedTopic, setSelectedTopic] = useState<string>('');
+  const [categoryList, setCategoryList] = useState<string[]>([]);
+  const [topicList, setTopicList] = useState<string[]>([]);
   const [newContent, setNewContent] = useState('');
   const [adding, setAdding] = useState(false);
   const [editId, setEditId] = useState<number | null>(null);
@@ -39,29 +44,64 @@ export default function QuestionList() {
   const PAGE_SIZE = 10;
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
-  const loadPage = async (p: number) => {
-    const { questions, total } = await fetchQuestions(p, PAGE_SIZE);
+  //질문 불러오기
+  const loadPage = async (page: number) => {
+    const { questions, total } = await fetchQuestions(page, PAGE_SIZE, {
+      category: selectedCategory,
+      topic: selectedTopic,
+    });
     setQuestions(questions);
     setTotal(total);
-    setPage(p);
+    setPage(page);
   };
-
-  const categoryTopicMap: Record<string, string[]> = {
-    'front-end': ['react', 'javascript', 'nextjs'],
-    cs: ['network', 'rendering'],
-    git: ['git'],
-  };
-
+  // 질문 불러오기
   useEffect(() => {
     loadPage(1);
+  }, [selectedCategory, selectedTopic]);
+
+  // 카테고리 불러오기
+  useEffect(() => {
+    (async () => {
+      try {
+        const categories = await fetchCategories();
+        setCategoryList(categories);
+        setSelectedCategory(categories[0] ?? '');
+      } catch (err: any) {
+        toast('카테고리 로드에 실패했습니다.\n' + err.message, 'error');
+      }
+    })();
   }, []);
 
-  const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newCategory = e.target.value;
-    setSelectedCategory(newCategory);
-    if (!categoryTopicMap[newCategory].includes(selectedTopic)) {
+  // 토픽 불러오기
+  useEffect(() => {
+    if (!selectedCategory) {
+      setTopicList([]);
       setSelectedTopic('');
+      return;
     }
+    (async () => {
+      try {
+        const topics = await fetchTopics(selectedCategory);
+        setTopicList(topics);
+        setSelectedTopic('');
+      } catch (err: any) {
+        toast('토픽 로드에 실패했습니다.\n' + err.message, 'error');
+      }
+    })();
+  }, [selectedCategory]);
+
+  // 카테고리 디바운싱
+  const onCategoryDebounce = useRef(
+    debounce((category: string) => {
+      setSelectedCategory(category);
+      setSelectedTopic('');
+      loadPage(1);
+    }, 300),
+  ).current;
+
+  const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedCategory(e.target.value);
+    setSelectedTopic('');
   };
 
   const handleAddQuestion = async () => {
@@ -158,7 +198,7 @@ export default function QuestionList() {
         <H4_placeholder>뒤로가기</H4_placeholder>
       </div>
 
-      <div className="mb-6 flex gap-4">
+      <div className="mb-3 flex gap-4">
         <select
           className="border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#427CF5] focus:border-[#427CF5] transition-all duration-200"
           required
@@ -168,11 +208,13 @@ export default function QuestionList() {
           <option value="" disabled>
             카테고리
           </option>
-          {Object.keys(categoryTopicMap).map((cat) => (
-            <option key={cat} value={cat}>
-              {cat}
-            </option>
-          ))}
+          {categoryList.map((category) => {
+            return (
+              <option key={category} value={category}>
+                {category}
+              </option>
+            );
+          })}
         </select>
         <select
           className="border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#427CF5] focus:border-[#427CF5] transition-all duration-200"
@@ -184,12 +226,11 @@ export default function QuestionList() {
           <option value="" disabled>
             토픽
           </option>
-          {selectedCategory &&
-            categoryTopicMap[selectedCategory].map((topic) => (
-              <option key={topic} value={topic}>
-                {topic}
-              </option>
-            ))}
+          {topicList.map((topic) => (
+            <option key={topic} value={topic}>
+              {topic}
+            </option>
+          ))}
         </select>
         <input
           className="border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#427CF5] focus:border-[#427CF5] transition-all duration-200 flex-1"
@@ -205,6 +246,29 @@ export default function QuestionList() {
           추가
         </button>
       </div>
+
+      {/* 카테고리 필터 */}
+      <div className="mb-3">
+        <ul className="flex gap-2">
+          {categoryList.map((category) => {
+            const isSelected = selectedCategory === category;
+            return (
+              <li
+                key={category}
+                onClick={() => onCategoryDebounce(category)}
+                className={`px-3 py-1 rounded-2xl border-2 text-sm cursor-pointer transition-colors ${
+                  isSelected
+                    ? 'bg-blue-50 text-blue-700 border-blue-300'
+                    : 'bg-white text-gray-100 border-gray-300 hover:bg-gray-50'
+                }`}
+              >
+                {category}
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+
       <div>
         <ul className="flex rounded-lg font-medium text-slate-700 text-sm mb-2 bg-slate-50 py-3">
           <li className="flex-[0.8] text-center">#</li>

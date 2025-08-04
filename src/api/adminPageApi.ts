@@ -18,22 +18,29 @@ export async function deleteUser(user_id: string) {
 }
 
 // 질문 전체 조회
-export async function fetchQuestions(page: number = 1, perPage: number = 10) {
+export async function fetchQuestions(
+  page: number = 1,
+  perPage: number,
+  filter?: { category?: string; topic?: string },
+) {
   const from = (page - 1) * perPage;
   const to = from + perPage - 1;
-  const { data, count, error } = await supabase
+
+  let query = supabase
     .from('questions')
     .select('*', { count: 'exact' })
     .range(from, to)
     .order('question_id', { ascending: true });
 
+  if (filter?.category) query = query.eq('category', filter.category);
+  if (filter?.topic) query = query.eq('topic', filter.topic);
+
+  const { data, count, error } = await query;
   if (error) throw error;
 
   return {
     questions: data ?? [],
     total: count ?? 0,
-    page,
-    perPage,
   };
 }
 
@@ -63,4 +70,30 @@ export async function deleteQuestion(question_id: number) {
     .from('questions')
     .delete()
     .eq('question_id', question_id);
+}
+
+// 카테고리 정보 가져오기
+export async function fetchCategories() {
+  const { data, error } = await supabase
+    .from('questions')
+    .select('category', { count: 'exact' })
+    .neq('category', null)
+    .order('category', { ascending: true });
+
+  if (error) throw error;
+
+  const uniqueCategories = [...new Set(data.map((q) => q.category))];
+  return uniqueCategories;
+}
+
+// 토픽 정보 가져오기
+export async function fetchTopics(category: string) {
+  const { data, error } = await supabase
+    .from('questions')
+    .select('topic')
+    .eq('category', category)
+    .neq('topic', null);
+
+  if (error) throw error;
+  return [...new Set(data.map((row) => row.topic))];
 }
