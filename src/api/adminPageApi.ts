@@ -18,7 +18,7 @@ export async function deleteUser(user_id: string) {
 }
 
 // 질문 전체 조회
-export async function fetchQuestons(page: number = 1, perPage: number = 10) {
+export async function fetchQuestions(page: number = 1, perPage: number = 10) {
   const from = (page - 1) * perPage;
   const to = from + perPage - 1;
   const { data, count, error } = await supabase
@@ -30,7 +30,7 @@ export async function fetchQuestons(page: number = 1, perPage: number = 10) {
   if (error) throw error;
 
   return {
-    question: data ?? [],
+    questions: data ?? [],
     total: count ?? 0,
     page,
     perPage,
