@@ -5,13 +5,15 @@ interface Question {
   content: string;
 }
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
+import debounce from 'lodash/debounce';
 import {
   fetchQuestions,
   addQuestion,
   updateQuestion,
   deleteQuestion,
   fetchCategories,
+  fetchTopics,
 } from '../../api/adminPageApi';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCaretLeft } from '@fortawesome/free-solid-svg-icons';
@@ -42,12 +44,6 @@ export default function QuestionList() {
   const PAGE_SIZE = 10;
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
-  const categoryTopicMap: Record<string, string[]> = {
-    'front-end': ['react', 'javascript', 'nextjs'],
-    cs: ['network', 'rendering'],
-    git: ['git'],
-  };
-
   //질문 불러오기
   const loadPage = async (page: number) => {
     const { questions, total } = await fetchQuestions(page, PAGE_SIZE, {
@@ -76,12 +72,36 @@ export default function QuestionList() {
     })();
   }, []);
 
-  const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newCategory = e.target.value;
-    setSelectedCategory(newCategory);
-    if (!categoryTopicMap[newCategory].includes(selectedTopic)) {
+  // 토픽 불러오기
+  useEffect(() => {
+    if (!selectedCategory) {
+      setTopicList([]);
       setSelectedTopic('');
+      return;
     }
+    (async () => {
+      try {
+        const topics = await fetchTopics(selectedCategory);
+        setTopicList(topics);
+        setSelectedTopic('');
+      } catch (err: any) {
+        toast('토픽 로드에 실패했습니다.\n' + err.message, 'error');
+      }
+    })();
+  }, [selectedCategory]);
+
+  // 카테고리 디바운싱
+  const onCategoryDebounce = useRef(
+    debounce((category: string) => {
+      setSelectedCategory(category);
+      setSelectedTopic('');
+      loadPage(1);
+    }, 300),
+  ).current;
+
+  const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedCategory(e.target.value);
+    setSelectedTopic('');
   };
 
   const handleAddQuestion = async () => {
@@ -206,12 +226,11 @@ export default function QuestionList() {
           <option value="" disabled>
             토픽
           </option>
-          {selectedCategory &&
-            categoryTopicMap[selectedCategory].map((topic) => (
-              <option key={topic} value={topic}>
-                {topic}
-              </option>
-            ))}
+          {topicList.map((topic) => (
+            <option key={topic} value={topic}>
+              {topic}
+            </option>
+          ))}
         </select>
         <input
           className="border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#427CF5] focus:border-[#427CF5] transition-all duration-200 flex-1"
@@ -236,11 +255,7 @@ export default function QuestionList() {
             return (
               <li
                 key={category}
-                onClick={() => {
-                  setSelectedCategory(category);
-                  setSelectedTopic('');
-                  loadPage(1);
-                }}
+                onClick={() => onCategoryDebounce(category)}
                 className={`px-3 py-1 rounded-2xl border-2 text-sm cursor-pointer transition-colors ${
                   isSelected
                     ? 'bg-blue-50 text-blue-700 border-blue-300'
