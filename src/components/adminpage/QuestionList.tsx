@@ -11,6 +11,7 @@ import {
   addQuestion,
   updateQuestion,
   deleteQuestion,
+  fetchCategories,
 } from '../../api/adminPageApi';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCaretLeft } from '@fortawesome/free-solid-svg-icons';
@@ -23,6 +24,7 @@ export default function QuestionList() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [selectedTopic, setSelectedTopic] = useState<string>('');
+  const [categoryList, setCategoryList] = useState<string[]>([]);
   const [newContent, setNewContent] = useState('');
   const [adding, setAdding] = useState(false);
   const [editId, setEditId] = useState<number | null>(null);
@@ -39,21 +41,35 @@ export default function QuestionList() {
   const PAGE_SIZE = 10;
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
-  const loadPage = async (p: number) => {
-    const { questions, total } = await fetchQuestions(p, PAGE_SIZE);
-    setQuestions(questions);
-    setTotal(total);
-    setPage(p);
-  };
-
   const categoryTopicMap: Record<string, string[]> = {
     'front-end': ['react', 'javascript', 'nextjs'],
     cs: ['network', 'rendering'],
     git: ['git'],
   };
 
+  //질문 불러오기
+  const loadPage = async (p: number) => {
+    const { questions, total } = await fetchQuestions(p, PAGE_SIZE);
+    setQuestions(questions);
+    setTotal(total);
+    setPage(p);
+  };
+  // 질문 불러오기
   useEffect(() => {
     loadPage(1);
+  }, []);
+
+  // 카테고리 불러오기
+  useEffect(() => {
+    (async () => {
+      try {
+        const categories = await fetchCategories();
+        setCategoryList(categories);
+        setSelectedCategory(categories[0] ?? '');
+      } catch (err: any) {
+        toast('카테고리 로드에 실패했습니다.\n' + err.message, 'error');
+      }
+    })();
   }, []);
 
   const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -208,12 +224,27 @@ export default function QuestionList() {
 
       {/* 카테고리 필터 */}
       <div className="mb-3">
-        <ul className="flex gap-5">
-          <li
-            className={`px-4 py-1.5 rounded-full border-2 text-sm cursor-pointer transition-colors`}
-          >
-            front-end
-          </li>
+        <ul className="flex gap-2">
+          {categoryList.map((category) => {
+            const isSelected = selectedCategory === category;
+            return (
+              <li
+                key={category}
+                onClick={() => {
+                  setSelectedCategory(category);
+                  setSelectedTopic('');
+                  loadPage(1);
+                }}
+                className={`px-3 py-1 rounded-2xl border-2 text-sm cursor-pointer transition-colors ${
+                  isSelected
+                    ? 'bg-blue-50 text-blue-700 border-blue-300'
+                    : 'bg-white text-gray-100 border-gray-300 hover:bg-gray-50'
+                }`}
+              >
+                {category}
+              </li>
+            );
+          })}
         </ul>
       </div>
 

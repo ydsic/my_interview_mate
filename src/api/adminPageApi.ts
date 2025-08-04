@@ -68,7 +68,7 @@ export async function deleteQuestion(question_id: number) {
 // 카테고리 정보 가져오기
 export async function fetchCategories() {
   const { data, error } = await supabase
-    .from('quesionts')
+    .from('questions')
     .select('category', { count: 'exact' })
     .neq('category', null)
     .order('category', { ascending: true });
