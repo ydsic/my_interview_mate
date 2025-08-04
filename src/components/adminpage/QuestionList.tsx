@@ -32,6 +32,20 @@ export default function QuestionList() {
   const toast = useToast();
   const modal = useModal();
 
+  // pagination
+  const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
+
+  const PAGE_SIZE = 10;
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+
+  const loadPage = async (p: number) => {
+    const { questions, total } = await fetchQuestions(p, PAGE_SIZE);
+    setQuestions(questions);
+    setTotal(total);
+    setPage(p);
+  };
+
   const categoryTopicMap: Record<string, string[]> = {
     'front-end': ['react', 'javascript', 'nextjs'],
     cs: ['network', 'rendering'],
@@ -39,9 +53,7 @@ export default function QuestionList() {
   };
 
   useEffect(() => {
-    fetchQuestions().then((res) => {
-      if (res.data) setQuestions(res.data);
-    });
+    loadPage(1);
   }, []);
 
   const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -68,8 +80,7 @@ export default function QuestionList() {
       if (res.error) throw res.error;
       toast('질문이 성공적으로 추가되었습니다.', 'success');
 
-      const refreshed = await fetchQuestions();
-      setQuestions(refreshed.data ?? []);
+      await loadPage(page);
       setNewContent('');
     } catch (err: any) {
       toast('질문 추가 실패: ' + err.message, 'error');
@@ -97,10 +108,8 @@ export default function QuestionList() {
     }
     setEditId(null);
     setEditContent('');
-    fetchQuestions().then((res) => {
-      if (res.data) setQuestions(res.data);
-      toast('수정 완료!', 'success');
-    });
+    await loadPage(page);
+    toast('수정 완료!', 'success');
   };
 
   const handleEditCancel = () => {
@@ -121,8 +130,7 @@ export default function QuestionList() {
 
           toast('질문이 삭제되었습니다.', 'success');
 
-          const { data } = await fetchQuestions();
-          if (data) setQuestions(data);
+          await loadPage(page);
           close();
         } catch (err: any) {
           if (err.code == '23503') {
@@ -211,7 +219,7 @@ export default function QuestionList() {
             className="flex border-b border-slate-200 last:border-b-0 hover:bg-slate-50 transition-colors duration-150 text-sm items-center"
           >
             <li className="flex-[0.8] py-3 text-center text-slate-500">
-              {idx}
+              {idx + 1}
             </li>
             <li className="flex-[2] text-center text-slate-600">
               {q.category}
@@ -267,6 +275,59 @@ export default function QuestionList() {
           </ul>
         ))}
       </div>
+
+      {/* 페이지네이션 */}
+      <nav className="flex items-center justify-center gap-2 mt-6">
+        <button
+          onClick={() => loadPage(1)}
+          disabled={page === 1}
+          className="px-2 py-1 text-sm rounded bg-gray-40 text-black disabled:opacity-50 cursor-pointer"
+        >
+          &laquo;
+        </button>
+        <button
+          onClick={() => loadPage(page - 1)}
+          disabled={page === 1}
+          className="px-4 py-1 text-sm rounded bg-gray-40 text-black disabled:opacity-50 cursor-pointer"
+        >
+          &lsaquo;
+        </button>
+
+        {/* 페이지 번호 */}
+        {Array.from({ length: totalPages }, (_, idx) => {
+          const pageNumber = idx + 1;
+          const isCurrent = pageNumber === page;
+          return (
+            <button
+              key={pageNumber}
+              onClick={() => loadPage(pageNumber)}
+              disabled={isCurrent}
+              aria-current={isCurrent ? 'page' : undefined}
+              className={`w-8 h-8 rounded text-sm font-medium ${
+                isCurrent
+                  ? 'bg-blue-500 text-white'
+                  : 'text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              {pageNumber}
+            </button>
+          );
+        })}
+        <button
+          onClick={() => loadPage(page + 1)}
+          disabled={page === totalPages}
+          className="px-4 py-1 text-sm rounded bg-gray-40 text-black disabled:opacity-50 cursor-pointer"
+        >
+          &rsaquo;
+        </button>
+        <button
+          onClick={() => loadPage(totalPages)}
+          disabled={page === totalPages}
+          className="px-2 py-1 text-sm rounded bg-gray-40 text-black disabled:opacity-50 cursor-pointer "
+        >
+          &raquo;
+        </button>
+      </nav>
     </div>
   );
 }
