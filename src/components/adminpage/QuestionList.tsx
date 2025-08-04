@@ -25,6 +25,7 @@ export default function QuestionList() {
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [selectedTopic, setSelectedTopic] = useState<string>('');
   const [categoryList, setCategoryList] = useState<string[]>([]);
+  const [topicList, setTopicList] = useState<string[]>([]);
   const [newContent, setNewContent] = useState('');
   const [adding, setAdding] = useState(false);
   const [editId, setEditId] = useState<number | null>(null);
@@ -187,11 +188,13 @@ export default function QuestionList() {
           <option value="" disabled>
             카테고리
           </option>
-          {Object.keys(categoryTopicMap).map((cat) => (
-            <option key={cat} value={cat}>
-              {cat}
-            </option>
-          ))}
+          {categoryList.map((category) => {
+            return (
+              <option key={category} value={category}>
+                {category}
+              </option>
+            );
+          })}
         </select>
         <select
           className="border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#427CF5] focus:border-[#427CF5] transition-all duration-200"

@@ -85,3 +85,15 @@ export async function fetchCategories() {
   const uniqueCategories = [...new Set(data.map((q) => q.category))];
   return uniqueCategories;
 }
+
+// 토픽 정보 가져오기
+export async function fetchTopics(category: string) {
+  const { data, error } = await supabase
+    .from('questions')
+    .select('topic')
+    .eq('category', category)
+    .neq('topic', null);
+
+  if (error) throw error;
+  return [...new Set(data.map((row) => row.topic))];
+}
