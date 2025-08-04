@@ -158,7 +158,7 @@ export default function QuestionList() {
         <H4_placeholder>뒤로가기</H4_placeholder>
       </div>
 
-      <div className="mb-6 flex gap-4">
+      <div className="mb-3 flex gap-4">
         <select
           className="border border-slate-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#427CF5] focus:border-[#427CF5] transition-all duration-200"
           required
@@ -205,6 +205,18 @@ export default function QuestionList() {
           추가
         </button>
       </div>
+
+      {/* 카테고리 필터 */}
+      <div className="mb-3">
+        <ul className="flex gap-5">
+          <li
+            className={`px-4 py-1.5 rounded-full border-2 text-sm cursor-pointer transition-colors`}
+          >
+            front-end
+          </li>
+        </ul>
+      </div>
+
       <div>
         <ul className="flex rounded-lg font-medium text-slate-700 text-sm mb-2 bg-slate-50 py-3">
           <li className="flex-[0.8] text-center">#</li>
