@@ -48,16 +48,19 @@ export default function QuestionList() {
   };
 
   //질문 불러오기
-  const loadPage = async (p: number) => {
-    const { questions, total } = await fetchQuestions(p, PAGE_SIZE);
+  const loadPage = async (page: number) => {
+    const { questions, total } = await fetchQuestions(page, PAGE_SIZE, {
+      category: selectedCategory,
+      topic: selectedTopic,
+    });
     setQuestions(questions);
     setTotal(total);
-    setPage(p);
+    setPage(page);
   };
   // 질문 불러오기
   useEffect(() => {
     loadPage(1);
-  }, []);
+  }, [selectedCategory, selectedTopic]);
 
   // 카테고리 불러오기
   useEffect(() => {

@@ -18,22 +18,29 @@ export async function deleteUser(user_id: string) {
 }
 
 // 질문 전체 조회
-export async function fetchQuestions(page: number = 1, perPage: number = 10) {
+export async function fetchQuestions(
+  page: number = 1,
+  perPage: number,
+  filter?: { category?: string; topic?: string },
+) {
   const from = (page - 1) * perPage;
   const to = from + perPage - 1;
-  const { data, count, error } = await supabase
+
+  let query = supabase
     .from('questions')
     .select('*', { count: 'exact' })
     .range(from, to)
     .order('question_id', { ascending: true });
 
+  if (filter?.category) query = query.eq('category', filter.category);
+  if (filter?.topic) query = query.eq('topic', filter.topic);
+
+  const { data, count, error } = await query;
   if (error) throw error;
 
   return {
     questions: data ?? [],
     total: count ?? 0,
-    page,
-    perPage,
   };
 }
 
