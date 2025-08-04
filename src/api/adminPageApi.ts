@@ -64,3 +64,17 @@ export async function deleteQuestion(question_id: number) {
     .delete()
     .eq('question_id', question_id);
 }
+
+// 카테고리 정보 가져오기
+export async function fetchCategories() {
+  const { data, error } = await supabase
+    .from('quesionts')
+    .select('category', { count: 'exact' })
+    .neq('category', null)
+    .order('category', { ascending: true });
+
+  if (error) throw error;
+
+  const uniqueCategories = [...new Set(data.map((q) => q.category))];
+  return uniqueCategories;
+}
