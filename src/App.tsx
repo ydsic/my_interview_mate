@@ -22,6 +22,7 @@ import NotFound from './page/NotFound';
 import InterviewViewPage from './page/InterviewViewPage';
 import ModalProvider from './components/common/ModalProvider';
 import { useEffect } from 'react';
+import FirstLandingPage from './components/mainpage/FirstLanding';
 
 const TRACKING_ID = 'G-TJFKXS7LCF';
 
