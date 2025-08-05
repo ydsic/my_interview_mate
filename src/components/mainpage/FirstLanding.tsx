@@ -42,7 +42,7 @@ export default function FirstLandingPage({ setFirstLandingPage }: Props) {
         overLight={true}
         elasticity={0}
         cornerRadius={52}
-        padding="100px 70px"
+        padding="100px 30px"
         style={{
           position: 'fixed',
           top: '50%',
@@ -65,7 +65,7 @@ export default function FirstLandingPage({ setFirstLandingPage }: Props) {
 
           {/* 메인 타이틀 */}
           <h1
-            className="text-3xl max-sm:text-2xl lg:text-5xl font-bold bg-gradient-to-r from-white to-blue-200
+            className="text-3xl max-sm:text-3xl lg:text-5xl font-bold bg-gradient-to-r from-white to-blue-200
                   bg-clip-text text-transparent"
           >
             스마트한 면접 준비
@@ -96,7 +96,7 @@ export default function FirstLandingPage({ setFirstLandingPage }: Props) {
           >
             <button
               onClick={dontSeeAgain}
-              className="text-white px-10 py-5 rounded-xl font-semibold transition-all duration-300 hover:bg-white/20"
+              className="cursor-pointer text-white px-10 py-5 rounded-xl font-semibold transition-all duration-300 hover:bg-white/20"
             >
               바로가기
             </button>
