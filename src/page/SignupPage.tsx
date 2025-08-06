@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { SubmitButton } from '../components/common/Button';
 import {
   H1_big_title,
@@ -7,7 +7,7 @@ import {
 } from '../components/common/HTagStyle';
 import { Link, useNavigate } from 'react-router-dom';
 import Input from '../components/common/Input';
-import { validateField } from '../utils/validation';
+import { validateField, validateEmailAsync } from '../utils/validation';
 import { signUpUser } from '../api/authAPI';
 import { useToast } from '../hooks/useToast';
 
@@ -49,8 +49,61 @@ export default function SignupPage() {
   });
 
   const [loading, setLoading] = useState(false);
+  const [emailChecking, setEmailChecking] = useState(false);
+  const emailCheckTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const navigate = useNavigate();
   const toast = useToast();
+
+  // 컴포넌트 언마운트 시 타이머 정리
+  useEffect(() => {
+    return () => {
+      if (emailCheckTimeoutRef.current) {
+        clearTimeout(emailCheckTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  // 폼 유효성 검사 - 모든 필수 필드가 채워져 있고 오류가 없는지 확인
+  const isFormValid = () => {
+    // 필수 필드 체크
+    const requiredFields = [
+      'userId',
+      'password',
+      'confirmPassword',
+      'nickname',
+    ];
+    const hasRequiredValues = requiredFields.every(
+      (field) => formData[field as keyof FormDataType].trim() !== '',
+    );
+
+    // 오류 체크 (필수 필드만)
+    const hasErrors = requiredFields.some(
+      (field) => formErrors[field as keyof FormErrors] !== null,
+    );
+
+    // 이메일 중복 체크 중이 아닌지 확인
+    return hasRequiredValues && !hasErrors && !emailChecking;
+  };
+
+  // 이메일 중복 체크 함수 (debounced)
+  const checkEmailDuplicate = useCallback(async (email: string) => {
+    if (!email || !/\S+@\S+\.\S+/.test(email)) {
+      return;
+    }
+
+    setEmailChecking(true);
+    try {
+      const error = await validateEmailAsync(email);
+      setFormErrors((prev) => ({
+        ...prev,
+        userId: error,
+      }));
+    } catch (error) {
+      console.error('이메일 중복 체크 실패:', error);
+    } finally {
+      setEmailChecking(false);
+    }
+  }, []);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
@@ -60,6 +113,35 @@ export default function SignupPage() {
     setFormData((prev) => {
       const updated = { ...prev, [name]: value };
 
+      // 이메일 필드의 경우 실시간 중복 체크
+      if (name === 'userId') {
+        // 기본 형식 검증
+        const basicError = validateField(name, value);
+
+        setFormErrors((prevErrors) => ({
+          ...prevErrors,
+          [name]: basicError,
+        }));
+
+        // 이전 타이머가 있다면 클리어
+        if (emailCheckTimeoutRef.current) {
+          clearTimeout(emailCheckTimeoutRef.current);
+        }
+
+        // 기본 형식이 올바르고 빈 값이 아닌 경우에만 중복 체크 (500ms 지연)
+        if (!basicError && value.trim()) {
+          emailCheckTimeoutRef.current = setTimeout(() => {
+            checkEmailDuplicate(value);
+          }, 500);
+        } else if (basicError) {
+          // 형식 오류가 있으면 중복 체크 중단
+          setEmailChecking(false);
+        }
+
+        return updated;
+      }
+
+      // 다른 필드들의 기존 로직
       const error = validateField(name, value, {
         password: name === 'confirmPassword' ? prev.password : value,
       });
@@ -98,13 +180,21 @@ export default function SignupPage() {
 
   const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (loading) return;
+    if (loading || !isFormValid()) return;
 
+    // 이메일 중복 체크가 진행 중이면 대기
+    if (emailChecking) {
+      toast('이메일 확인 중입니다. 잠시만 기다려주세요.', 'info');
+      return;
+    }
+
+    // 필수 필드 재검증
     if (!formData.password || !formData.nickname || !formData.userId) {
       toast('비밀번호, 닉네임, 이메일을 모두 입력하세요.', 'error');
       return;
     }
 
+    // 오류 상태 재검증
     const hasError = Object.values(formErrors).some((error) => error != null);
     if (hasError) {
       toast('입력란을 다시 확인해주세요!', 'error');
@@ -147,6 +237,9 @@ export default function SignupPage() {
         <div>
           <label className="flex font-medium text-gray-700 mb-2">
             이메일<span className="text-red-500 ml-1">*</span>
+            {emailChecking && (
+              <span className="ml-2 text-sm text-blue-600">확인 중...</span>
+            )}
           </label>
           <H4_placeholder>
             <Input
@@ -212,7 +305,7 @@ export default function SignupPage() {
         </div>
         <div>
           <label className="flex font-medium text-gray-700 mb-2">
-            희망 직무
+            희망 직무 <span className="text-red-500 ml-1">*</span>
           </label>
           <H4_placeholder>
             <select
@@ -248,10 +341,16 @@ export default function SignupPage() {
           </H4_placeholder>
         </div>
         <SubmitButton
-          className="w-full py-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-lg"
-          isDisabled={loading}
+          className="w-full py-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
+          isDisabled={loading || !isFormValid()}
         >
-          {loading ? '회원가입 중...' : '회원가입'}
+          {loading
+            ? '회원가입 중...'
+            : emailChecking
+              ? '이메일 확인 중...'
+              : !isFormValid()
+                ? '필수 정보를 입력해주세요'
+                : '회원가입'}
         </SubmitButton>
         <div className="mt-6 text-center">
           <span className="text-gray-600">이미 계정이 있으신가요? </span>

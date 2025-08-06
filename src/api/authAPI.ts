@@ -1,5 +1,48 @@
 import { supabase } from '../supabaseClient';
 
+// 이메일 중복 체크 함수 (Edge Function 사용)
+export async function checkEmailExists(email: string): Promise<boolean> {
+  try {
+    const { data, error } = await supabase.functions.invoke(
+      'check-email-exists',
+      {
+        body: { email },
+      },
+    );
+
+    if (error) {
+      console.error('이메일 중복 체크 오류:', error);
+      return false;
+    }
+
+    return data?.emailExists || false;
+  } catch (error) {
+    console.error('이메일 중복 체크 중 오류 발생:', error);
+    return false;
+  }
+}
+
+// 더 간단한 방법: user 테이블에서 직접 확인 (RLS 정책 고려)
+export async function checkEmailExistsLocal(email: string): Promise<boolean> {
+  try {
+    const { data, error } = await supabase
+      .from('user')
+      .select('user_id')
+      .eq('user_id', email)
+      .maybeSingle();
+
+    if (error) {
+      console.error('이메일 중복 체크 오류:', error);
+      return false;
+    }
+
+    return !!data;
+  } catch (error) {
+    console.error('이메일 중복 체크 중 오류 발생:', error);
+    return false;
+  }
+}
+
 export async function signUpUser({
   userId,
   password,
