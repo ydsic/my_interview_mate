@@ -11,8 +11,11 @@ import { supabase } from '../supabaseClient';
 
 import { loginUserInfo } from '../api/userInfo';
 import { useLoggedInStore, useUserDataStore } from '../store/userData';
+import { useToast } from '../hooks/useToast';
 
 export default function LoginPage() {
+  const toast = useToast();
+
   const [email, setEmail] = useState('');
   const [userPassword, setUserPassword] = useState('');
 
@@ -44,6 +47,12 @@ export default function LoginPage() {
 
       if (userInfoError || !userInfo || userInfo.length === 0) {
         throw new Error('유저 정보를 불러오지 못했습니다.');
+      }
+
+      if (userInfo[0].is_deleted === true) {
+        await supabase.auth.signOut();
+        alert('탈퇴된 계정입니다. 관리자에게 문의하세요.');
+        return;
       }
 
       setUserData({
