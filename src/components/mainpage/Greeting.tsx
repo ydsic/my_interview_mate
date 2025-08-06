@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import Button from '../common/Button';
 import { H1_big_title } from '../common/HTagStyle';
+import { MainBannerAd } from '../common/AdLayouts';
 
 export default function Greeting() {
   return (

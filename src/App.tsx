@@ -6,6 +6,7 @@ import {
   useLocation,
 } from 'react-router-dom';
 import { initGA, logPageView } from './utils/analytics';
+import { initializeAdsense } from './utils/adsense';
 
 import MainPage from './page/MainPage';
 import StyleTest from './page/StyleTest';
@@ -22,7 +23,6 @@ import NotFound from './page/NotFound';
 import InterviewViewPage from './page/InterviewViewPage';
 import ModalProvider from './components/common/ModalProvider';
 import { useEffect } from 'react';
-import FirstLandingPage from './components/mainpage/FirstLanding';
 
 const TRACKING_ID = 'G-TJFKXS7LCF';
 
@@ -37,6 +37,7 @@ function LayoutWrapper() {
 export default function App() {
   useEffect(() => {
     initGA(TRACKING_ID);
+    initializeAdsense(); // AdSense 초기화
   }, []);
 
   return (
