@@ -6,7 +6,6 @@ import { topics } from '../../data/topics';
 import type { Topic, TopicItem } from '../../data/topics';
 import { Link } from 'react-router-dom';
 import { useUserDataStore } from '../../store/userData';
-import { MainBannerAd, ContentAd } from '../common/AdLayouts';
 
 const categoryStyles: Record<
   string,
@@ -46,19 +45,12 @@ export default function UserMain() {
   const handleSelect = (topic: Topic, item: TopicItem) => {
     setSelectedTopic({ topic, item });
   };
-
   return (
     <div className="flex flex-col w-full px-10 py-6 gap-10">
-      {/* 상단 배너 광고 */}
-      <MainBannerAd />
-
       <div className="bg-gradient-to-br from-blue-50 to-purple-50 p-10 rounded-4xl shadow-2xs space-y-4">
         <H2_content_title> 안녕하세요 {nickname} 님! 👋 </H2_content_title>
         <p> 오늘도 프론트엔드 개발자 면접 준비를 시작해볼까요? </p>
       </div>
-
-      {/* 콘텐츠 중간 광고 */}
-      <ContentAd />
 
       {/* 면접 주제 선택 박스 */}
       <div className=" flex flex-col items-center gap-15 bg-white rounded-4xl shadow-md px-20 py-12">
