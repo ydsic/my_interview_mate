@@ -95,7 +95,7 @@ export default function InterviewPage() {
       toast('더 이상 질문이 없습니다.', 'info');
       return;
     }
-    console.log('가져온 질문:', main);
+    //console.log('가져온 질문:', main);
 
     setQuestion(toQuestionData(main));
 
@@ -115,7 +115,7 @@ export default function InterviewPage() {
       mainUsedIdsRef.current,
     );
 
-    console.log('추가질문:', data);
+    //console.log('추가질문:', data);
 
     const filtered = data.filter((q) => q.question_id !== question.questionId);
 
@@ -224,7 +224,7 @@ export default function InterviewPage() {
     const next = !isBookMarked;
     const questionId = question.questionId;
 
-    console.log('[북마크 질문 id] : ', questionId);
+    //console.log('[북마크 질문 id] : ', questionId);
 
     setIsBookMarked(next);
     debounceBookMark(user_id, questionId, next, () => {

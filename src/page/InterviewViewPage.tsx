@@ -134,7 +134,7 @@ export default function InterviewViewPage() {
         data!.question.questionId,
         answerId!,
       );
-      console.log('다시보기 페이지 피드백 데이터 : ', feedback);
+      //console.log('다시보기 페이지 피드백 데이터 : ', feedback);
       setFeedbackData(feedback);
     } catch (err) {
       console.error('피드백 조회 에러:', err); // 예외 ui노출
