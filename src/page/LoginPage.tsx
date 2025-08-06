@@ -70,6 +70,9 @@ export default function LoginPage() {
       const error = err as Error;
       alert(error.message || '알 수 없는 오류가 발생했습니다.');
       console.log('로그인 에러 : ', error);
+    } finally {
+      setEmail('');
+      setUserPassword('');
     }
   };
 
