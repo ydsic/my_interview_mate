@@ -60,7 +60,7 @@ export default function Nav() {
         </Link>
 
         {isLoggedIn ? (
-          <div className="flex gap-15 font-heavy">
+          <div className="flex items-center gap-15 max-sm:gap-2 font-heavy max-sm:text-sm">
             {admin && <Link to="/admin">관리자페이지</Link>}
             <Link to="/mypage">마이페이지</Link>
             <button
