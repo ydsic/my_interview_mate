@@ -77,19 +77,36 @@ export default function LoginPage() {
   };
 
   return (
-    <>
-      <div className="flex flex-col h-full justify-center items-center text-center gap-5">
-        <H1_big_title>모의 면접 플랫폼</H1_big_title>
+    <div className="relative min-h-screen overflow-y-auto overflow-x-hidden">
+      <div className="fixed inset-0 -z-10" />
+
+      <section
+        className="flex flex-col items-center text-center 
+      gap-5 max-sm:gap-4
+      pt-10 max-sm:pt-2 pb-[12vh] max-sm:pb-20"
+      >
+        <H1_big_title>Aimigo</H1_big_title>
         <H3_sub_detail>AI와 함께하는 스마트한 면접 준비 </H3_sub_detail>
 
-        <div className="w-1/2 bg-gray-50 flex items-center justify-center px-4">
-          <div className="w-full">
-            <div className="bg-white rounded-2xl border-2 border-gray-300 p-8 shadow-sm">
-              <h1 className="text-2xl font-bold text-center mb-8">로그인</h1>
+        <div
+          className="
+          w-4/5 sm:w-3/4 max-sm:w-2/7
+        bg-gray-50 flex items-center justify-center 
+          px-4 max-sm:pt-3"
+        >
+          <div className="w-full max-w-sm sm:max-w-lg md:max-w-xl">
+            <div
+              className="bg-white rounded-2xl border-2 border-gray-300 
+              p-8 max-sm:p-6
+              shadow-sm"
+            >
+              <h1 className="text-2xl max-sm:text-xl font-bold text-center mb-8 max-sm:mb-4">
+                로그인
+              </h1>
 
-              <form onSubmit={handleSubmit} className="space-y-6" noValidate>
-                <div>
-                  <label className="flex font-medium text-gray-700 mb-2">
+              <form onSubmit={handleSubmit} className="space-y-2" noValidate>
+                <div className="pb-6 max-sm:pb-1">
+                  <label className="flex font-medium text-gray-700 mb-2 max-sm:mb-1">
                     이메일
                   </label>
                   <H4_placeholder>
@@ -98,12 +115,13 @@ export default function LoginPage() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="이메일을 입력하세요"
+                      className="max-sm:h-10 max-sm:text-sm placeholder:text-[#757575]"
                     />
                   </H4_placeholder>
                 </div>
 
-                <div>
-                  <label className="flex font-medium text-gray-700 mb-2">
+                <div className="pb-13 max-sm:pb-9">
+                  <label className="flex font-medium text-gray-700 mb-2 max-sm:mb-1">
                     비밀번호
                   </label>
                   <H4_placeholder>
@@ -113,12 +131,17 @@ export default function LoginPage() {
                       onChange={(e) => setUserPassword(e.target.value)}
                       placeholder="비밀번호를 입력하세요"
                       autoComplete="off"
+                      className="max-sm:h-10 max-sm:text-sm placeholder:text-[#757575]"
                     />
                   </H4_placeholder>
                 </div>
 
                 <SubmitButton
-                  className="w-full py-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-lg hover:from-blue-600 hover:to-purple-600 transition-all duration-200 shadow-md"
+                  className="w-full py-4 max-sm:py-3 
+                  bg-gradient-to-r from-blue-500 to-purple-500 
+                  text-white font-semibold rounded-lg 
+                  hover:from-blue-600 hover:to-purple-600 
+                  transition-all duration-200 shadow-md"
                   isDisabled={email === '' || userPassword === ''}
                 >
                   로그인
@@ -137,7 +160,7 @@ export default function LoginPage() {
             </div>
           </div>
         </div>
-      </div>
-    </>
+      </section>
+    </div>
   );
 }

@@ -4,8 +4,9 @@
   font-family: 'Pretendard';
   src: url('/public/fonts/PretendardVariable.ttf');
 }
-
+html,
 body * {
+  overflow-x: hidden;
   font-family: 'Pretendard';
 }
 
