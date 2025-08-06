@@ -6,7 +6,11 @@ type textTag = {
 };
 
 export function H1_big_title({ children }: textTag) {
-  return <h1 className="text-[26px] font-black h-[48px]">{children}</h1>;
+  return (
+    <h1 className="text-[26px] font-black h-[48px] max-sm:text-[23px] max-sm:font-bold">
+      {children}
+    </h1>
+  );
 }
 
 export function H2_content_title({ children }: textTag) {
