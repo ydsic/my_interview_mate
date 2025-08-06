@@ -23,6 +23,6 @@ export async function OpenAIApi(
   );
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const feedbackObj = await res.json();
-  console.log(feedbackObj);
+  //console.log(feedbackObj);
   return feedbackObj;
 }

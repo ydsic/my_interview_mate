@@ -207,8 +207,8 @@ export default function AnswerInput({
       } = await supabase.auth.getUser();
 
       console.log('getUser error:', userError);
-      console.log('getUser user object:', user);
-      console.log('getUser user.email:', user?.email);
+      //console.log('getUser user object:', user);
+      //console.log('getUser user.email:', user?.email);
       if (!user || !user.email) {
         throw new Error('로그인 정보가 없습니다.');
       }
@@ -220,7 +220,7 @@ export default function AnswerInput({
         questionId,
         answer,
       );
-      console.log('answerId:', answerId);
+      //console.log('answerId:', answerId);
       toast('답변 저장 완료!', 'success');
 
       const feedbackObj = await OpenAIApi(

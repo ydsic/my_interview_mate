@@ -33,11 +33,11 @@ export async function getInterviewHistory(
     .eq('user_id', userEmail)
     .order('updated_at', { ascending: false }) // 최신 수정 순으로 정렬
     .range(from, to);
-  console.log('history data:', data);
+  //console.log('history data:', data);
 
   if (error) throw error;
   const items = (data ?? []).map((item: any) => {
-    console.log('item feedback:', item.feedback);
+    //console.log('item feedback:', item.feedback);
     // questions: 배열일 수도, 객체일 수도
     const q = Array.isArray(item.questions)
       ? item.questions[0]
@@ -68,7 +68,7 @@ export async function getInterviewHistory(
 export async function deleteInterviewHistory(
   answerId: number,
   questionId: number,
-  uwerId: string,
+  //userId: string,
 ) {
   //feedback에서 먼저 삭제
   const { error: fbErr } = await supabase
