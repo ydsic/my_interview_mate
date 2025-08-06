@@ -233,7 +233,7 @@ export default function AnswerInput({
 
       try {
         await saveFeedback(answerId, questionId, scores, feedback, summary);
-        toast('피드백을 성공적으로 저장했어요!', 'success');
+        //toast('피드백을 성공적으로 저장했어요!', 'success');
 
         // 피드백을 새로 불러오면 다시보기 페이지에서 다시 피드백 정보 Fetch
         if (afterFeedbackSaved) {
