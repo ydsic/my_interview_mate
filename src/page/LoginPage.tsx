@@ -26,7 +26,7 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!email || !userPassword) {
-      alert('이메일과 비밀번호를 입력하세요.');
+      toast('이메일과 비밀번호를 입력하세요.', 'error');
       return;
     }
 
