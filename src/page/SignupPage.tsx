@@ -234,7 +234,7 @@ export default function SignupPage() {
         <H3_sub_detail>정보를 입력해 주세요</H3_sub_detail>
         <form
           onSubmit={handleSignup}
-          className="space-y-6 max-sm:space-y-4 w-1/2 max-sm:w-2/7 max-sm:mt-5
+          className="space-y-6 max-sm:space-y-4 w-1/2 max-sm:w-full max-sm:mt-5
            bg-white p-8 rounded-2xl border-2 border-gray-300 shadow-sm"
           noValidate
         >
