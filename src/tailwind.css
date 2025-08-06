@@ -34,6 +34,10 @@
   --color-front-bg-tag: #dbe9fe;
   --color-cs-bg-tag: #d5f8bb;
   --color-git-bg-tag: #feecdb;
+  /* 
+  --breakpoint-mobile: 40rem;
+  --breakpoint-tablet: 64rem;
+  --breakpoint-desktop: 80rem; */
 }
 .front-text-tag {
   color: var(--color-front-text-tag);

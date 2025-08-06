@@ -86,7 +86,7 @@ export default function Nav() {
             </button>
           </div>
         ) : (
-          <div className="flex gap-15 font-heavy">
+          <div className="flex gap-15 max-sm:gap-5 font-heavy">
             <Link to="/login">로그인</Link>
             <Link to="/signup">회원가입</Link>
           </div>

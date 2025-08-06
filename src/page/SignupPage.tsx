@@ -226,142 +226,153 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="flex flex-col h-full justify-center items-center text-center gap-5 mt-5">
-      <H1_big_title>회원가입</H1_big_title>
-      <H3_sub_detail>정보를 입력해 주세요</H3_sub_detail>
-      <form
-        onSubmit={handleSignup}
-        className="space-y-6 w-1/2 bg-white p-8 rounded-2xl border-2 border-gray-300 shadow-sm"
-        noValidate
-      >
-        <div>
-          <label className="flex font-medium text-gray-700 mb-2">
-            이메일<span className="text-red-500 ml-1">*</span>
-            {emailChecking && (
-              <span className="ml-2 text-sm text-blue-600">확인 중...</span>
-            )}
-          </label>
-          <H4_placeholder>
-            <Input
-              type="email"
-              name="userId"
-              value={formData.userId}
-              onChange={handleChange}
-              placeholder="이메일을 입력하세요"
-              error={formErrors.userId}
-              required
-            />
-          </H4_placeholder>
-        </div>
-        <div>
-          <label className="flex font-medium text-gray-700 mb-2">
-            비밀번호<span className="text-red-500 ml-1">*</span>
-          </label>
-          <H4_placeholder>
-            <Input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="비밀번호를 입력하세요"
-              autoComplete="off"
-              required
-              error={formErrors.password}
-            />
-          </H4_placeholder>
-        </div>
-        <div>
-          <label className="flex font-medium text-gray-700 mb-2">
-            비밀번호 확인<span className="text-red-500 ml-1">*</span>
-          </label>
-          <H4_placeholder>
-            <Input
-              name="confirmPassword"
-              type="password"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              placeholder="비밀번호를 확인헤주세요."
-              autoComplete="off"
-              required
-              error={formErrors.confirmPassword}
-            />
-          </H4_placeholder>
-        </div>
-        <div>
-          <label className="flex font-medium text-gray-700 mb-2">
-            닉네임<span className="text-red-500 ml-1">*</span>
-          </label>
-          <H4_placeholder>
-            <Input
-              type="text"
-              name="nickname"
-              value={formData.nickname}
-              onChange={handleChange}
-              placeholder="닉네임을 입력하세요"
-              required
-              error={formErrors.nickname}
-            />
-          </H4_placeholder>
-        </div>
-        <div>
-          <label className="flex font-medium text-gray-700 mb-2">
-            희망 직무 <span className="text-red-500 ml-1">*</span>
-          </label>
-          <H4_placeholder>
-            <select
-              className="flex w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              name="job"
-              value={formData.job}
-              onChange={handleChange}
-            >
-              <option value="frontend">프론트엔드</option>
-              <option value="backend">백엔드</option>
-              <option value="fullstack">풀스택</option>
-              <option value="devops">DevOps</option>
-              <option value="data">데이터 분석</option>
-              <option value="design">디자인</option>
-              <option value="qa">QA</option>
-              <option value="other">기타</option>
-            </select>
-          </H4_placeholder>
-        </div>
-        <div>
-          <label className="flex font-medium text-gray-700 mb-2">
-            면접 목표
-          </label>
-          <H4_placeholder>
-            <Input
-              type="text"
-              name="goal"
-              value={formData.goal}
-              onChange={handleChange}
-              placeholder="목표를 입력하세요"
-              error={formErrors.goal}
-            />
-          </H4_placeholder>
-        </div>
-        <SubmitButton
-          className="w-full py-4 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
-          isDisabled={loading || !isFormValid()}
+    <div className="relative min-h-screen overflow-y-auto overflow-x-hidden">
+      <div className="fixed inset-0 -z-10" />
+
+      <section className="flex flex-col items-center text-center gap-5 pt-3 pb-[8vh] max-sm:gap-4 max-sm:pt-4 max-sm:pb-10">
+        <H1_big_title>회원가입</H1_big_title>
+        <H3_sub_detail>정보를 입력해 주세요</H3_sub_detail>
+        <form
+          onSubmit={handleSignup}
+          className="space-y-6 max-sm:space-y-4 w-1/2 max-sm:w-2/7 max-sm:mt-5
+           bg-white p-8 rounded-2xl border-2 border-gray-300 shadow-sm"
+          noValidate
         >
-          {loading
-            ? '회원가입 중...'
-            : emailChecking
-              ? '이메일 확인 중...'
-              : !isFormValid()
-                ? '필수 정보를 입력해주세요'
-                : '회원가입'}
-        </SubmitButton>
-        <div className="mt-6 text-center">
-          <span className="text-gray-600">이미 계정이 있으신가요? </span>
-          <Link
-            to="/login"
-            className="text-blue-500 hover:text-blue-600 font-medium"
+          <div>
+            <label className="flex font-medium text-gray-700 mb-2">
+              이메일<span className="text-red-500 ml-1">*</span>
+              {emailChecking && (
+                <span className="ml-2 text-sm text-blue-600">확인 중...</span>
+              )}
+            </label>
+            <H4_placeholder>
+              <Input
+                type="email"
+                name="userId"
+                value={formData.userId}
+                onChange={handleChange}
+                placeholder="이메일을 입력하세요"
+                error={formErrors.userId}
+                required
+                className="max-sm:h-10 max-sm:text-sm placeholder:text-[#757575]"
+              />
+            </H4_placeholder>
+          </div>
+          <div>
+            <label className="flex font-medium text-gray-700 mb-2">
+              비밀번호<span className="text-red-500 ml-1">*</span>
+            </label>
+            <H4_placeholder>
+              <Input
+                type="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="비밀번호를 입력하세요"
+                autoComplete="off"
+                required
+                error={formErrors.password}
+                className="max-sm:h-10 max-sm:text-sm placeholder:text-[#757575]"
+              />
+            </H4_placeholder>
+          </div>
+          <div>
+            <label className="flex font-medium text-gray-700 mb-2">
+              비밀번호 확인<span className="text-red-500 ml-1">*</span>
+            </label>
+            <H4_placeholder>
+              <Input
+                name="confirmPassword"
+                type="password"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                placeholder="비밀번호를 확인헤주세요."
+                autoComplete="off"
+                required
+                error={formErrors.confirmPassword}
+                className="max-sm:h-10 max-sm:text-sm placeholder:text-[#757575]"
+              />
+            </H4_placeholder>
+          </div>
+          <div>
+            <label className="flex font-medium text-gray-700 mb-2">
+              닉네임<span className="text-red-500 ml-1">*</span>
+            </label>
+            <H4_placeholder>
+              <Input
+                type="text"
+                name="nickname"
+                value={formData.nickname}
+                onChange={handleChange}
+                placeholder="닉네임을 입력하세요"
+                required
+                error={formErrors.nickname}
+                className="max-sm:h-10 max-sm:text-sm placeholder:text-[#757575]"
+              />
+            </H4_placeholder>
+          </div>
+          <div>
+            <label className="flex font-medium text-gray-700 mb-2">
+              희망 직무 <span className="text-red-500 ml-1">*</span>
+            </label>
+            <H4_placeholder>
+              <select
+                className="flex w-full px-3 py-2 appearance-none
+                border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                name="job"
+                value={formData.job}
+                onChange={handleChange}
+              >
+                <option value="frontend">프론트엔드</option>
+                <option value="backend">백엔드</option>
+                <option value="fullstack">풀스택</option>
+                <option value="devops">DevOps</option>
+                <option value="data">데이터 분석</option>
+                <option value="design">디자인</option>
+                <option value="qa">QA</option>
+                <option value="other">기타</option>
+              </select>
+            </H4_placeholder>
+          </div>
+          <div>
+            <label className="flex font-medium text-gray-700 mb-2">
+              면접 목표
+            </label>
+            <H4_placeholder>
+              <Input
+                type="text"
+                name="goal"
+                value={formData.goal}
+                onChange={handleChange}
+                placeholder="목표를 입력하세요"
+                error={formErrors.goal}
+                className="max-sm:h-10 max-sm:text-sm placeholder:text-[#757575]"
+              />
+            </H4_placeholder>
+          </div>
+          <SubmitButton
+            className="w-full py-4 max-sm:mt-10 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-opacity"
+            isDisabled={loading || !isFormValid()}
           >
-            로그인
-          </Link>
-        </div>
-      </form>
+            {loading
+              ? '회원가입 중...'
+              : emailChecking
+                ? '이메일 확인 중...'
+                : !isFormValid()
+                  ? '필수 정보를 입력해주세요'
+                  : '회원가입'}
+          </SubmitButton>
+          <div className="mt-6 text-center">
+            <span className="text-gray-600">이미 계정이 있으신가요? </span>
+            <Link
+              to="/login"
+              className="text-blue-500 hover:text-blue-600 font-medium"
+            >
+              로그인
+            </Link>
+          </div>
+        </form>
+      </section>
     </div>
   );
 }
