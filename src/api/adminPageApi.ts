@@ -14,7 +14,10 @@ export async function updateUser(user_id: string, data: any) {
 
 // 유저 삭제
 export async function deleteUser(user_id: string) {
-  return await supabase.from('user').delete().eq('user_id', user_id);
+  return await supabase
+    .from('user')
+    .update({ is_deleted: true })
+    .eq('user_id', user_id);
 }
 
 // 질문 전체 조회
