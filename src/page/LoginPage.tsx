@@ -38,7 +38,7 @@ export default function LoginPage() {
       });
 
       if (error) {
-        alert('이메일 또는 비밀번호가 올바르지 않습니다.');
+        toast('이메일 또는 비밀번호가 올바르지 않습니다.', 'error');
         return;
       }
 
@@ -51,7 +51,7 @@ export default function LoginPage() {
 
       if (userInfo[0].is_deleted === true) {
         await supabase.auth.signOut();
-        alert('탈퇴된 계정입니다. 관리자에게 문의하세요.');
+        toast('탈퇴된 계정입니다. 관리자에게 문의하세요.', 'error');
         return;
       }
 
@@ -70,6 +70,9 @@ export default function LoginPage() {
       const error = err as Error;
       alert(error.message || '알 수 없는 오류가 발생했습니다.');
       console.log('로그인 에러 : ', error);
+    } finally {
+      setEmail('');
+      setUserPassword('');
     }
   };
 
