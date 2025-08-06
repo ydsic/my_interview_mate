@@ -51,7 +51,10 @@ export default function LoginPage() {
 
       if (userInfo[0].is_deleted === true) {
         await supabase.auth.signOut();
-        toast('탈퇴된 계정입니다. 관리자에게 문의하세요.', 'error');
+        toast(
+          '이 계정은 탈퇴 처리되어 로그인할 수 없습니다. 관리자에게 문의해 주세요.',
+          'error',
+        );
         return;
       }
 
