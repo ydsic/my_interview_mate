@@ -6,6 +6,7 @@ import { topics } from '../../data/topics';
 import type { Topic, TopicItem } from '../../data/topics';
 import { Link } from 'react-router-dom';
 import { useUserDataStore } from '../../store/userData';
+import useScrollDir from '../../hooks/useScrollDir';
 
 const categoryStyles: Record<
   string,
@@ -45,6 +46,9 @@ export default function UserMain() {
   const handleSelect = (topic: Topic, item: TopicItem) => {
     setSelectedTopic({ topic, item });
   };
+
+  const { scrollDir, isBottom } = useScrollDir();
+
   return (
     <div
       className="flex flex-col w-full 
@@ -55,8 +59,9 @@ export default function UserMain() {
       <div
         className="bg-gradient-to-br from-blue-50 to-purple-50  
                    rounded-2xl sm:rounded-4xl shadow-2xs space-y-4
-                   p-4 sm:p-8 lg:p-10
-                   sm:text-left text-center"
+                   p-4 sm:p-7 lg:p-10
+                   sm:text-left text-center
+                   "
       >
         <H2_content_title> 안녕하세요 {nickname} 님! 👋 </H2_content_title>
         <p className="text-sm text-gray-70 leading-relaxed font-medium">
@@ -73,7 +78,8 @@ export default function UserMain() {
       gap-12 sm:gap-14 lg:gap-15
       bg-white rounded-4xl shadow-md 
       px-4 sm:px-8 lg:px-20
-      py-8 sm:py-10 lg:py-12"
+      py-8 sm:py-10 lg:py-12
+      pb-20"
       >
         <div className="text-center">
           <H3_sub_detail> 면접 주제 선택 </H3_sub_detail>
@@ -158,19 +164,30 @@ export default function UserMain() {
         </div>
 
         {/* 모바일 버전 sm 미만에서만 노출*/}
-        <div className="flex sm:hidden flex-col w-full ring-1 ring-gray-200 shadow-sm rounded-2xl px-4 py-6">
+        <div
+          className={clsx(
+            'flex sm:hidden flex-col w-full',
+            'fixed bottom-0 left-0 z-50',
+            'ring-1 ring-gray-200 shadow-[0_-1px_10px_rgba(0,0,0,0.1)] ',
+            'bg-white rounded-4xl px-4 py-6',
+            'transition-transform duration-300',
+            scrollDir === 'down' || isBottom
+              ? 'translate-y-full'
+              : 'translate-y-0',
+          )}
+        >
           <div className="flex items-center justify-between w-full">
             {/* 토픽 제목 */}
-            <p className="font-bold text-lg">{selectedTopic.item.title}</p>
+            <p className="font-bold text-xl p-3">{selectedTopic.item.title}</p>
             {/* 카테고리 칩 */}
             <p
-              className={`${style.bg} ${style.text} text-sm font-bold px-4 py-2 text-center w-[100px] rounded-lg whitespace-nowrap`}
+              className={`${style.bg} ${style.text} text-xl font-bold px-4 py-2 text-center w-[150px] rounded-lg whitespace-nowrap`}
             >
               {selectedTopic.topic.category}
             </p>
           </div>
           {/* 토픽 설명 */}
-          <p className="text-sm text-gray-70">
+          <p className="text-md text-gray-70 p-3">
             {selectedTopic.item.description}
           </p>
           <div className="w-full pt-3">
