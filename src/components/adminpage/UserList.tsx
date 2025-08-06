@@ -3,6 +3,7 @@ interface User {
   email: string;
   nickname: string;
   created_at: string;
+  is_deleted: boolean;
 }
 
 import { useState, useEffect } from 'react';
@@ -55,10 +56,20 @@ export default function UserList() {
         if (error) {
           throw new Error('사용자 정보를 불러오는데 실패했습니다.');
         }
-        setUsers(data.users || []);
+
+        const filteredUsers = (data.users || []).filter(
+          (user: User) => user.is_deleted === false,
+        );
+
+        setUsers(filteredUsers);
         setTotal(data.total);
-      } catch (err: any) {
-        setError(err.message);
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          console.error('알 수 없는 에러 발생:', err);
+          alert('예기치 못한 오류가 발생했습니다.');
+        }
       } finally {
         setIsLoading(false);
       }
@@ -75,12 +86,20 @@ export default function UserList() {
 
   const handleUpdateUser = async () => {
     if (!selectedUser) return;
-    try {
-      if (editedNickname.trim() === '') {
-        setIsNameError(true);
-        return;
-      }
 
+    if (editedNickname.trim() === '') {
+      setIsNameError(true);
+      return;
+    }
+
+    if (selectedUser.user_id !== storeUserData.user_id) {
+      toast('사용자는 본인의 계정만 수정할 수 있습니다.', 'error');
+      setIsEditing(false);
+      setEditedNickname('');
+      return;
+    }
+
+    try {
       const { error } = await updateUser(selectedUser.user_id, {
         nickname: editedNickname,
       });
@@ -90,10 +109,16 @@ export default function UserList() {
       }
 
       const { data } = await fetchUsers(page);
-      setUsers(data.users || []);
+      const filteredUsers = (data.users || []).filter(
+        (user: User) => user.is_deleted === false,
+      );
+
+      setUsers(filteredUsers);
+
       setSelectedUser((prev) =>
         prev ? { ...prev, nickname: editedNickname } : null,
       );
+
       setIsEditing(false);
       toast('사용자 정보가 수정되었습니다.', 'success');
 
@@ -104,13 +129,24 @@ export default function UserList() {
           nickname: editedNickname,
         });
       }
-    } catch (err: any) {
-      alert(err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        alert(err.message);
+      } else {
+        console.error('알 수 없는 에러 발생:', err);
+        alert('예기치 못한 오류가 발생했습니다.');
+      }
     }
   };
 
   const handleDeleteUser = async () => {
     if (!selectedUser) return;
+
+    if (selectedUser.user_id !== storeUserData.user_id) {
+      toast('사용자는 본인의 계정만 삭제할 수 있습니다.', 'error');
+      return;
+    }
+
     modal({
       title: '사용자 삭제',
       description: `${selectedUser.nickname} 사용자를 정말 삭제하시겠습니까?`,
@@ -121,12 +157,22 @@ export default function UserList() {
           if (error) {
             throw new Error('사용자 삭제에 실패했습니다.');
           }
-
-          setUsers(users.filter((u) => u.user_id !== selectedUser.user_id));
           setSelectedUser(null);
           toast('사용자가 삭제되었습니다.', 'success');
-        } catch (err: any) {
-          alert(err.message);
+
+          const { data } = await fetchUsers(page);
+          const filteredUsers = (data.users || []).filter(
+            (user: User) => user.is_deleted === false,
+          );
+
+          setUsers(filteredUsers);
+        } catch (err: unknown) {
+          if (err instanceof Error) {
+            alert(err.message);
+          } else {
+            console.error('알 수 없는 에러 발생:', err);
+            alert('예기치 못한 오류가 발생했습니다.');
+          }
         }
       },
       onCancel: () => {},
