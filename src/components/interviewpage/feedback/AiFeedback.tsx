@@ -24,7 +24,7 @@ export default function AiFeedback({ feedbackData }: FeedbackCardProps) {
 
   return (
     <div className="p-5 rounded-xl border border-gray-300 bg-white shadow-sm space-y-4 animate-fade-in">
-      <div className="bg-gray-50 rounded-lg p-4 text-left whitespace-pre-line text-sm text-gray-800 border border-gray-200 mb-2">
+      <div className="bg-gray-50 rounded-lg p-4 text-left whitespace-pre-line text-sm text-gray-800 border border-gray-200 mb-4">
         <div
           className="flex flex-col
         max-sm:flex-row max-sm:items-start max-sm:justify-between max-sm:pb-2"
@@ -32,7 +32,7 @@ export default function AiFeedback({ feedbackData }: FeedbackCardProps) {
           {/* 왼쪽 */}
           <div>
             <H2_content_title>종합 평가</H2_content_title>
-            <H4_placeholder className="text-gray-70 mb-3 max-sm:mb-0 max-sm:text-xs">
+            <H4_placeholder className="text-gray-70 mb-3 max-sm:mb-1 max-sm:text-xs">
               AI가 분석한 답변 평가 결과입니다.
             </H4_placeholder>
           </div>
@@ -43,7 +43,7 @@ export default function AiFeedback({ feedbackData }: FeedbackCardProps) {
 
         {/* 점수 바 */}
         <MyProgressBar score={score} />
-        <H4_placeholder className="text-black mt-2">
+        <H4_placeholder className="text-black mt-2 mb-2">
           {feedbackData.summary}
         </H4_placeholder>
       </div>

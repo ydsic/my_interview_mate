@@ -48,35 +48,35 @@ export default function MyPage() {
 
   return (
     <>
-      <div className="flex justify-between w-ful px-10 py-3 bg-white rounded-4xl mb-10 ">
-        <div
-          className={`flex items-center px-5 cursor-pointer gap-5 ${activeTab === 'dashboard' ? 'text-black' : 'text-gray-400'}`}
-          onClick={() => handleTabClick('dashboard')}
-        >
-          <FontAwesomeIcon icon={faChartSimple} />
-          <p> 대시보드</p>
-        </div>
-        <div
-          className={`flex items-center px-5 cursor-pointer gap-5 ${activeTab === 'interview' ? 'text-black' : 'text-gray-400'}`}
-          onClick={() => handleTabClick('interview')}
-        >
-          <FontAwesomeIcon icon={faClockRotateLeft} />
-          <p> 면접 기록</p>
-        </div>
-        <div
-          className={`flex items-center px-5 cursor-pointer gap-5 ${activeTab === 'favorites' ? 'text-black' : 'text-gray-400'}`}
-          onClick={() => handleTabClick('favorites')}
-        >
-          <FontAwesomeIcon icon={faStar} />
-          <p> 즐겨 찾기</p>
-        </div>
-        <div
-          className={`flex items-center px-5 cursor-pointer gap-5 ${activeTab === 'profile' ? 'text-black' : 'text-gray-400'}`}
-          onClick={() => handleTabClick('profile')}
-        >
-          <FontAwesomeIcon icon={faUser} />
-          <p> 프로필</p>
-        </div>
+      <div
+        className={`flex justify-center gap-10 max-sm:gap-5 items-center 
+          w-full bg-white rounded-4xl
+          mb-6 sm:mb-10 px-10 py-3
+
+          max-sm:fixed max-sm:bottom-0 max-sm:left-1/2 max-sm:-translate-x-1/2
+          max-sm:w-[95%] max-sm:px-0 max-sm:py-2 
+          max-sm:rounded-2xl max-sm:shadow-lg 
+          max-sm:z-50`}
+      >
+        {[
+          { id: 'dashboard', icon: faChartSimple, label: '대시보드' },
+          { id: 'interview', icon: faClockRotateLeft, label: '면접 기록' },
+          { id: 'favorites', icon: faStar, label: '즐겨 찾기' },
+          { id: 'profile', icon: faUser, label: '프로필' },
+        ].map(({ id, icon, label }) => (
+          <button
+            key={id}
+            onClick={() => handleTabClick(id as typeof activeTab)}
+            className={`flex flex-col sm:flex-row items-center sm:gap-5 flex-1 cursor-pointer sm:px-5 gap-1
+
+              transition
+              ${activeTab === id ? 'text-black' : 'text-gray-400'}
+              max-sm:text-[10px] sm:text-xs`}
+          >
+            <FontAwesomeIcon icon={icon} className="text-lg sm:text-base" />
+            <span className="sm:inline max-sm:block">{label}</span>
+          </button>
+        ))}
       </div>
 
       <div className=" w-full ">{tabComponents[activeTab]}</div>
