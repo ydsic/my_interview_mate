@@ -33,7 +33,7 @@ export default function Nav() {
     if (logoutClickCount === 0) {
       // 첫 번째 클릭
       setLogoutClickCount(1);
-      toast('로그아웃하려면 3초 내에 다시 한 번 클릭하세요.', 'info');
+      toast('로그아웃하려면 \n3초 내에 다시 한 번 클릭하세요.', 'info');
 
       // 3초 후 상태 초기화
       logoutTimeoutRef.current = setTimeout(() => {
@@ -57,13 +57,13 @@ export default function Nav() {
 
   return (
     <div className="fixed top-0 w-full h-[7vh] flex justify-around items-center bg-white z-[10000] shadow-sm">
-      <div className="w-full max-w-7xl mx-auto px-5 max-sm:px-3 h-full flex justify-between items-center ">
+      <div className="w-full max-w-7xl mx-auto px-5 max-sm:px-5 h-full flex justify-between items-center ">
         <Link to="/">
           <p className="text-xl font-bold">Aimigo</p>
         </Link>
 
         {isLoggedIn ? (
-          <div className="flex items-center gap-10 max-sm:gap-0 font-heavy max-sm:text-sm">
+          <div className="flex items-center gap-5 max-lg:gap-2 max-sm:gap-0 font-heavy max-sm:text-sm">
             {admin && (
               <Link to="/admin" className={navHover}>
                 관리자페이지

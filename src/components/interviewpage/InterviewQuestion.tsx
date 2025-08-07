@@ -59,12 +59,12 @@ export default function InterviewQuestion({
     );
   }
   return (
-    <div className="p-5 rounded-xl border border-gray-300 bg-white shadow-sm space-y-4">
-      <div className="flex justify-between mb-5">
+    <div className="p-5 max-sm:p-3 rounded-xl border border-gray-300 bg-white shadow-sm space-y-4">
+      <div className="flex justify-between itmes-start mb-5">
         <div className="flex items-center gap-4">
           {/* 왼쪽 상단 - 카테고리 */}
           <div
-            className={`flex items-center px-6 pt-2 pb-3 rounded-md ${categoryStyle.bg} ${categoryStyle.text}`}
+            className={`flex items-center px-6 pt-2 pb-3 rounded-md max-sm:px-4 max-sm:pt-1 max-sm:pb-2 ${categoryStyle.bg} ${categoryStyle.text}`}
           >
             <H3_sub_detail>{topic}</H3_sub_detail>
           </div>
@@ -79,6 +79,7 @@ export default function InterviewQuestion({
         <button
           onClick={onToggleBookmark}
           className={`
+            self-start
             text-[24px] transition
             ${canBookmark ? 'cursor-pointer' : 'cursor-not-allowed opacity-40'}
           `}

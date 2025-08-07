@@ -76,6 +76,8 @@ export default function AnswerInput({
 
   const isReadOnly = isReviewMode && !editMode;
 
+  const showFollowUpBtn = !isReviewMode && (!isMobile || hasFeedback);
+
   // VoiceRecording 세팅
   useEffect(() => {
     const recording = new VoiceRecording({
@@ -307,7 +309,7 @@ export default function AnswerInput({
       </div>
 
       {/* 답변 입력 + 음성 UI */}
-      <div className="relative">
+      <div className="relative max-sm:text-sm">
         {/* disabled 대신 reaonly로 전환하여 키 다운순간 readOnly를 false로 풀어 편집 가능하게  */}
         <textarea
           rows={4}
@@ -367,7 +369,7 @@ flex items-center gap-2 border border-gray-200 rounded-xl px-3 py-2 transition
           <>
             <SubmitButton
               onClick={debounceRequest}
-              className="flex items-center gap-2 pl-3 pr-4"
+              className="flex items-center gap-2 pl-3 pr-4 max-sm:text-xs"
               isDisabled={isBtnDisabled}
             >
               <FontAwesomeIcon
@@ -379,7 +381,7 @@ flex items-center gap-2 border border-gray-200 rounded-xl px-3 py-2 transition
             </SubmitButton>
 
             {/* 추가 질문 버튼 */}
-            {!isReviewMode && (
+            {showFollowUpBtn && (
               <button
                 onClick={() => {
                   if (!hasFeedback) {
@@ -391,6 +393,7 @@ flex items-center gap-2 border border-gray-200 rounded-xl px-3 py-2 transition
                 className={`
             flex items-center gap-2 border border-gray-200 rounded-xl px-3 py-1 transition
             hover:bg-gray-40 cursor-pointer justify-center w-38
+            max-sm:text-xs max-sm:px-2 max-sm:py-1 max-sm:gap-2 max-sm:w-30
                 ${!hasFeedback ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
                 <img

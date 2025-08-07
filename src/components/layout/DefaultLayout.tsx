@@ -11,7 +11,9 @@ export default function DefaultLayout({
 }: DefaultLayoutProps) {
   return (
     <div className="pt-[7vh] w-full flex justify-center min-h-[100vh] bg-gray-15">
-      <div className={`w-full max-w-7xl px-5 ${noPadding ? 'py-0' : 'py-10'}`}>
+      <div
+        className={`w-full max-w-7xl px-5 max-sm:px-1 ${noPadding ? 'py-0' : 'py-10'}`}
+      >
         {children}
       </div>
     </div>
