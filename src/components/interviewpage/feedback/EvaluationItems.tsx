@@ -20,16 +20,12 @@ export default function EvaluationItems({ data }: ScoresType) {
   }
 
   return (
-    <div className="space-y-2 p-2">
-      <div className="flex gap-2">
+    <div className="space-y-2 p-2 max-sm:text-sm">
+      <div className="grid grid-cols-2 max-sm:grid-cols-1 gap-2">
         <Item label="논리적 일관성" score={data[0]} />
         <Item label="명료성" score={data[1]} />
-      </div>
-      <div className="flex gap-2">
         <Item label="구조화" score={data[2]} />
         <Item label="기술적 명확성" score={data[3]} />
-      </div>
-      <div className="flex gap-2">
         <Item label="심층성" score={data[4]} />
         <div className={itemClass + ' border-0'} />
       </div>

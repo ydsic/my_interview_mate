@@ -297,7 +297,7 @@ export default function InterviewPage() {
         </div>
         <div className="flex justify-center items-center">
           <Button
-            className={`w-60 sm:w-55 h-13 sm:h-15 mt-6 sm:mt-8 ${nextDisabled ? 'opacity-50' : ''}`}
+            className={`w-full lg:w-55 h-12 sm:h-15 mt-6 sm:mt-8 ${nextDisabled ? 'opacity-50' : ''}`}
             onClick={onNextClick}
             disabled={nextDisabled}
           >
