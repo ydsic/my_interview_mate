@@ -65,6 +65,8 @@ export default function AnswerInput({
 
   const voiceRecordingRef = useRef<VoiceRecording | null>(null);
 
+  const lastAnswerRef = useRef(initialAnswer);
+
   const setRadarData = useRadarChartData((state) => state.setRadarData);
 
   // AbortController 적용
@@ -175,26 +177,27 @@ export default function AnswerInput({
 
   // 답변 수정
   const handleAnswerChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setAnswer(e.target.value);
-    setIsDirty(true);
+    const value = e.target.value;
+    setAnswer(value);
+    setIsDirty(value.trim() !== lastAnswerRef.current.trim());
   };
 
   const handleFeedback = useCallback(async () => {
+    if (!answer.trim()) {
+      toast('먼저 질문에 대한 답변을 해주세요.', 'info');
+      return;
+    }
     // 동일 답변 방지
     if (answer == initialAnswer) {
       toast('기존 답변과 동일해요. 내용을 수정해 주세요.', 'info');
       return;
     }
 
-    if (hasFeedback && !isDirty) {
+    if (answer.trim() === lastAnswerRef.current.trim()) {
       toast('이미 제출한 답변이에요. 내용을 수정해 주세요.', 'info');
       return;
     }
 
-    if (!answer.trim()) {
-      toast('먼저 질문에 대한 답변을 해주세요.', 'info');
-      return;
-    }
     controllerRef.current?.abort();
     controllerRef.current = new AbortController();
     setLoading(true);
@@ -245,6 +248,7 @@ export default function AnswerInput({
 
       setRadarData(scores);
       setEditAnswer(answer);
+      lastAnswerRef.current = answer.trim();
       setHasFeedback(true);
       setIsDirty(false);
       toast('피드백을 가져왔어요!', 'success');
