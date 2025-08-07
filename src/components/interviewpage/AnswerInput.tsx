@@ -69,6 +69,8 @@ export default function AnswerInput({
 
   const setRadarData = useRadarChartData((state) => state.setRadarData);
 
+  const isMobile = window.matchMedia('(max-width: 640px)').matches;
+
   // AbortController 적용
   const controllerRef = useRef<AbortController | null>(null);
 
@@ -194,7 +196,12 @@ export default function AnswerInput({
     }
 
     if (answer.trim() === lastAnswerRef.current.trim()) {
-      toast('이미 제출한 답변이에요. 내용을 수정해 주세요.', 'info');
+      toast(
+        isMobile
+          ? '이미 제출한 답변이에요. \n내용을 수정해 주세요.'
+          : '이미 제출한 답변이에요. 내용을 수정해 주세요.',
+        'info',
+      );
       return;
     }
 

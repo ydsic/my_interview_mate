@@ -48,20 +48,32 @@ export default function WaitingMessage() {
   }, []);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-15/70">
-      <div className="flex flex-col items-center bg-white p-6 rounded-2xl shadow-xl w-full sm:mx-4 max-w-xl -mt-16">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-15/70 px-6">
+      <div
+        className="flex flex-col items-center bg-white 
+      px-5 py-6 sm:px-8 sm:py-8
+       rounded-2xl shadow-xl w-full sm:mx-4 max-w-xl 
+       -mt-12 sm:-mt-16"
+      >
         <div
           className="
-            w-10 h-10 
-            border-[5px] border-blue-500 
+            w-8 h-8 sm:w-10 sm:h-10 
+            border-[4px] sm:border-[5px] border-blue-500 
             border-t-transparent 
             rounded-full 
             animate-spin 
-            mb-4
+            mb-3 sm:mb-4
           "
         />
-        <H2_content_title>피드백을 불러오는 중입니다...</H2_content_title>
-        <blockquote className="italic text-gray-70 mt-3">“{quote}”</blockquote>
+        <div className="text-base">
+          <H2_content_title>피드백을 불러오는 중입니다...</H2_content_title>
+        </div>
+        <blockquote
+          className="italic text-gray-70 mt-2 sm:mt-3 
+        text-sm sm:text-base max-sm:text-center"
+        >
+          “{quote}”
+        </blockquote>
       </div>
     </div>
   );

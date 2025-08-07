@@ -14,7 +14,11 @@ export function H1_big_title({ children }: textTag) {
 }
 
 export function H2_content_title({ children }: textTag) {
-  return <h2 className="text-[24px] font-bold h-[36px]">{children}</h2>;
+  return (
+    <h2 className="text-[24px] font-bold h-[36px] max-sm:text-[20px]">
+      {children}
+    </h2>
+  );
 }
 
 export function H3_sub_detail({ children }: textTag) {

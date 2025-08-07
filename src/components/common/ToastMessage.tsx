@@ -37,18 +37,17 @@ export default function ToastMessage({ id, message, type = 'info' }: Toast) {
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, x: 40 }}
-      className="min-w-[320px] m-auto flex items-center gap-5 rounded-xl bg-white p-4
-               shadow-md shadow-gray-100/30 ring-[#E9F0FF]"
+      className="min-w-[320px] m-auto flex items-center gap-2 max-sm:gap-1 rounded-xl bg-white p-4 max-sm:p-3               shadow-md shadow-gray-100/30 ring-[#E9F0FF]"
     >
       {/* 아이콘 */}
       <span
-        className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-white ${BADGE_BG[type]}`}
+        className={`flex h-8 w-8 max-sm:h-7 max-sm:w-7 shrink-0 items-center justify-center rounded-full text-white ${BADGE_BG[type]}`}
       >
         <FontAwesomeIcon icon={ICONS[type]} size="xl" />
       </span>
 
       {/* 메시지 */}
-      <p className="p-2 flex-1 text-center text-lg text-gray-100 whitespace-pre-line">
+      <p className="p-2 flex-1 text-center text-lg max-lg:text-sm max-sm:text-sm text-gray-100 whitespace-pre-line">
         {message}
       </p>
     </motion.div>
