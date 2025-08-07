@@ -17,6 +17,9 @@ export default function Nav() {
   const [logoutClickCount, setLogoutClickCount] = useState(0);
   const logoutTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  const navHover =
+    'px-5 py-2 rounded-md transition-colors hover:bg-gray-200 max-sm:px-2 max-sm:py-1';
+
   // 컴포넌트 언마운트 시 타이머 정리
   useEffect(() => {
     return () => {
@@ -30,7 +33,7 @@ export default function Nav() {
     if (logoutClickCount === 0) {
       // 첫 번째 클릭
       setLogoutClickCount(1);
-      toast('로그아웃하려면 3초 내에 다시 한 번 클릭하세요.', 'info');
+      toast('로그아웃하려면 \n3초 내에 다시 한 번 클릭하세요.', 'info');
 
       // 3초 후 상태 초기화
       logoutTimeoutRef.current = setTimeout(() => {
@@ -54,18 +57,25 @@ export default function Nav() {
 
   return (
     <div className="fixed top-0 w-full h-[7vh] flex justify-around items-center bg-white z-[10000] shadow-sm">
-      <div className="w-full max-w-7xl mx-auto px-5 h-full flex justify-between items-center ">
+      <div className="w-full max-w-7xl mx-auto px-5 max-sm:px-5 h-full flex justify-between items-center ">
         <Link to="/">
           <p className="text-xl font-bold">Aimigo</p>
         </Link>
 
         {isLoggedIn ? (
-          <div className="flex items-center gap-15 max-sm:gap-2 font-heavy max-sm:text-sm">
-            {admin && <Link to="/admin">관리자페이지</Link>}
-            <Link to="/mypage">마이페이지</Link>
+          <div className="flex items-center gap-5 max-lg:gap-2 max-sm:gap-0 font-heavy max-sm:text-sm">
+            {admin && (
+              <Link to="/admin" className={navHover}>
+                관리자페이지
+              </Link>
+            )}
+            <Link to="/mypage" className={navHover}>
+              마이페이지
+            </Link>
+
             <button
               onClick={handleLogout}
-              className={`cursor-pointer p-1 rounded transition-colors border ${
+              className={`${navHover} flex cursor-pointer rounded transition-colors border ${
                 logoutClickCount === 1
                   ? 'bg-red-100 border-red-300'
                   : 'hover:bg-gray-50 border-transparent'
@@ -86,9 +96,13 @@ export default function Nav() {
             </button>
           </div>
         ) : (
-          <div className="flex gap-15 max-sm:gap-5 font-heavy">
-            <Link to="/login">로그인</Link>
-            <Link to="/signup">회원가입</Link>
+          <div className="flex gap-8 max-sm:gap-5 font-heavy">
+            <Link to="/login" className={navHover}>
+              로그인
+            </Link>
+            <Link to="/signup" className={navHover}>
+              회원가입
+            </Link>
           </div>
         )}
       </div>

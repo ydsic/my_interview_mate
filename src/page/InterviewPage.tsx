@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
+import clsx from 'clsx';
 
 import Button from '../components/common/Button';
 import AnswerInput from '../components/interviewpage/AnswerInput';
@@ -44,6 +45,7 @@ export default function InterviewPage() {
   const [answer, setAnswer] = useState('');
   const toast = useToast();
   const isFirstLoad = useRef(true);
+  const isDesktop = window.matchMedia('(min-width: 1024px)').matches;
 
   const [question, setQuestion] = useState<QuestionData>({
     questionId: 0,
@@ -240,11 +242,12 @@ export default function InterviewPage() {
   }, [rawCategory, topicParam]);
 
   return (
-    <div className="h-full flex flex-row justify-center items-start gap-6 w-full px-8">
+    <div className="h-full flex flex-col lg:flex-row justify-center items-start gap-6 w-full px-4 sm:px-6 lg:px-8">
       <div
-        className={`flex-1 transition-all duration-500 ${
-          showFeedback ? 'w-1/2' : 'w-full'
-        }`}
+        className={clsx(
+          'w-full lg:flex-1 transition-all duration-500',
+          showFeedback ? 'lg:w-1/2' : 'w-full',
+        )}
       >
         {/* 인터뷰 질문 컴포넌트 */}
         <div>
@@ -294,7 +297,7 @@ export default function InterviewPage() {
         </div>
         <div className="flex justify-center items-center">
           <Button
-            className={`w-55 h-15 mt-8 ${nextDisabled ? 'opacity-50' : ''}`}
+            className={`w-full lg:w-55 h-12 sm:h-15 mt-6 sm:mt-8 ${nextDisabled ? 'opacity-50' : ''}`}
             onClick={onNextClick}
             disabled={nextDisabled}
           >
@@ -302,18 +305,15 @@ export default function InterviewPage() {
           </Button>
         </div>
       </div>
-
+      {/* 피드백 카드 */}
       <div
-        className={`flex-1 flex justify-center items-start transition-all duration-700 ${
+        className={clsx(
+          'flex justify-center items-start overflow-hidden',
+          'transition-all duration-700 ease-[cubic-bezier(0.4,0,0.2,1)]',
           showFeedback
-            ? 'opacity-100 translate-x-0'
-            : 'opacity-0 translate-x-10 pointer-events-none'
-        } animate-fade-in`}
-        style={{
-          minWidth: showFeedback ? 0 : '0',
-          maxWidth: showFeedback ? '50%' : '0',
-          transition: 'all 1s cubic-bezier(.4,0,.2,1)',
-        }}
+            ? 'w-full lg:max-w-1/2 opacity-100 translate-y-0 lg:translate-x-0'
+            : 'w-0   lg:max-w-0   opacity-0 -translate-y-3 lg:translate-x-10 pointer-events-none',
+        )}
       >
         {showFeedback && (
           <FeedbackCard feedback={feedbackContent} answer={answer} />

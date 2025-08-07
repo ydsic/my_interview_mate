@@ -14,18 +14,26 @@ export function H1_big_title({ children }: textTag) {
 }
 
 export function H2_content_title({ children }: textTag) {
-  return <h2 className="text-[24px] font-bold h-[36px]">{children}</h2>;
+  return (
+    <h2 className="text-[24px] font-bold h-[36px] max-sm:h-[28px] max-sm:text-[18px]">
+      {children}
+    </h2>
+  );
 }
 
 export function H3_sub_detail({ children }: textTag) {
   return (
-    <h3 className="text-[22px] font-semibold leading-none">{children}</h3>
+    <h3 className="text-[22px] font-semibold leading-none max-sm:text-[16px]">
+      {children}
+    </h3>
   ); /* 해당 부분 상의 필요 height 높이를 정하느냐 아니면 leading-none */
 }
 
 export function H4_placeholder({ children, className }: textTag) {
   return (
-    <h4 className={`text-[16px] font-semibold ${className}`}>{children}</h4>
+    <h4 className={`text-[16px] font-semibold max-sm:text-[14px] ${className}`}>
+      {children}
+    </h4>
   );
 }
 
