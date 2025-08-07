@@ -83,7 +83,7 @@ export default function Dashboard() {
       max-sm:pt-10   
       max-sm:pb-8
       
-      max-sm:w-[calc(100%+32px)]
+      max-sm:w-[calc(100%+8px)]
       max-sm:rounded-none  max-sm:gap-1"
       >
         <p
