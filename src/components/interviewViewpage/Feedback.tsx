@@ -41,20 +41,29 @@ export default function Feedback({
   }, [feedbackData.feedback]);
 
   return (
-    <div className="flex flex-col items-baseline w-full gap-5">
+    <div className="flex flex-col items-baseline w-full gap-5 max-sm:gap-4">
       <H3_sub_detail> AI 피드백 </H3_sub_detail>
 
-      <div className="w-full bg-gray-50 rounded-lg p-4 text-left whitespace-pre-line text-sm text-gray-800 border border-gray-200 mb-2">
-        <p className="text-lg font-bold text-gray-800 mb-1">종합 평가</p>
-        <p className="text-gray-70 mb-3">AI가 분석한 답변 평가 결과입니다.</p>
-        <p className="text-2xl font-bold text-right mb-2 text-gray-800">
-          {feedbackData.average}점
-        </p>
+      <div
+        className="w-full bg-gray-50 rounded-lg p-5 max-sm:p-3
+       text-left whitespace-pre-line text-sm text-gray-800 border border-gray-200 mb-2"
+      >
+        <div className="flex justify-between sm:p-2 ">
+          <div>
+            <p className="text-lg font-bold text-gray-800 mb-1">종합 평가</p>
+            <p className="text-gray-70 mb-3">
+              AI가 분석한 답변 평가 결과입니다.
+            </p>
+          </div>
+          <p className="text-2xl font-bold text-right mb-2 text-gray-800">
+            {feedbackData.average}점
+          </p>
+        </div>
         <MyProgressBar score={feedbackData.average} />
-        <p className="text-black mt-4">{feedbackData.summary}</p>
+        <p className="text-black mt-5 max-sm:text-ms">{feedbackData.summary}</p>
       </div>
 
-      <div className="flex flex-col w-full  gap-5">
+      <div className="flex flex-col w-full gap-5 max-sm:gap-2">
         <p className="text-lg font-bold text-gray-800 text-left px-4">
           세부 평가 항목
         </p>

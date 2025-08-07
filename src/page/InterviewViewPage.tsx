@@ -134,7 +134,7 @@ export default function InterviewViewPage() {
         data!.question.questionId,
         answerId!,
       );
-      console.log('다시보기 페이지 피드백 데이터 : ', feedback);
+      //console.log('다시보기 페이지 피드백 데이터 : ', feedback);
       setFeedbackData(feedback);
     } catch (err) {
       console.error('피드백 조회 에러:', err); // 예외 ui노출
@@ -150,10 +150,23 @@ export default function InterviewViewPage() {
   }, [data, answerId]);
 
   // 로딩 에러
-  if (loading) return <div className="py-20 text-center">로딩 중...</div>;
+
+  if (loading)
+    return (
+      <div
+        className="min-h-[60vh]
+                  flex flex-col justify-center items-center text-gray-85 gap-5"
+      >
+        <div className="w-10 h-10 border-[5px] border-gray-70 border-t-transparent rounded-full animate-spin mb-4" />
+        <p> 로딩중 ... </p>
+      </div>
+    );
   if (error || !data)
     return (
-      <div className="py-20 text-center text-red-600 font-semibold">
+      <div
+        className="min-h-[60vh] 
+      flex items-center justify-center text-center text-red-600 font-semibold"
+      >
         {error ?? '데이터 없음'}
       </div>
     );

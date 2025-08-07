@@ -17,7 +17,7 @@ export default function ToastProvider() {
 
   return createPortal(
     <div
-      className="fixed bottom-20 left-1/2 -translate-x-1/2 z-[9999]
+      className="fixed bottom-20 max-sm:bottom-5 left-1/2 -translate-x-1/2 z-[9999]
                flex flex-col items-center gap-4 px-4"
     >
       <AnimatePresence>

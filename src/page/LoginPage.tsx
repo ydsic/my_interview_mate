@@ -90,7 +90,7 @@ export default function LoginPage() {
 
         <div
           className="
-          w-4/5 sm:w-3/4 max-sm:w-2/7
+          w-full max-w-[100%]
         bg-gray-50 flex items-center justify-center 
           px-4 max-sm:pt-3"
         >

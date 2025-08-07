@@ -65,12 +65,18 @@ export default function AnswerInput({
 
   const voiceRecordingRef = useRef<VoiceRecording | null>(null);
 
+  const lastAnswerRef = useRef(initialAnswer);
+
   const setRadarData = useRadarChartData((state) => state.setRadarData);
+
+  const isMobile = window.matchMedia('(max-width: 640px)').matches;
 
   // AbortController 적용
   const controllerRef = useRef<AbortController | null>(null);
 
   const isReadOnly = isReviewMode && !editMode;
+
+  const showFollowUpBtn = !isReviewMode && (!isMobile || hasFeedback);
 
   // VoiceRecording 세팅
   useEffect(() => {
@@ -175,26 +181,32 @@ export default function AnswerInput({
 
   // 답변 수정
   const handleAnswerChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setAnswer(e.target.value);
-    setIsDirty(true);
+    const value = e.target.value;
+    setAnswer(value);
+    setIsDirty(value.trim() !== lastAnswerRef.current.trim());
   };
 
   const handleFeedback = useCallback(async () => {
+    if (!answer.trim()) {
+      toast('먼저 질문에 대한 답변을 해주세요.', 'info');
+      return;
+    }
     // 동일 답변 방지
     if (answer == initialAnswer) {
       toast('기존 답변과 동일해요. 내용을 수정해 주세요.', 'info');
       return;
     }
 
-    if (hasFeedback && !isDirty) {
-      toast('이미 제출한 답변이에요. 내용을 수정해 주세요.', 'info');
+    if (answer.trim() === lastAnswerRef.current.trim()) {
+      toast(
+        isMobile
+          ? '이미 제출한 답변이에요. \n내용을 수정해 주세요.'
+          : '이미 제출한 답변이에요. 내용을 수정해 주세요.',
+        'info',
+      );
       return;
     }
 
-    if (!answer.trim()) {
-      toast('먼저 질문에 대한 답변을 해주세요.', 'info');
-      return;
-    }
     controllerRef.current?.abort();
     controllerRef.current = new AbortController();
     setLoading(true);
@@ -207,8 +219,8 @@ export default function AnswerInput({
       } = await supabase.auth.getUser();
 
       console.log('getUser error:', userError);
-      console.log('getUser user object:', user);
-      console.log('getUser user.email:', user?.email);
+      //console.log('getUser user object:', user);
+      //console.log('getUser user.email:', user?.email);
       if (!user || !user.email) {
         throw new Error('로그인 정보가 없습니다.');
       }
@@ -220,7 +232,7 @@ export default function AnswerInput({
         questionId,
         answer,
       );
-      console.log('answerId:', answerId);
+      //console.log('answerId:', answerId);
       toast('답변 저장 완료!', 'success');
 
       const feedbackObj = await OpenAIApi(
@@ -233,7 +245,7 @@ export default function AnswerInput({
 
       try {
         await saveFeedback(answerId, questionId, scores, feedback, summary);
-        toast('피드백을 성공적으로 저장했어요!', 'success');
+        //toast('피드백을 성공적으로 저장했어요!', 'success');
 
         // 피드백을 새로 불러오면 다시보기 페이지에서 다시 피드백 정보 Fetch
         if (afterFeedbackSaved) {
@@ -245,6 +257,7 @@ export default function AnswerInput({
 
       setRadarData(scores);
       setEditAnswer(answer);
+      lastAnswerRef.current = answer.trim();
       setHasFeedback(true);
       setIsDirty(false);
       toast('피드백을 가져왔어요!', 'success');
@@ -296,7 +309,7 @@ export default function AnswerInput({
       </div>
 
       {/* 답변 입력 + 음성 UI */}
-      <div className="relative">
+      <div className="relative max-sm:text-sm">
         {/* disabled 대신 reaonly로 전환하여 키 다운순간 readOnly를 false로 풀어 편집 가능하게  */}
         <textarea
           rows={4}
@@ -340,14 +353,14 @@ export default function AnswerInput({
             <button
               onClick={() => setEditMode(true)}
               className="
-flex items-center gap-2 border border-gray-200 rounded-xl px-3 py-2 transition
+flex items-center gap-2 border border-gray-200 rounded-xl px-3 py-2 transition max-sm:text-xs
             hover:bg-gray-40 cursor-pointer
           "
             >
               <img
                 src={addQuestionIcon}
                 alt="답변 수정하기 아이콘"
-                className="w-5 h-5"
+                className="w-5 h-5 max-sm:w-4 max-sm:h-4"
               />
               {'답변 수정하기'}
             </button>
@@ -356,7 +369,7 @@ flex items-center gap-2 border border-gray-200 rounded-xl px-3 py-2 transition
           <>
             <SubmitButton
               onClick={debounceRequest}
-              className="flex items-center gap-2 pl-3 pr-4"
+              className="flex items-center gap-2 pl-3 pr-4 max-sm:text-xs"
               isDisabled={isBtnDisabled}
             >
               <FontAwesomeIcon
@@ -368,13 +381,20 @@ flex items-center gap-2 border border-gray-200 rounded-xl px-3 py-2 transition
             </SubmitButton>
 
             {/* 추가 질문 버튼 */}
-            {!isReviewMode && (
+            {showFollowUpBtn && (
               <button
-                onClick={onFollowUpToggle}
-                className="
+                onClick={() => {
+                  if (!hasFeedback) {
+                    toast('질문에 대한 피드백을 먼저 받아주세요.', 'info');
+                    return;
+                  }
+                  onFollowUpToggle();
+                }}
+                className={`
             flex items-center gap-2 border border-gray-200 rounded-xl px-3 py-1 transition
             hover:bg-gray-40 cursor-pointer justify-center w-38
-          "
+            max-sm:text-xs max-sm:px-2 max-sm:py-1 max-sm:gap-2 max-sm:w-30
+                ${!hasFeedback ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
                 <img
                   src={addQuestionIcon}
@@ -401,7 +421,7 @@ flex items-center gap-2 border border-gray-200 rounded-xl px-3 py-2 transition
                   setAnswer(editAnswer);
                 }}
                 className="
-            flex items-center gap-2 border border-gray-200 rounded-xl px-3 py-1 transition
+            flex items-center gap-2 border border-gray-200 rounded-xl px-3 py-2 transition max-sm:text-xs
             hover:bg-gray-40 cursor-pointer
           "
               >

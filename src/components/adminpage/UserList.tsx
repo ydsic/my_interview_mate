@@ -52,7 +52,7 @@ export default function UserList() {
       try {
         setIsLoading(true);
         const { data, error } = await fetchUsers(page);
-        console.log('[관리자 유저 목록] : ', data);
+        //console.log('[관리자 유저 목록] : ', data);
         if (error) {
           throw new Error('사용자 정보를 불러오는데 실패했습니다.');
         }

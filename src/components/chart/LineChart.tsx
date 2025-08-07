@@ -34,7 +34,7 @@ export default function LineChart({ days, data }: LineChartProps) {
   };
 
   return (
-    <div className="w-full p-5">
+    <div className="w-full h-full p-5">
       <Line data={chartData} options={options} />
     </div>
   );

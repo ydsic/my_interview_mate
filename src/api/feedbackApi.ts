@@ -40,5 +40,5 @@ export const saveFeedback = async (
     console.error('피드백 저장 실패:', error);
     throw new Error('피드백 저장에 실패했어요.');
   }
-  console.log('[피드백] 업서트 결과:', data);
+  //console.log('[피드백] 업서트 결과:', data);
 };

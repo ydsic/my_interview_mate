@@ -18,6 +18,7 @@ import { debounce } from 'lodash';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useModal } from '../../hooks/useModal';
+import clsx from 'clsx';
 
 const CATEGORY_STYLES: Record<
   string,
@@ -116,149 +117,192 @@ export default function Bookmark() {
   };
 
   return (
-    <section className="max-w-7xl mx-auto rounded-3xl bg-white p-6 shadow-md flex flex-col justify-start gap-7 mb-5 min-h-[750px]">
-      <H3_sub_detail>즐겨찾기 질문</H3_sub_detail>
+    <div className="pb-20">
+      <section
+        className="max-w-7xl mx-auto rounded-3xl
+                        bg-white p-6 shadow-md 
+                        flex flex-col 
+                        gap-7 max-sm:gap-3 mb-5 justify-start min-h-[750px]"
+      >
+        {/* 제목 */}
+        <H3_sub_detail>즐겨찾기 질문</H3_sub_detail>
 
-      {isLoading && (
-        <div className="flex flex-col flex-1 justify-center items-center text-gray-85 gap-5">
-          <div className="w-10 h-10 border-[5px] border-gray-70 border-t-transparent rounded-full animate-spin mb-4" />
-          <p> 로딩중 ... </p>
-        </div>
-      )}
+        {/* 즐겨찾기 기록 불러오기 */}
+        {isLoading && (
+          <div className="flex flex-col flex-1 justify-center items-center text-gray-85 gap-5">
+            <div className="w-10 h-10 border-[5px] border-gray-70 border-t-transparent rounded-full animate-spin mb-4" />
+            <p> 로딩중 ... </p>
+          </div>
+        )}
 
-      {!isLoading && bookMarkList.length === 0 && (
-        <div className="py-20 text-center text-gray-70">
-          <H2_content_title>아직 즐겨찾기한 질문이 없어요!</H2_content_title>
-          <br />
-          <span className="font-semibold mt-2">
-            관심 있는 질문을 북마크해보세요 ⭐️
-          </span>
-        </div>
-      )}
+        {!isLoading && bookMarkList.length === 0 && (
+          <div className="py-20 text-center text-gray-70">
+            <H2_content_title>아직 즐겨찾기한 질문이 없어요!</H2_content_title>
+            <br />
+            <span className="font-semibold mt-2">
+              관심 있는 질문을 북마크해보세요 ⭐️
+            </span>
+          </div>
+        )}
 
-      {!isLoading && bookMarkList.length > 0 && (
-        <>
-          <motion.div
-            layout
-            transition={{ duration: 0.5, ease: 'easeInOut' }}
-            className="flex-grow"
-          >
-            <motion.ul
+        {!isLoading && bookMarkList.length > 0 && (
+          <>
+            <motion.div
               layout
-              className="relative space-y-3 pt-6 pb-13 flex-grow"
+              transition={{ duration: 0.5, ease: 'easeInOut' }}
+              className="flex-grow"
             >
-              <AnimatePresence mode="popLayout" initial={false}>
-                {bookMarkList.map((bookmark) => {
-                  const { bg, text } = CATEGORY_STYLES[
-                    bookmark.question_category
-                  ] ?? {
-                    bg: 'bg-gray-200',
-                    text: 'text-gray-700',
-                  };
-                  return (
-                    <motion.li
-                      key={`${bookmark.question_id}-${pageParam}`}
-                      layout
-                      custom={direction}
-                      initial={{ opacity: 0, x: direction > 0 ? 40 : -40 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: direction > 0 ? -40 : 40 }}
-                      transition={{ duration: 0.35 }}
-                      className="flex items-center justify-between rounded-md bg-gray-50 shadow-sm px-4 py-5 mb-5"
-                    >
-                      <div className="flex w-full items-center gap-10 ml-3">
-                        <button
-                          className="text-[24px] cursor-pointer"
-                          onClick={() => handleBookMark(bookmark.question_id)}
-                        >
-                          <FontAwesomeIcon
-                            icon={solidStar}
-                            className="text-orange-100"
-                          />
-                        </button>
-                        {/* 면접 질문 / 카테고리 */}
-                        <div className="mt-1 flex flex-col gap-4 max-w-[80%] grow">
-                          <H3_sub_detail>
-                            {bookmark.question_content}
-                          </H3_sub_detail>
-                          <div className="flex items-center gap-2 text-base font-semibold">
+              <motion.ul
+                layout
+                className="relative space-y-3 pt-6 pb-13 max-sm:pb-5 flex-grow"
+              >
+                <AnimatePresence mode="popLayout" initial={false}>
+                  {bookMarkList.map((bookmark) => {
+                    return (
+                      <motion.li
+                        key={`${bookmark.question_id}-${pageParam}`}
+                        layout
+                        custom={direction}
+                        initial={{ opacity: 0, x: direction > 0 ? 40 : -40 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: direction > 0 ? -40 : 40 }}
+                        transition={{ duration: 0.35 }}
+                        className={clsx(
+                          /* 📱 모바일: 2열·3행 그리드 */
+                          'grid grid-rows-[auto_auto_auto] grid-cols-[1fr_auto] gap-y-2',
+                          'rounded-xl bg-gray-50 shadow-sm p-4',
+                          /* 🖥 PC: flex-row */
+                          'sm:flex sm:items-center sm:justify-between sm:px-4 sm:py-5 sm:mb-5',
+                        )}
+                      >
+                        <div className="flex flex-col gap-2 sm:flex-row sm:gap-4 sm:flex-1 sm:min-w-0 row-start-1 col-span-1">
+                          {/* 카테고리 칩 ------------------------------------------- */}
+                          <div className="flex items-center gap-2 justify-between">
                             <span
-                              className={`inline-flex justify-center items-center h-7 min-w-28 py-4 rounded-lg text-center ${bg} ${text}`}
+                              className={clsx(
+                                'w-24 h-6 sm:w-30 sm:h-9 flex-none inline-flex items-center justify-center rounded-lg',
+                                'text-xs sm:text-base font-semibold truncate',
+                                CATEGORY_STYLES[bookmark.question_category]?.bg,
+                                CATEGORY_STYLES[bookmark.question_category]
+                                  ?.text,
+                              )}
                             >
                               {bookmark.question_category === 'front-end'
                                 ? 'Front-end'
                                 : bookmark.question_category.toUpperCase()}
                             </span>
-                            <H4_placeholder className="ml-2 text-gray-70 font-extralight">
+
+                            {/* 즐겨찾기 아이콘 */}
+                            <button
+                              onClick={() =>
+                                handleBookMark(bookmark.question_id)
+                              }
+                              className="
+                              row-start-1 col-start-2 justify-self-end
+                              sm:satic sm:order-first sm:mr-2
+                              text-[20px] sm:text-[30px] flex-none cursor-pointer"
+                            >
+                              <FontAwesomeIcon
+                                icon={solidStar}
+                                className="text-orange-100"
+                              />
+                            </button>
+                          </div>
+
+                          {/* 질문 내용 -------------------------------------------*/}
+                          <div className="text-left sm:min-w-0">
+                            <H3_sub_detail>
+                              {bookmark.question_content}
+                            </H3_sub_detail>
+
+                            {/* 질문 내용 -------------------------------------------*/}
+                            <H4_placeholder className="max-sm:hidden mt-4 text-gray-70 font-extralight">
                               {new Date(
                                 bookmark.bookmarked_at,
                               ).toLocaleDateString()}
                             </H4_placeholder>
                           </div>
                         </div>
-                      </div>
 
-                      {/* 오른쪽: 점수 & 다시보기 */}
-                      <div className="flex items-center gap-5 shrink-0">
-                        <H2_content_title>
-                          {bookmark.average_score ?? '-'}점
-                        </H2_content_title>
-                        <WhiteButton
-                          onClick={() =>
-                            handleButtonClick(bookmark.question_id)
-                          }
+                        <div
+                          className="
+      row-start-3 col-span-2 flex items-center justify-between gap-4
+      sm:row-auto sm:col-auto sm:justify-end sm:gap-6
+    "
                         >
-                          다시보기
-                        </WhiteButton>
-                      </div>
-                    </motion.li>
+                          {/* 작성일 ------------------------------------------- 모바일 칩 아래 */}
+                          <H4_placeholder className="sm:hidden text-gray-70 font-extralight">
+                            {new Date(
+                              bookmark.bookmarked_at,
+                            ).toLocaleDateString()}
+                          </H4_placeholder>
+
+                          {/* 점수 + 다시보기 버튼 */}
+                          <div className="flex items-center gap-4 shrink-0 whitespace-nowrap">
+                            <H2_content_title>
+                              {bookmark.average_score ?? '-'}점
+                            </H2_content_title>
+                            <WhiteButton
+                              onClick={() =>
+                                handleButtonClick(bookmark.question_id)
+                              }
+                            >
+                              다시보기
+                            </WhiteButton>
+                          </div>
+                        </div>
+                      </motion.li>
+                    );
+                  })}
+                </AnimatePresence>
+              </motion.ul>
+            </motion.div>
+
+            {/* 페이지네이션 */}
+            <div className="flex justify-center w-full gap-2">
+              <button
+                onClick={() => handlePageChange(Math.max(pageParam - 1, 1))}
+                disabled={pageParam === 1}
+                className="px-4 py-2 rounded bg-gray-40 text-black disabled:opacity-50 cursor-pointer"
+              >
+                이전
+              </button>
+
+              {Array.from(
+                { length: Math.ceil(total / PAGE_SIZE) },
+                (_, idx) => {
+                  const pageNumber = idx + 1;
+                  const isCurrent = pageNumber === pageParam;
+                  return (
+                    <button
+                      key={pageNumber}
+                      onClick={() => handlePageChange(pageNumber)}
+                      disabled={isCurrent}
+                      className={`w-6 text-center text-base font-semibold cursor-pointer ${
+                        isCurrent ? 'text-black' : 'text-gray-300'
+                      }`}
+                    >
+                      {pageNumber}
+                    </button>
                   );
-                })}
-              </AnimatePresence>
-            </motion.ul>
-          </motion.div>
+                },
+              )}
 
-          {/* 페이지네이션 */}
-          <div className="flex justify-center w-full gap-2">
-            <button
-              onClick={() => handlePageChange(Math.max(pageParam - 1, 1))}
-              disabled={pageParam === 1}
-              className="px-4 py-2 rounded bg-gray-40 text-black disabled:opacity-50 cursor-pointer"
-            >
-              이전
-            </button>
-
-            {Array.from({ length: Math.ceil(total / PAGE_SIZE) }, (_, idx) => {
-              const pageNumber = idx + 1;
-              const isCurrent = pageNumber === pageParam;
-              return (
-                <button
-                  key={pageNumber}
-                  onClick={() => handlePageChange(pageNumber)}
-                  disabled={isCurrent}
-                  className={`w-6 text-center text-base font-semibold cursor-pointer ${
-                    isCurrent ? 'text-black' : 'text-gray-300'
-                  }`}
-                >
-                  {pageNumber}
-                </button>
-              );
-            })}
-
-            <button
-              onClick={() =>
-                handlePageChange(
-                  Math.min(pageParam + 1, Math.ceil(total / PAGE_SIZE)),
-                )
-              }
-              disabled={pageParam >= Math.ceil(total / PAGE_SIZE)}
-              className="px-4 py-2 rounded bg-gray-40 text-black disabled:opacity-50 cursor-pointer"
-            >
-              다음
-            </button>
-          </div>
-        </>
-      )}
-    </section>
+              <button
+                onClick={() =>
+                  handlePageChange(
+                    Math.min(pageParam + 1, Math.ceil(total / PAGE_SIZE)),
+                  )
+                }
+                disabled={pageParam >= Math.ceil(total / PAGE_SIZE)}
+                className="px-4 py-2 rounded bg-gray-40 text-black disabled:opacity-50 cursor-pointer"
+              >
+                다음
+              </button>
+            </div>
+          </>
+        )}
+      </section>
+    </div>
   );
 }
