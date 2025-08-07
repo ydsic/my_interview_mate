@@ -1,4 +1,4 @@
-import { elevenLabsSTT } from '../api/elevenlabsSTT';
+import { elevenLabsSTT, checkAuthStatus } from '../api/elevenlabsSTT';
 
 export interface VoiceRecordingConfig {
   onStart?: () => void;
@@ -31,6 +31,22 @@ export class VoiceRecording {
   public async startRecording(): Promise<void> {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
       this.config.onError?.('이 브라우저는 마이크를 지원하지 않습니다.');
+      return;
+    }
+
+    // 음성 녹음 시작 전에 인증 상태 미리 체크
+    try {
+      await checkAuthStatus();
+      console.log('인증 상태 확인 완료');
+    } catch (authError) {
+      console.error('사전 인증 체크 실패:', authError);
+      if (authError instanceof Error) {
+        this.config.onError?.(authError.message);
+      } else {
+        this.config.onError?.(
+          '로그인 상태를 확인할 수 없습니다. 다시 로그인해주세요.',
+        );
+      }
       return;
     }
 

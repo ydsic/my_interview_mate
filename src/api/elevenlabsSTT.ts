@@ -4,7 +4,26 @@ import { supabase } from '../supabaseClient'; // supabase 인스턴스 import �
 
 // 인증 상태 확인 함수
 export async function checkAuthStatus(): Promise<string> {
-  const { data, error: sessionError } = await supabase.auth.getSession();
+  // 첫 번째 시도: 현재 세션 확인
+  let { data, error: sessionError } = await supabase.auth.getSession();
+
+  // 세션이 없으면 유저 정보 다시 가져오기 시도
+  if (!data.session) {
+    console.log('세션이 없어서 유저 정보 재확인 시도...');
+    const { data: userData, error: userError } = await supabase.auth.getUser();
+
+    if (userData.user && !userError) {
+      // 유저는 있는데 세션이 없으면 세션 새로고침 시도
+      const { data: refreshData, error: refreshError } =
+        await supabase.auth.refreshSession();
+      if (refreshData.session && !refreshError) {
+        data = refreshData;
+        sessionError = null;
+        console.log('세션 새로고침 성공');
+      }
+    }
+  }
+
   const accessToken = data.session?.access_token;
 
   if (sessionError) {
@@ -14,6 +33,10 @@ export async function checkAuthStatus(): Promise<string> {
 
   if (!accessToken) {
     console.log('세션 데이터:', data);
+    console.log(
+      'localStorage에서 토큰 확인:',
+      localStorage.getItem('aimigo-auth-token'),
+    );
     throw new Error('로그인이 필요합니다. 다시 로그인해주세요.');
   }
 
