@@ -17,7 +17,7 @@ export default function FirstLandingPage({ setFirstLandingPage }: Props) {
   return (
     <div
       ref={containerRef}
-      className="fixed inset-0
+      className="fixed inset-0 z-[11000]
       flex items-center justify-center
       overflow-hidden
       "
