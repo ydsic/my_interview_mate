@@ -17,6 +17,7 @@ import type { InterviewHistoryItem as RawItem } from '../../api/historyAPI';
 import { useToast } from '../../hooks/useToast';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useModal } from '../../hooks/useModal';
+import clsx from 'clsx';
 
 const CATEGORY_STYLES: Record<
   string,
@@ -133,7 +134,17 @@ export default function InterviewHistory() {
     gap-7 max-sm:gap-3 mb-5 justify-start min-h-[750px]"
       >
         {/* 제목 */}
-        <H3_sub_detail>최근 면접 기록</H3_sub_detail>
+        <div className="flex items-center justify-between w-full">
+          <H3_sub_detail>최근 면접 기록</H3_sub_detail>
+
+          {/* 모바일에서만 노출, 모바일 용 수정 버튼*/}
+          <Button
+            className="lg:hidden max-sm:px-3 max-sm:py-2 max-sm:text-xs max-sm:rounded-lg"
+            onClick={toggleEditMode}
+          >
+            {editMode ? '수정 내용 저장하기' : '히스토리 수정'}
+          </Button>
+        </div>
 
         {/* 면접 기록 불러오기 */}
         {loading ? (
@@ -175,6 +186,7 @@ export default function InterviewHistory() {
                     question,
                     feedback,
                   }) => (
+                    // ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
                     <motion.li
                       key={answer_id}
                       layout
@@ -182,71 +194,110 @@ export default function InterviewHistory() {
                       animate={{
                         opacity: 1,
                         x: editMode ? 10 : 0,
-                        width: editMode ? '98%' : '100%',
+                        width: editMode ? '97%' : '99%',
                       }}
                       exit={{ opacity: 0, x: direction > 0 ? -40 : 40 }}
                       transition={{ duration: 0.35 }}
-                      style={{ transformOrigin: 'right center' }}
-                      className={`flex flex-col sm:flex-row sm:items-center sm:justify-between 
-                      rounded-md bg-gray-50 shadow-sm px-4 py-5 mb-5 
-                      gap-4 max-sm:gap-2
-                      ${editMode ? 'ml-auto' : 'w-full'}`}
+                      className={clsx(
+                        /* 모바일: 2열 3행 그리드 */
+                        'grid grid-rows-[auto_auto_auto] grid-cols-[1fr_auto] gap-y-2',
+                        'rounded-xl bg-gray-50 shadow-sm p-4',
+                        /* PC: flex-row */
+                        'sm:flex sm:items-center sm:justify-between sm:px-4 sm:py-5 sm:mb-5',
+                        editMode ? 'ml-auto' : 'w-full',
+                      )}
                     >
-                      {/* 삭제버튼 */}
+                      {/* 좌측 ------------------------------------------- */}
+
+                      {/* 카테고리 칩 ------------------------------------------- */}
+                      <div
+                        className="flex flex-col gap-2 sm:flex-row sm:gap-4 sm:flex-1 sm:min-w-0
+                row-start-1 col-span-2"
+                      >
+                        <span
+                          className={clsx(
+                            /* ── 고정 크기 ── */
+                            'w-20 h-6 sm:w-28 sm:h-8 flex-none',
+                            /* ── 가운데 정렬 ── */
+                            'inline-flex items-center justify-center rounded-lg',
+                            /* ── 글자 사이즈 ── */
+                            'text-xs sm:text-base font-semibold',
+                            /* ── 길면 말줄임 ── */
+                            'truncate',
+                            CATEGORY_STYLES[question.category]?.bg,
+                            CATEGORY_STYLES[question.category]?.text,
+                          )}
+                        >
+                          {question.category === 'front-end'
+                            ? 'Front-end'
+                            : question.category.toUpperCase()}
+                        </span>
+
+                        {/* 질문 내용 -------------------------------------------*/}
+                        <div className="text-left sm:min-w-0">
+                          <H3_sub_detail>{question.content}</H3_sub_detail>
+
+                          {/* 작성일 ------------------------------------------- 테스크톱 하단 */}
+                          <div className="max-sm:hidden mt-4 max-sm:row-start-3 col-start-1">
+                            <H4_placeholder className="text-gray-70 font-extraligh">
+                              {new Date(created_at).toLocaleDateString()}
+                            </H4_placeholder>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* 우측(점수 + 버튼) ------------------------------------------- */}
+                      <div
+                        className="row-start-3 col-start-1 col-span-2
+                      flex items-center justify-between 
+                      gap-4 shrink-0 whitespace-nowrap 
+                      sm:row-auto sm:col-auto sm:justify-end sm:gap-6"
+                      >
+                        {/* 작성일 ------------------------------------------- 모바일 칩 아래 */}
+                        <div className="sm:hidden mt-2">
+                          <H4_placeholder className="text-gray-70 font-extraligh">
+                            {new Date(created_at).toLocaleDateString()}
+                          </H4_placeholder>
+                        </div>
+
+                        <div className="flex items-center gap-4 shrink-0 whitespace-nowrap">
+                          {/* 점수 -------------------------------------------*/}
+                          <H2_content_title className="whitespace-nowrap">
+                            {feedback?.average ?? '0'}점
+                          </H2_content_title>
+
+                          {/* 다시보기 / 수정하기 버튼 -------------------------------------------*/}
+                          <WhiteButton
+                            onClick={() =>
+                              navigate(
+                                editMode
+                                  ? `/interview-view/${answer_id}?mode=edit`
+                                  : `/interview-view/${answer_id}`,
+                                { state: { answerId: answer_id } },
+                              )
+                            }
+                          >
+                            {editMode ? '수정하기' : '다시보기'}
+                          </WhiteButton>
+                        </div>
+                      </div>
+
+                      {/* 🗑 삭제 버튼 (편집 모드) */}
                       {editMode && (
                         <button
                           type="button"
                           onClick={() => handleDelete(answer_id, question_id)}
                           aria-label="delete history"
-                          className="items-center justify-center flex border rounded-3xl h-7 w-7 absolute -left-10 top-1/2 -translate-y-1/2 text-gray-400 hover:text-red-500 transition-colors cursor-pointer"
+                          className="cursor-pointer absolute -left-10 top-1/2 -translate-y-1/2 flex 
+                          h-7 w-7 max-sm:h-5 max-sm:w-5 max-sm:-left-7
+                 items-center justify-center rounded-3xl border
+                 text-gray-400 hover:text-red-500 transition-colors"
                         >
                           <FontAwesomeIcon icon={faXmark} />
                         </button>
                       )}
-
-                      {/* 면접 질문 / 카테고리 */}
-                      <div className="mt-1 flex flex-col gap-4 max-w-[65%]">
-                        <H3_sub_detail>{question.content}</H3_sub_detail>
-                        <div className="flex items-center gap-2 text-base font-semibold">
-                          <span
-                            className={`inline-flex justify-center items-center text-center h-7 min-w-28 py-4 rounded-lg ${
-                              CATEGORY_STYLES[question.category]?.bg
-                            } ${CATEGORY_STYLES[question.category]?.text}`}
-                          >
-                            {question.category === 'front-end'
-                              ? 'Front-end'
-                              : question.category.toUpperCase()}
-                          </span>
-
-                          <H4_placeholder className="ml-2 text-gray-70 font-extralight">
-                            {new Date(created_at).toLocaleDateString()}
-                          </H4_placeholder>
-                        </div>
-                      </div>
-
-                      {/* 오른쪽: 점수 & 다시보기 */}
-                      <div className="flex items-center gap-3 shrink-0">
-                        <H2_content_title>
-                          {feedback?.average ?? '-'} 점
-                        </H2_content_title>
-                        <WhiteButton
-                          onClick={() =>
-                            navigate(
-                              editMode
-                                ? `/interview-view/${answer_id}?mode=edit`
-                                : `/interview-view/${answer_id}`,
-                              {
-                                state: {
-                                  answerId: answer_id,
-                                },
-                              },
-                            )
-                          }
-                        >
-                          {editMode ? '수정하기' : '다시보기'}
-                        </WhiteButton>
-                      </div>
                     </motion.li>
+                    // ---------------------------------------------------------------------------------------------------------------------------------
                   ),
                 )}
               </AnimatePresence>
@@ -258,14 +309,14 @@ export default function InterviewHistory() {
         {items.length > 0 && (
           <div className="relative">
             {/* 수정버튼 */}
-            <div className="absolute right-0 top-0">
+            <div className="absolute right-0 top-0 max-lg:hidden">
               <Button onClick={toggleEditMode}>
                 {editMode ? '수정 내용 저장하기' : '히스토리 수정'}
               </Button>
             </div>
 
-            {/* 페이지네이션 */}
-            <div className="flex justify-center w-full gap-1 sm:gap-2 text-sm sm:text-base">
+            {/* 페이지네이션 -------------------------------------------------------------------------------*/}
+            <div className="flex justify-center w-full gap-1 sm:gap-2 text-sm sm:text-base max-sm:pb-7">
               <button
                 onClick={() => handlePageChange(Math.max(pageParam - 1, 1))}
                 disabled={pageParam === 1}

@@ -15,7 +15,7 @@ export function H1_big_title({ children }: textTag) {
 
 export function H2_content_title({ children }: textTag) {
   return (
-    <h2 className="text-[24px] font-bold h-[36px] max-sm:font-medium max-sm:h-[28px] max-sm:text-[18px]">
+    <h2 className="text-[24px] font-bold h-[36px] max-lg:font-medium max-lg:text-[22px] max-sm:font-medium max-sm:h-[28px] max-sm:text-[18px]">
       {children}
     </h2>
   );
@@ -23,7 +23,7 @@ export function H2_content_title({ children }: textTag) {
 
 export function H3_sub_detail({ children }: textTag) {
   return (
-    <h3 className="text-[22px] font-semibold max-sm:font-medium leading-none max-sm:text-[16px]">
+    <h3 className="text-[22px] font-semibold max-lg:font-medium max-lg:text-[17px] max-sm:font-normal max-sm:text-[15px] leading-5.5 ">
       {children}
     </h3>
   ); /* 해당 부분 상의 필요 height 높이를 정하느냐 아니면 leading-none */
