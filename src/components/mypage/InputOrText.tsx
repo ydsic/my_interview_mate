@@ -30,10 +30,10 @@ export default function InputOrText({
   ) : (
     <p
       className={clsx(
-        'grow-1 focus:outline-none rounded-2xl',
+        'grow-1 focus:outline-none rounded-2xl max-sm:rounded-xl',
         name === 'nickname'
-          ? 'text-[24px] font-bold h-[36px]'
-          : 'px-5 py-3 bg-gray-15',
+          ? 'text-[24px] max-sm:text-[22px] font-bold h-[36px] max-sm:h-[30px]'
+          : 'px-5 py-3 max-sm:py-2 bg-gray-15',
         value.trim() === '' && 'text-gray-70',
       )}
     >

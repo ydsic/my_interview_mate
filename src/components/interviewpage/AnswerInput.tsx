@@ -353,14 +353,14 @@ export default function AnswerInput({
             <button
               onClick={() => setEditMode(true)}
               className="
-flex items-center gap-2 border border-gray-200 rounded-xl px-3 py-2 transition
+flex items-center gap-2 border border-gray-200 rounded-xl px-3 py-2 transition max-sm:text-xs
             hover:bg-gray-40 cursor-pointer
           "
             >
               <img
                 src={addQuestionIcon}
                 alt="답변 수정하기 아이콘"
-                className="w-5 h-5"
+                className="w-5 h-5 max-sm:w-4 max-sm:h-4"
               />
               {'답변 수정하기'}
             </button>
@@ -421,7 +421,7 @@ flex items-center gap-2 border border-gray-200 rounded-xl px-3 py-2 transition
                   setAnswer(editAnswer);
                 }}
                 className="
-            flex items-center gap-2 border border-gray-200 rounded-xl px-3 py-1 transition
+            flex items-center gap-2 border border-gray-200 rounded-xl px-3 py-2 transition max-sm:text-xs
             hover:bg-gray-40 cursor-pointer
           "
               >

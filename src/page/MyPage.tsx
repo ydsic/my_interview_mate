@@ -51,10 +51,10 @@ export default function MyPage() {
       <div
         className={`flex justify-center gap-10 max-sm:gap-5 items-center 
           w-full bg-white rounded-4xl
-          mb-6 sm:mb-10 px-10 py-3
+          mb-6 sm:mb-10 px-10 py-4
 
           max-sm:fixed max-sm:bottom-0 max-sm:left-1/2 max-sm:-translate-x-1/2
-          max-sm:w-[95%] max-sm:px-0 max-sm:py-2 
+          max-sm:w-[95%] max-sm:px-0 max-sm:py-3  
           max-sm:rounded-2xl max-sm:shadow-lg 
           max-sm:z-50`}
       >
