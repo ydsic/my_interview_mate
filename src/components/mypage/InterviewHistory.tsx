@@ -129,9 +129,9 @@ export default function InterviewHistory() {
     <div className="pb-20">
       <section
         className="max-w-7xl mx-auto rounded-3xl 
-    bg-white p-10 max-sm:p-3 shadow-md 
-    flex flex-col
-    gap-7 max-sm:gap-3 mb-5 justify-start min-h-[750px]"
+                bg-white p-10 max-sm:p-3 shadow-md 
+                 flex flex-col
+                gap-7 max-sm:gap-3 mb-5 justify-start min-h-[750px]"
       >
         {/* 제목 */}
         <div className="flex items-center justify-between w-full">
@@ -156,13 +156,13 @@ export default function InterviewHistory() {
           <div className="m-10 p-5 rounded-xl border border-red-200 bg-red-50 text-red-600 text-center font-semibold">
             {error}
           </div>
-        ) : items.length === 0 ? (
+        ) : !loading && items.length === 0 ? (
           <div className="py-20 text-center text-gray-70">
             {/* 면접 질문이 없을 때 */}
             <H2_content_title>아직 인터뷰 기록이 없어요!</H2_content_title>
             <br />
             <span className="font-semibold mt-2">
-              나만의 인터뷰 실력을 보여주세요
+              나만의 인터뷰 실력을 보여주세요 ✏️
             </span>
           </div>
         ) : (
@@ -177,7 +177,6 @@ export default function InterviewHistory() {
               className="relative space-y-3 pt-6 pb-13 max-sm:pb-5 flex-grow"
             >
               <AnimatePresence mode="popLayout" initial={false}>
-                {' '}
                 {(isFetching ? prevItems : items).map(
                   ({
                     answer_id,
@@ -288,7 +287,7 @@ export default function InterviewHistory() {
                           type="button"
                           onClick={() => handleDelete(answer_id, question_id)}
                           aria-label="delete history"
-                          className="cursor-pointer absolute -left-10 top-1/2 -translate-y-1/2 flex 
+                          className="cursor-pointer absolute -left-13 top-1/2 -translate-y-1/2 flex 
                           h-7 w-7 max-sm:h-5 max-sm:w-5 max-sm:-left-7
                  items-center justify-center rounded-3xl border
                  text-gray-400 hover:text-red-500 transition-colors"
