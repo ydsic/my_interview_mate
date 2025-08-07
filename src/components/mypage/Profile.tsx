@@ -197,7 +197,8 @@ export default function Profile() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex flex-col gap-10 mb-5 bg-white p-[24px] rounded-4xl shadow-md relative h-[450px]"
+      className="flex flex-col gap-10 mb-5 bg-white p-[24px] rounded-4xl shadow-md relative h-[450px]
+      max-sm:w-[92%] max-sm:mx-auto"
     >
       <H3_sub_detail className="font-semibold">프로필 정보</H3_sub_detail>
 
@@ -211,7 +212,7 @@ export default function Profile() {
           <div className="flex items-center gap-5.5 h-20 relative">
             <div className="relative">
               <img
-                className="h-20 w-20 rounded-full object-cover"
+                className="h-20 w-20 max-sm:h-25 max-sm:w-25 rounded-full object-cover"
                 src={previewImg || defaultProfileImg}
                 alt="프로필 사진"
               />
@@ -254,9 +255,9 @@ export default function Profile() {
             </div>
           </div>
 
-          <div className="flex flex-col gap-5">
+          <div className="flex flex-col gap-5 max-sm:gap-4">
             <div className="flex w-full gap-8 px-2 items-center">
-              <p className="flex-shrink-0"> 희망 직무</p>
+              <p className="flex-shrink-0 max-sm:text-sm"> 희망 직무</p>
               <InputOrText
                 isEditing={isEditing}
                 name="job"
@@ -268,7 +269,7 @@ export default function Profile() {
             </div>
 
             <div className="flex w-full gap-8 px-2 items-center">
-              <p className="flex-shrink-0"> 면접 목표</p>
+              <p className="flex-shrink-0 max-sm:text-sm"> 면접 목표</p>
               <InputOrText
                 isEditing={isEditing}
                 name="goal"
@@ -280,7 +281,7 @@ export default function Profile() {
             </div>
           </div>
 
-          <div className="flex justify-end mt-auto gap-5">
+          <div className="flex justify-end max-sm:justify-center mt-auto gap-5">
             {isEditing ? (
               <>
                 <button
