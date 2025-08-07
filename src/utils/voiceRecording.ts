@@ -106,7 +106,30 @@ export class VoiceRecording {
           }
         } catch (error) {
           console.error('STT Error:', error);
-          this.config.onError?.('음성 인식에 실패했습니다. 다시 시도해주세요.');
+
+          // 에러 타입에 따른 구체적인 메시지 처리
+          if (error instanceof Error) {
+            if (
+              error.message.includes('로그인이 필요합니다') ||
+              error.message.includes('인증 세션에 문제가 있습니다')
+            ) {
+              this.config.onError?.(
+                '로그인이 만료되었습니다. 다시 로그인해주세요.',
+              );
+            } else if (error.message.includes('STT API 요청 실패')) {
+              this.config.onError?.(
+                '음성 인식 서버에 문제가 있습니다. 잠시 후 다시 시도해주세요.',
+              );
+            } else {
+              this.config.onError?.(
+                error.message || '음성 인식에 실패했습니다. 다시 시도해주세요.',
+              );
+            }
+          } else {
+            this.config.onError?.(
+              '음성 인식에 실패했습니다. 다시 시도해주세요.',
+            );
+          }
         } finally {
           this.isProcessing = false;
           this.config.onProcessingEnd?.();

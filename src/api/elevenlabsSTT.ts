@@ -2,6 +2,33 @@
 
 import { supabase } from '../supabaseClient'; // supabase 인스턴스 import 필요
 
+// 인증 상태 확인 함수
+export async function checkAuthStatus(): Promise<string> {
+  const { data, error: sessionError } = await supabase.auth.getSession();
+  const accessToken = data.session?.access_token;
+
+  if (sessionError) {
+    console.error('세션 가져오기 오류:', sessionError);
+    throw new Error('인증 세션에 문제가 있습니다. 다시 로그인해주세요.');
+  }
+
+  if (!accessToken) {
+    console.log('세션 데이터:', data);
+    throw new Error('로그인이 필요합니다. 다시 로그인해주세요.');
+  }
+
+  // 토큰 만료 체크
+  if (data.session?.expires_at) {
+    const expiresAt = new Date(data.session.expires_at * 1000);
+    const now = new Date();
+    if (expiresAt <= now) {
+      throw new Error('로그인이 만료되었습니다. 다시 로그인해주세요.');
+    }
+  }
+
+  return accessToken;
+}
+
 export async function elevenLabsSTT(audioBlob: Blob): Promise<string> {
   if (audioBlob.size === 0) {
     throw new Error('오디오 파일이 비어있습니다.');
@@ -18,10 +45,8 @@ export async function elevenLabsSTT(audioBlob: Blob): Promise<string> {
   formData.append('language_code', 'ko');
   formData.append('timestamps_granularity', 'word');
 
-  // JWT 토큰 가져오기
-  const { data } = await supabase.auth.getSession();
-  const accessToken = data.session?.access_token;
-  if (!accessToken) throw new Error('로그인이 필요합니다.');
+  // JWT 토큰 가져오기 (인증 체크 포함)
+  const accessToken = await checkAuthStatus();
 
   // 타임아웃 및 네트워크 예외 처리
   const controller = new AbortController();
@@ -57,13 +82,13 @@ export async function elevenLabsSTT(audioBlob: Blob): Promise<string> {
     else throw new Error('응답에서 텍스트를 찾을 수 없습니다.');
 
     return text.trim();
-  } catch (error: any) {
+  } catch (error: unknown) {
     clearTimeout(timeoutId);
 
-    if (error.name === 'AbortError') {
-      throw new Error('요청 시간이 초과되었습니다. 다시 시도해주세요.');
-    }
     if (error instanceof Error) {
+      if (error.name === 'AbortError') {
+        throw new Error('요청 시간이 초과되었습니다. 다시 시도해주세요.');
+      }
       throw error;
     } else {
       throw new Error('STT API 호출 중 알 수 없는 오류가 발생했습니다.');
