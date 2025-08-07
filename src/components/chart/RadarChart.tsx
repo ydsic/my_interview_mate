@@ -38,7 +38,7 @@ export default function RadarChart({ data }: RadarChartProps) {
   };
 
   return (
-    <div className="w-[450px] h-[300px] max-sm:w-[400px] max-sm:h-[250px] place-self-center">
+    <div className="w-[450px] h-[300px] max-sm:w-full max-sm:h-[270px] place-self-center">
       <Radar
         data={RadarData}
         options={{

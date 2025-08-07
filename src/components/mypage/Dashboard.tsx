@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useUserDataStore } from '../../store/userData';
 import DoughnutChart from '../chart/DoughnutChart';
+import BarChart from '../chart/BarChart';
 import LineChart from '../chart/LineChart';
 import RadarChart from '../chart/RadarChart';
 import { H2_content_title } from '../common/HTagStyle';
@@ -74,21 +75,47 @@ export default function Dashboard() {
 
   return (
     <div className="flex flex-col items-center gap-6 mb-5">
-      <section className="flex flex-col w-full bg-gradient-to-r from-blue-500 to-purple-500 p-[50px] rounded-4xl gap-3 text-white">
-        <p className="text-4xl font-bold"> 안녕하세요 {nickname} 님 👋</p>
-        <p> 지난 연습 기록을 한 눈에 확인해보세요. </p>
+      <section
+        className="flex flex-col w-full 
+      bg-gradient-to-r from-blue-500 to-purple-500 
+      p-[50px] rounded-4xl gap-3 text-white
+      max-sm:px-10
+      max-sm:pt-10   
+      max-sm:pb-8
+      
+      max-sm:w-[calc(100%+32px)]
+      max-sm:rounded-none  max-sm:gap-1"
+      >
+        <p
+          className="text-4xl font-bold
+        max-sm:text-2xl max-sm:font-medium"
+        >
+          안녕하세요 {nickname} 님 👋
+        </p>
+        <p className="max-sm:text-base">
+          지난 연습 기록을 한 눈에 확인해보세요.
+        </p>
 
-        <div className="flex flex-col items-center mt-10">
-          <div className="flex w-full justify-between">
+        <div className="flex flex-col items-center mt-10 max-sm:mt-8">
+          <div className="flex w-full justify-between items-center">
             <p> 평균 점수 </p>
-            <DoughnutChart score={avgScore} />
+            {/* 데스크톱 */}
+            <div className="hidden sm:block">
+              <DoughnutChart score={avgScore} />
+            </div>
+            {/* 모바일 */}
+            <div className="block sm:hidden w-full max-w-[220px]">
+              <BarChart score={avgScore} />
+            </div>
           </div>
-          <div className="flex w-full justify-around mt-15 border-t pt-8">
-            <div className="flex items-center gap-6">
+
+          {/* 하단부분 */}
+          <div className="flex w-full justify-around mt-15 max-sm:mt-3 border-t pt-8 max-sm:pt-10">
+            <div className="flex items-center gap-6 max-sm:gap-2">
               <p> 총 문제 수</p>
               <H2_content_title>{solvedCount} 개</H2_content_title>
             </div>
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-6 max-sm:gap-2">
               <p> 최고 점수</p>
               <H2_content_title>{bestScore} 점</H2_content_title>
             </div>
@@ -96,13 +123,19 @@ export default function Dashboard() {
         </div>
       </section>
 
-      <section className="flex w-full justify-between gap-3">
-        <div className="flex-col bg-white w-full p-5 rounded-4xl shadow-md">
+      <section className="grid md:grid-cols-2 gap-5 w-full max-sm:max-w-[340px] mx-auto max-sm:pb-5">
+        <div
+          className="bg-white p-5 rounded-4xl shadow-md
+        w-full max-sm:max-w-full max-sm:overflow-hidden"
+        >
           <p className="font-semibold">점수 변화 추이</p>
           <LineChart days={lineDays} data={lineData} />
         </div>
-        <div className="flex-col items-center bg-white w-full p-5 rounded-4xl shadow-md">
-          <p className="font-semibold">역량 분석</p>
+        <div
+          className="bg-white p-5 rounded-4xl shadow-md
+        w-full max-sm:max-w-full max-sm:overflow-hidden"
+        >
+          <p className="w-full font-semibold">역량 분석</p>
           <RadarChart data={RadarData} />
         </div>
       </section>
