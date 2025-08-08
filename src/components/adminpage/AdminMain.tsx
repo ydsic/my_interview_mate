@@ -12,10 +12,14 @@ export default function AdminMainPage({
   onQuestionClick,
 }: AdminPageProps) {
   return (
-    <div className="h-full bg-gray-50 flex justify-center items-center gap-8">
+    <div className="h-full bg-gray-50 flex flex-wrap justify-center items-center gap-8 p-4">
       <Link
         to="user"
-        className="w-96 h-96 bg-white border-2 border-gray-200 flex flex-col justify-center items-center rounded-2xl shadow-lg hover:shadow-xl transition-shadow cursor-pointer"
+        className="w-full sm:w-80 lg:w-96 h-64 sm:h-80 lg:h-96 
+        bg-white border-2 border-gray-200 
+        flex flex-col justify-center items-center 
+        rounded-2xl shadow-lg hover:shadow-xl 
+        transition-shadow cursor-pointer"
         onClick={onUserClick}
       >
         <FontAwesomeIcon icon={faUsers} size="3x" />
@@ -26,7 +30,11 @@ export default function AdminMainPage({
 
       <Link
         to="question"
-        className="w-96 h-96 bg-white border-2 border-gray-200 flex flex-col justify-center items-center rounded-2xl shadow-lg hover:shadow-xl transition-shadow cursor-pointer"
+        className="w-full sm:w-80 lg:w-96 h-64 sm:h-80 lg:h-96 
+        bg-white border-2 border-gray-200 
+        flex flex-col justify-center items-center 
+        rounded-2xl shadow-lg hover:shadow-xl 
+        transition-shadow cursor-pointer"
         onClick={onQuestionClick}
       >
         <FontAwesomeIcon icon={faQuestion} size="3x" />
