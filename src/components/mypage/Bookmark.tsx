@@ -259,11 +259,12 @@ export default function Bookmark() {
             </motion.div>
 
             {/* 페이지네이션 */}
-            <div className="flex justify-center w-full gap-2">
+            <div className="flex justify-center w-full gap-1 sm:gap-2 text-sm sm:text-base max-sm:pb-7">
               <button
                 onClick={() => handlePageChange(Math.max(pageParam - 1, 1))}
                 disabled={pageParam === 1}
-                className="px-4 py-2 rounded bg-gray-40 text-black disabled:opacity-50 cursor-pointer"
+                className="px-2 py-1 sm:px-4 sm:py-2 rounded bg-gray-40 text-black text-sm sm:text-base
+               disabled:opacity-50 cursor-pointer"
               >
                 이전
               </button>
@@ -295,7 +296,8 @@ export default function Bookmark() {
                   )
                 }
                 disabled={pageParam >= Math.ceil(total / PAGE_SIZE)}
-                className="px-4 py-2 rounded bg-gray-40 text-black disabled:opacity-50 cursor-pointer"
+                className="px-2 py-1 sm:px-4 sm:py-2 rounded bg-gray-40 text-black text-sm sm:text-base
+               disabled:opacity-50 cursor-pointer"
               >
                 다음
               </button>
