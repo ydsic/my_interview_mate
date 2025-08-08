@@ -12,6 +12,7 @@ export default function Nav() {
   const admin = useUserDataStore((state) => state.userData.admin);
   const clearUserData = useUserDataStore((state) => state.clearUserData);
   const toast = useToast();
+  const isMobile = window.matchMedia('(max-width: 640px)').matches;
 
   // 로그아웃 더블 클릭 상태 관리
   const [logoutClickCount, setLogoutClickCount] = useState(0);
@@ -33,7 +34,12 @@ export default function Nav() {
     if (logoutClickCount === 0) {
       // 첫 번째 클릭
       setLogoutClickCount(1);
-      toast('로그아웃하려면 \n3초 내에 다시 한 번 클릭하세요.', 'info');
+      toast(
+        isMobile
+          ? '3초 안에 한 번 더 클릭하면\n로그아웃이 완료돼요.'
+          : '3초 안에 한 번 더 클릭하면 로그아웃이 완료돼요.',
+        'info',
+      );
 
       // 3초 후 상태 초기화
       logoutTimeoutRef.current = setTimeout(() => {
@@ -51,7 +57,7 @@ export default function Nav() {
       setIsLoggedIn(false);
       clearUserData();
       navigate('/');
-      toast('로그아웃이 되었습니다!', 'success');
+      toast('로그아웃 되었습니다.', 'success');
     }
   };
 
