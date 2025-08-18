@@ -34,7 +34,7 @@ function LayoutWrapper() {
     </DefaultLayout>
   );
 }
-
+// 테스트
 export default function App() {
   const setIsLoggedIn = useLoggedInStore((state) => state.setIsLoggedIn);
   const setUserData = useUserDataStore((state) => state.setUserData);
